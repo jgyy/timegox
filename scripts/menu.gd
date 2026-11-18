@@ -28,10 +28,10 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Root & Rites", "In Their Own Words", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "The Land", "The Way", "The Law", "The Wild", "The Almanac", "Bestiary", "World Map", "Annals", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "rites", "words", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "land", "way", "law", "wild", "almanac", "bestiary", "map", "annals", "resume"]
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Root & Rites", "In Their Own Words", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "The Land", "The Way", "The Law", "The Wild", "The Almanac", "Bestiary", "World Map", "Annals", "Seals & Lists", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "rites", "words", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "land", "way", "law", "wild", "almanac", "bestiary", "map", "annals", "seals", "resume"]
 		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, true, true, Game.companion or Game.bond > 0,
-			Game.dao != "" or not Game.met.is_empty(), Game.prologue == "", not Game.pages.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
+			Game.dao != "" or not Game.met.is_empty(), Game.prologue == "", not Game.pages.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, Game.done(Seals.OPEN), true]
 	elif mode == "bestiary":
 		labels = []
 		ids = []
@@ -67,7 +67,7 @@ func _build() -> void:
 		labels.append("Back")
 		ids.append("back")
 		enabled.append(true)
-	elif mode == "way" or mode == "almanac" or mode == "wild":
+	elif mode == "way" or mode == "almanac" or mode == "wild" or mode == "seals":
 		# creed.gd, almanac.gd, wilds.gd: a page to read
 		labels = ["Back"]
 		ids = ["back"]
@@ -255,7 +255,7 @@ func press(act: String) -> void:
 				var k := ls.find(map_layer)
 				map_layer = ls[(k + (1 if act == "right" else -1) + ls.size()) % ls.size()]
 		"cancel":
-			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words"]:
+			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words", "seals"]:
 				mode = "root"
 				cursor = 0
 				_build()
@@ -344,7 +344,7 @@ func press(act: String) -> void:
 				"forbidden":
 					main.pop()
 					main.open_forbidden()
-				"works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words":
+				"works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words", "seals":
 					mode = id
 					cursor = 0
 					msg = ""
@@ -521,6 +521,43 @@ func _draw_way() -> void:
 		var ax2: Dictionary = Creed.AXIS[str(c.axis)]
 		UI.text(self, Vector2(r.position.x + 24, y + 22.0 * float(i + 1)), "%s %+d" % [str(ax2.pos if int(c.d) > 0 else ax2.neg), absi(int(c.d))], 13, ax2.col if int(c.d) > 0 else ax2.neg_col)
 		UI.text(self, Vector2(r.position.x + 170, y + 22.0 * float(i + 1)), str(c.why), 13, UI.C_TEXT)
+
+## Seals & Lists (the Red Seal release: seals.gd, lists.gd, auction.gd): the paper of every Dao there is, with the
+## grade his is sealed at; the three meets and where he came in them; and what he has bought with a hammer.
+func _draw_seals() -> void:
+	UI.text(self, Vector2(60, 70), "Seals & Lists", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 16)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	UI.text(self, r.position + Vector2(24, 40), "The papers of the Hall of Seals", 20, UI.C_GOLD)
+	UI.text(self, r.position + Vector2(420, 40), "%d of %d held" % [Seals.count(Game), Seals.order().size()], 14, UI.C_DIM)
+	var y := r.position.y + 62.0
+	var k := 0
+	for id in Seals.order():
+		var col := float(k % 2)
+		var px := r.position.x + 24.0 + 384.0 * col
+		var py := y + 30.0 * float(k / 2)
+		var gn := Seals.grade_name(Game, id)
+		var held := Seals.grade(Game, id) > 0
+		# a leaf of paper, and on it a square of red where it is sealed
+		draw_rect(Rect2(px, py, 368, 26), Color(0.93, 0.9, 0.82, 0.92 if held else 0.14))
+		if held:
+			draw_rect(Rect2(px + 336, py + 3, 20, 20), Color("b83a2a"))
+			draw_rect(Rect2(px + 340, py + 7, 12, 12), Color(0.93, 0.9, 0.82), false, 1.5)
+		var pn := Seals.name_of(id).trim_prefix("Paper of the ").trim_prefix("Abjuration: ")
+		UI.text(self, Vector2(px + 8, py + 18), pn, UI.fit(pn, 14, 236, 10), Color("2a2420") if held else UI.C_DIM)
+		UI.text(self, Vector2(px + 256, py + 18), gn if gn != "" else ("to be sat" if Seals.due(Game, id) > 0 else "-"), 13, Color("8a2a20") if held else (UI.C_RED if gn == "void" else UI.C_DIM))
+		k += 1
+	y += 30.0 * float((k + 1) / 2) + 26.0
+	UI.text(self, Vector2(r.position.x + 24, y), "The lists", 20, UI.C_GOLD)
+	y += 8.0
+	for ln in Lists.text(Game).split("\n"):
+		y += 21.0
+		UI.text(self, Vector2(r.position.x + 24, y), main.told(ln), 14, UI.C_TEXT)
+	y += 40.0
+	UI.text(self, Vector2(r.position.x + 24, y), "The rooms", 20, UI.C_GOLD)
+	UI.wrapped(self, Vector2(r.position.x + 24, y + 24.0), Auction.text(Game), 14, UI.C_TEXT, r.size.x - 48)
+	UI.wrapped(self, Vector2(r.position.x + 24, r.position.y + r.size.y - 44.0), "A desk of the Hall, a board of the lists and an auction room are at the counter of whoever answers for a town. The post goes both ways now: letters of his own, parcels home, sealed bids.", 12, UI.C_DIM, r.size.x - 48)
 
 ## The Law (crime.gd, taboo.gd): how he stands with the gates of the land, the price on his head town by town,
 ## what is charged, who is dead by his hand, and how deep he has sat to what the precepts forbid.
@@ -1627,6 +1664,9 @@ func _draw() -> void:
 		return
 	if mode == "wild":
 		_draw_wild()
+		return
+	if mode == "seals":
+		_draw_seals()
 		return
 	if mode == "body":
 		_draw_body()

@@ -195,7 +195,7 @@ const PAGES := {
 		"They did not want me. I was told so. A king keeps grooms; he has no use for whatever I am. So for three days I sat on the wall outside and watched you carry water.",
 		"I have seen you beaten bloody and I have seen you hold up the sky. I had never seen you take an order from somebody who did not care if you lived. You said: yes. You said it properly. I bit through my sleeve.",
 		"When you came out you smelled of horse and you would not look at me. I am writing this so that you know I was not ashamed of you for one breath of it. I was ashamed of the wall I sat on."]},
-	"p38_fuchai_up_lin": {"n": "The Day I Did Not Lose", "who": "lin", "after": "s_p38_fuchai", "if": ["fuchai", "up"], "lines": [
+	"p38_fuchai_up_lin": {"n": "The Day I Did Not Lose", "who": "lin", "after": "s_p38_spared", "if": ["fuchai", "up"], "lines": [
 		"He decides an hour before he strikes. That is the whole secret, and it is not much of one. Whatever you do in front of him he is answering something earlier. If you know the hour, there is a door in it.",
 		"I beat a king who stood realms above me. People will say: the root. It was not the root. It was standing in a yard being looked through by his grooms until I had seen what there was to see.",
 		"Goujian asked me how it felt. I said I did not know yet. He said that was the right answer, and that he had spent twenty years finding out what the other one felt like."]},
@@ -207,7 +207,7 @@ const PAGES := {
 		"I bound the knee. I have mended you more times than I have counted, and it was the first time what I closed did not close all the way. I said it would. I do not lie to you often. I am writing down that I did.",
 		"The man in the cart told you to cook. A hundred thousand fires the first night, fifty thousand the next, thirty the third, so that somebody counting would think you were running away.",
 		"You lit two fires, and sat by the second with your leg out straight, and laughed for the first time since. You said: he counts. You said it the way you used to say where the broom was kept."]},
-	"p38_pang_up_lin": {"n": "A General Who Counts", "who": "lin", "after": "s_p38_pang", "if": ["pang_juan", "up"], "lines": [
+	"p38_pang_up_lin": {"n": "A General Who Counts", "who": "lin", "after": "s_p38_cart", "if": ["pang_juan", "up"], "lines": [
 		"He counts everything. Fires, tents, hoofprints. I let him count me, and showed him a little less than there was. He had a number for me before we began, and the number was wrong.",
 		"I beat him. He stood realms above me, and was quicker, and better read. He lost because he was certain. I have been certain. I know that door from the inside.",
 		"Sun Bin did not thank me. He looked at my knees, both of them, for some time, and then asked whether I would push the cart as far as the road."]},
@@ -217,16 +217,34 @@ const PAGES := {
 		"Lin Xiangru once faced a king down over a piece of jade and then turned his carriage aside for this same man. I had heard that as a story about meekness. It is a story about knowing which fights are yours."]},
 	"p38_lian_down_yue": {"n": "The Ditch", "who": "yue", "after": "s_p38_lian", "if": ["lian_po", "down"], "lines": [
 		"I said: go round. I said it twice. You have listened to me about gods and seas and what to do with heaven, and you would not listen to me about a ditch.",
-		"It was not him you were fighting. You had lost to two of them by then and you wanted, very badly, to stand in a road and have it be yours. I know. I have wanted to be let through a door too.",
+		"It was not him you were fighting. You had stood under three of them by then and you wanted, very badly, to stand in a road and have it be yours. I know. I have wanted to be let through a door too.",
 		"I am not angry now. I was. I went and helped an old woman pick up her onions out of the lane while you lay there, and she said: yours? And I said yes, and it was not all pride."]},
-	"p38_lian_up_lin": {"n": "Thorns", "who": "lin", "after": "s_p38_lian", "if": ["lian_po", "up"], "lines": [
+	"p38_lian_up_lin": {"n": "Thorns", "who": "lin", "after": "s_p38_rods", "if": ["lian_po", "up"], "how": ["lian_po", ["gave"]], "lines": [
 		"I put up my sword and went round by the ditch. He shouted after me. It was the hardest stroke I have made in thirty-eight chapters and it does not look like anything.",
 		"Three days later he came to the door stripped to the waist with a bundle of thorn rods on his back, and knelt, and asked to be beaten. An old man with forty wounds, all in front.",
 		"I did not beat him. I gave him tea. It turns out that not everybody who stands above you is in your way. Some of them are only standing there, hoping to be asked in."]},
+	# (the Red Seal release: the journey that beat him writes of that, and not of a ditch it never went by)
+	"p38_lian_won_lin": {"n": "Thorns, All the Same", "who": "lin", "after": "s_p38_rods", "if": ["lian_po", "up"], "how": ["lian_po", ["won"]], "lines": [
+		"I beat him. In his own lane, with the carters looking on. It was the best fighting I have done and I knew before he had finished falling that it was the wrong thing to have been good at.",
+		"Three days later he came to the door stripped to the waist with a bundle of thorn rods on his back, and knelt, and asked to be beaten. An old man with forty wounds, all in front.",
+		"I did not beat him a second time. I gave him tea. The minister went round by the ditch for ten years and got a friend. I went through, and got a lane. I can count."]},
 	"p38_low": {"n": "Why the Sea Is King", "who": "yue", "after": "s_p38_end", "lines": [
-		"The sea is king of a hundred valleys because it lies below them. The Elder read you that, and you nodded as if you had always known, and you had not. You learned it this season, on your back, and I watched.",
+		"The sea is king of a hundred valleys because it lies below them. The Elder read you that, and you nodded as if you had always known, and you had not. You learned it this season, from below, and I watched.",
 		"I have followed somebody who could not lose. I did not know until now that I had been waiting to see what you were when you could.",
-		"You are the same. That is all I have to report. You got up, and paid what it cost, and asked the next person their name. I had hoped. It is another thing to know."]},
+		"You are the same. That is all I have to report. You came back, and paid what it cost, and asked the next person their name. I had hoped. It is another thing to know."]},
+	# ---- Part XXXIX: The Name That Can Be Named (the Red Seal release)
+	"p39_ring": {"n": "What I Said in the Yard", "who": "lin", "after": "s_p39_outer", "lines": [
+		"I said something across a ring today. I had never done that. I have fought things with nine heads and never once told one of them what I thought of its footwork.",
+		"It worked, or it did not: I am not writing about that. I am writing that I had it ready. It was sitting there, whole, with an edge on it. I have been polite for nine years and it turns out I was keeping a list.",
+		"Yue Ling says everybody has a list. She says the difference is whether you read it out. I think the difference is who you read it to. I should not like to read mine to somebody it would stay with."]},
+	"p39_paper": {"n": "A Paper with My Name on It", "who": "yue", "after": "s_p39_end", "lines": [
+		"You carried the first three as if they were hot. I watched you put them inside your robe, and take them out, and put them in your sleeve instead. You have never owned anything you were afraid of creasing.",
+		"I thought it would change you. That is the truth, and I am writing it here because I did not say it. I thought a man told in red ink what he is might begin to be that, and stop being the other things.",
+		"You kept the blank one. Of all of them. I knew then. I have a paper too, you know, and mine says Proven, and I looked at it tonight, and I find I like yours better."]},
+	"p39_last": {"n": "The Top Ten Steps", "who": "elder", "after": "s_break44", "lines": [
+		"The child has a blank paper with a seal on it, and I have a broom. I swept the top ten steps this evening. It took me an hour, and the corners are still wrong. I have ruled this mountain for seventy years and I cannot sweep it.",
+		"A registrar asked me what the child is. I have had a month to think. The child is whoever did the steps before I was awake, every morning, for three years, when nobody was keeping a column. Everything since has been a guest in that house.",
+		"I am eighty, and I was certified today, by a boy, in nothing. I should like it known that I have never held a grade I was prouder of."]},
 	"p38_last": {"n": "In My Own Hand", "who": "lin", "after": "s_break43", "lines": [
 		"These pages were her idea. She said a story told only from over somebody's shoulder is a story about a back. So here is the front of it.",
 		"I am Lin Feng. I swept steps. I was handed a root I did not earn and a companion I did not deserve, and I climbed until there was nobody above me, and then three people walked down a mountain and there was.",
@@ -236,7 +254,7 @@ const ORDER := ["p01_post", "p01_broom", "p01_gate", "p02_emperor", "p03_hollow"
 	"p13_gates", "p14_karma", "p15_woven", "p16_year", "p17_spring", "p18_fire", "p19_works", "p20_hollow", "p21_arms", "p22_roads", "p23_host", "p24_horse", "p25_town", "p26_springs", "p27_sack",
 	"p28_grass", "p29_chimney", "p30_net", "p31_shoe", "p32_mirror", "p33_pestle", "p34_road", "p35_block", "p36_fish", "p37_round",
 	"p38_word", "p38_fuchai_down_lin", "p38_fuchai_down_yue", "p38_fuchai_up_lin", "p38_pang_down_lin", "p38_pang_down_yue", "p38_pang_up_lin",
-	"p38_lian_down_lin", "p38_lian_down_yue", "p38_lian_up_lin", "p38_low", "p38_last"]
+	"p38_lian_down_lin", "p38_lian_down_yue", "p38_lian_up_lin", "p38_lian_won_lin", "p38_low", "p38_last", "p39_ring", "p39_paper", "p39_last"]
 
 static var _by_step := {}
 
@@ -260,6 +278,9 @@ static func open(g, id: String) -> bool:
 	if who == "yue" and not bool(g.companion):
 		return false
 	if p.has("if") and Betters.branch(g, str(p["if"][0])) != str(p["if"][1]):
+		return false
+	# (the Red Seal release: and a page may be of how the first bout went: he bowed, or he won)
+	if p.has("how") and not str(g.bested.get(str(p.how[0]), {}).get("first", "")) in p.how[1]:
 		return false
 	return true
 

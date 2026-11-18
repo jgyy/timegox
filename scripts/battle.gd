@@ -46,6 +46,13 @@ var suppress_note := ""
 var doomed := false
 ## the Higher Sky release (betters.gd): the better this bout is with ("" for any other battle)
 var better := ""
+## the Red Seal release (lists.gd): the meet this bout is of ("" for any other battle), what has been said across
+## the ring in it, how the rail leans, and whether something has been said this turn already
+var meet := ""
+var said := {}
+var crowd := 0
+var word_turn := false
+var ring_root: Node3D = null
 var crest := 99
 var acts := {"blows": 0, "mends": 0}
 var closed_said := false
@@ -182,6 +189,7 @@ func _stage_for(th: String) -> Dictionary:
 		tm.set_instance_color(i, Color(1, 1, 1, 1))
 	var ti := MultiMeshInstance3D.new()
 	ti.multimesh = tm
+	ti.name = "tufts"
 	ti.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	n.add_child(ti)
 	# far horizon silhouettes and a big celestial body
@@ -286,7 +294,12 @@ func start(foe_list: Array, c: Dictionary) -> void:
 	_clear_fighters()
 	party.clear()
 	foes.clear()
-	for i in Game.party_size():
+	# (the Red Seal release, lists.gd: a bout of the lists is fought alone; she is at the rail)
+	meet = str(c.get("meet", ""))
+	said = {}
+	crowd = 0
+	word_turn = false
+	for i in (1 if meet != "" else Game.party_size()):
 		party.append(Game.fighter(i))
 	foes = Data.make_foes(foe_list)
 	# the path taken through a trial shapes the battle: a talisman, allies, a bought advantage
@@ -395,6 +408,10 @@ func start(foe_list: Array, c: Dictionary) -> void:
 			stages[k].node.visible = false
 		var st: Dictionary = _stage_for(theme)
 		st.node.visible = true
+		# (the Red Seal release: the ring of a meet is boarded: no grass grows through the planks)
+		var tufts = st.node.get_node_or_null("tufts")
+		if tufts != null:
+			tufts.visible = meet == ""
 		cam.environment = st.env
 		Look.apply_lights(theme, sun, fill)
 		# the Living Land release: a battle is fought at the hour it was met (a tribulation brings its
@@ -442,6 +459,16 @@ func start(foe_list: Array, c: Dictionary) -> void:
 		say("This is not a thing that is beaten. (Give way, or stand as long as can be stood.)")
 	if better != "":
 		say("This is somebody above you. (It can be won. Losing will cost something, and so will giving way.)")
+	if meet != "":
+		ctx["said"] = said
+		ctx["crowd"] = 0
+		say("%s, %s: one against one. (Words can be said across the ring. Losing puts him out of the meet, and nothing else.)" % [str(Lists.MEETS[meet].n), str(Lists.ROUNDS[int(c.get("round", 0))].n)])
+	if ring_root != null and is_instance_valid(ring_root):
+		ring_root.queue_free()
+		ring_root = null
+	if meet != "" and not headless():
+		ring_root = _ring()
+		scene3d.add_child(ring_root)
 
 func say(s: String) -> void:
 	log_lines.append(s)
@@ -487,12 +514,22 @@ func _next_turn() -> void:
 				_fall(false)
 			elif better != "":
 				_bested(false)
+			elif meet != "":
+				_out(false)
 			else:
 				_lose()
 			return
 		if order.is_empty():
 			round_no += 1
 			Tactics.new_round(wits, round_no)
+			# (lists.gd: the rival has something to say as a round begins, and so has somebody at the rail)
+			if meet != "":
+				var jr := Lists.jeer(str(foes[0].id), round_no)
+				if jr != "":
+					say("%s: \"%s\"" % [str(foes[0].name), jr])
+					fx.append({"text": "jeers", "p": head3(foes[0]), "t": 1.2, "col": Color("f0d890"), "slash": ""})
+				elif round_no == 2 and Game.companion:
+					say(main.told(str(Lists.RAIL[int(Game.bouts) % Lists.RAIL.size()])))
 			# (dooms.gd: it mends, it comes on harder, and on the round it crests it goes over them)
 			if doomed:
 				if round_no > crest:
@@ -649,6 +686,9 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 	var raw: float = a.atk * mult * randf_range(0.9, 1.1) * em - tgt.def * 0.5 * guard
 	if a.side == "party" and tgt.has("marked"):
 		raw *= float(tgt.marked)
+	# (the Red Seal release, lists.gd: somebody a word has opened takes more of what reaches him)
+	if a.side == "party" and tgt.has("opened"):
+		raw *= float(tgt.opened)
 	# (tactics.gd: a foe that drew back and guards takes half of what reaches it)
 	if tgt.get("braced", false):
 		raw *= Tactics.BRACE_TAKEN
@@ -858,6 +898,7 @@ func _use_item(actor: Dictionary, item: String, tgt: Dictionary) -> void:
 	_end_action()
 
 func _end_action() -> void:
+	word_turn = false
 	state = "acting"
 	timer = 0.95
 	labels.clear()
@@ -960,6 +1001,97 @@ func _bested(gave: bool) -> void:
 			if p.has("model") and not gave and not p.dead:
 				Models.act(p.model, "die", t)
 
+## The Red Seal release (lists.gd): a bout of the lists is lost (`gave`: he stepped out of the ring).  He is out
+## of the meet at the place the round is worth; nobody is carried home and nothing is taken.
+func _out(gave: bool) -> void:
+	outcome = "out"
+	state = "result"
+	ctx["how"] = "gave" if gave else "lost"
+	ctx["rounds"] = round_no
+	result_lines = ["STEPPED OUT" if gave else "OUT OF THE LISTS", "%s goes through to the next round." % str(foes[0].name), "Nobody is carried home. The board is wiped at that name."]
+	_writeback()
+	if not headless():
+		for p in party:
+			if p.has("model") and not gave and not p.dead:
+				Models.act(p.model, "kneel", t)
+
+## Something is said across the ring (lists.gd `word`): it does what it does to whoever it is said to, and
+## the turn is still his.
+func _say_word(w: String) -> void:
+	var f: Dictionary = foes[0]
+	var e: Dictionary = Lists.word(str(f.id), w)
+	said[w] = true
+	word_turn = true
+	crowd += int(e.crowd)
+	ctx["crowd"] = crowd
+	f.atk = float(f.atk) * float(e.atk)
+	f["opened"] = float(f.get("opened", 1.0)) * float(e.open)
+	cur.atk = float(cur.atk) * float(e.mine)
+	say(main.told(str(Lists.SAID[w])))
+	say(str(e.say) % str(f.name))
+	fx.append({"text": str(Lists.WORDS[w].n).to_lower(), "p": head3(cur), "t": 1.2, "col": Color("f0d890"), "slash": ""})
+	if int(e.crowd) != 0:
+		fx.append({"text": "the rail likes it" if int(e.crowd) > 0 else "the rail does not like it", "p": head3(f) + Vector3(0, 0.8, 0), "t": 1.4, "col": Color("c8e8b0") if int(e.crowd) > 0 else Color("e8a8a0"), "slash": ""})
+	_open_main()
+
+## The ring of a meet: a low platform of planks with a post at each corner and a rope between them, banners
+## behind, lanterns, and the rail of people who have come to see it (drawn only).
+func _ring() -> Node3D:
+	var root := Node3D.new()
+	var b := MB.new()
+	var wood := MB.tag(Color("8a6a44"), MB.WOOD)
+	var dark := MB.tag(Color("4a3626"), MB.WOOD)
+	var red := MB.tag(Color("b83a2a"), MB.CLOTH)
+	var rope := MB.tag(Color("d8c898"), MB.CLOTH)
+	b.box(Vector3(0.2, 0.03, 0.0), Vector3(17.0, 0.06, 11.0), wood)
+	for k in 9:
+		b.box(Vector3(-7.8 + 2.0 * k, 0.065, 0.0), Vector3(0.05, 0.012, 11.0), dark)
+	var corners := [Vector3(-8.3, 0, -5.5), Vector3(8.7, 0, -5.5), Vector3(8.7, 0, 5.5), Vector3(-8.3, 0, 5.5)]
+	for ci in 4:
+		var c0: Vector3 = corners[ci]
+		b.cyl(c0 + Vector3(0, 0.7, 0), 0.09, 1.4, dark, Vector3.ZERO, 8)
+		b.box(c0 + Vector3(0, 1.45, 0), Vector3(0.24, 0.1, 0.24), red)
+		# (the side towards the camera is left open, so that nothing crosses the fighters)
+		if ci != 2:
+			var c1: Vector3 = corners[(ci + 1) % 4]
+			for h in [0.55, 1.0]:
+				b.limb(c0 + Vector3(0, h, 0), c1 + Vector3(0, h, 0), 0.025, 0.025, rope, 5)
+	# banners behind, and the board with eight names
+	for k in 5:
+		var bx := -6.0 + 3.2 * k
+		b.cyl(Vector3(bx, 2.2, -7.2), 0.05, 4.4, dark, Vector3.ZERO, 6)
+		b.box(Vector3(bx + 0.42, 3.3, -7.2), Vector3(0.75, 1.9, 0.02), MB.tag([Color("b83a2a"), Color("e8d8a8"), Color("2a5a7a"), Color("e8d8a8"), Color("b83a2a")][k], MB.CLOTH))
+	b.box(Vector3(0.2, 1.5, -6.4), Vector3(2.6, 1.5, 0.08), MB.tag(Color("e8e0c8"), MB.WOOD))
+	for k in 8:
+		b.box(Vector3(-0.85 + 0.3 * (k % 4) + (0.9 if k >= 4 else 0.0) * 0.0, 1.85 - 0.6 * float(k / 4), -6.35), Vector3(0.05, 0.42, 0.01), MB.tag(Color("1c1814"), MB.WOOD))
+	for sx in [-9.6, 10.0]:
+		b.cyl(Vector3(sx, 1.3, -4.0), 0.05, 2.6, dark, Vector3.ZERO, 6)
+		b.sph(Vector3(sx, 2.5, -4.0), Vector3(0.26, 0.32, 0.26), MB.tag(Color("f0b050"), MB.CRYSTAL))
+	MB.mesh_node(root, b.build())
+	# the rail: people of the towns, in a row behind the ropes and at either end
+	var bodies := ["folk_youth", "folk_maiden", "folk_grandpa", "folk_merchant", "folk_farmer", "folk_shopwife", "folk_scholar", "folk_porter", "folk_grandma", "folk_guard", "folk_boy", "folk_farmwife"]
+	var cols := [Color("6a7a5a"), Color("8a5a4a"), Color("5a6a8a"), Color("8a7a4a"), Color("7a5a7a"), Color("4a6a6a")]
+	var rail: Array = []
+	for k in 12:
+		rail.append([Vector3(-7.4 + 1.3 * k + 0.25 * float(k % 3), 0, -6.0 - 0.5 * float(k % 2)), 0.0])
+	for k in 4:
+		rail.append([Vector3(-9.6, 0, -3.2 + 1.5 * k), PI / 2.0])
+		rail.append([Vector3(10.0, 0, -3.2 + 1.5 * k), -PI / 2.0])
+	for k in rail.size():
+		var pm := Models.person(cols[k % cols.size()], cols[(k + 2) % cols.size()].darkened(0.5), {"asset": bodies[(k * 5 + 3) % bodies.size()]})
+		pm.position = rail[k][0]
+		pm.rotation.y = float(rail[k][1])
+		pm.set_meta("rail", true)
+		root.add_child(pm)
+		if k % 3 == 0:
+			Models.act(pm, "cheer", t + 0.4 * k)
+	if Game.companion:
+		var ym := Models.person(Color("e8a8b8"), Color("2a2020"), {"asset": "yue_ling"})
+		ym.position = Vector3(-9.6, 0, 3.9)
+		ym.rotation.y = PI / 2.0
+		root.add_child(ym)
+	return root
+
 func _writeback() -> void:
 	for p in party:
 		Game.hp[p.idx] = maxf(1.0, p.hp)
@@ -983,6 +1115,25 @@ func _open_main() -> void:
 		labels.append("Give way")
 		ids.append("yield")
 		enabled.append(true)
+	# (lists.gd: in a bout of the lists nobody flees: he may step out of the ring, and he may say something)
+	if meet != "":
+		labels[3] = "Step out"
+		ids[3] = "yield"
+		enabled[3] = true
+		labels.append("Words")
+		ids.append("words")
+		enabled.append(not word_turn and said.size() < Lists.WORD_ORDER.size())
+	cursor = 0
+
+func _open_words() -> void:
+	menu_kind = "words"
+	labels = []
+	ids = []
+	enabled = []
+	for w in Lists.WORD_ORDER:
+		labels.append(str(Lists.WORDS[w].n))
+		ids.append(w)
+		enabled.append(not said.has(w))
 	cursor = 0
 
 func _open_skills() -> void:
@@ -1069,10 +1220,14 @@ func _select() -> void:
 					_open_items()
 				"yield":
 					say("%s puts up the sword, and stands aside." % cur.name if cur.idx == 0 else "%s lowers both hands, and stands aside." % cur.name)
-					if better != "":
+					if meet != "":
+						_out(true)
+					elif better != "":
 						_bested(true)
 					else:
 						_fall(true)
+				"words":
+					_open_words()
 				"flee":
 					say("%s tries to flee..." % cur.name)
 					if randf() < 0.6:
@@ -1097,6 +1252,8 @@ func _select() -> void:
 					_perform(cur, sid, party if s.get("revive", false) else alive(party))
 				"ally":
 					_open_targets(party)
+		"words":
+			_say_word(str(ids[cursor]))
 		"items":
 			pending = {"skill": "", "item": ids[cursor]}
 			_open_targets(party)

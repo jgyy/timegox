@@ -223,6 +223,8 @@ const PICKUP_COLORS := {
 	"last_scale": Color("a8c8c0"), "pulled_ear": Color("b8c060"), "blind_coin": Color("e8b830"),
 	# Part XXXVII (the Five Hands release)
 	"wet_cinder": Color("8a8a90"), "boundary_stake": Color("4a4238"), "scorched_peg": Color("c8a868"),
+	# Part XXXIX (the Red Seal release)
+	"entry_tally": Color("c8b070"), "turnip_seal": Color("c83a2a"), "half_stick": Color("8a6a44"),
 	# Part XXXVIII (the Higher Sky release)
 	"bed_gall": Color("5a6a3a"), "war_slip": Color("c8b070"), "linchpin": Color("5a5a62"),
 	"charred_shingle": Color("4a3a30"), "crane_feather": Color("f4f4f8"), "furrow_piece": Color("e8c040"),

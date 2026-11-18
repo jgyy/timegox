@@ -116,6 +116,10 @@ const LATE := {
 	"dragon": {-1: {"pool": [["stable_fork", 126, 126], ["tribute_chest", 126, 126], ["hung_gall", 126, 126]], "n": 6, "vis": "s_p38_home"}},
 	"maple": {-1: {"pool": [["counted_fire", 127, 127], ["forced_march", 127, 127], ["barked_tree", 127, 127]], "n": 9, "vis": "s_p38_home"}},
 	"terraces": {-1: {"pool": [["barred_lane", 128, 128], ["old_scar", 128, 128], ["turned_cart", 128, 128]], "n": 10, "vis": "s_p38_home"}},
+	# Part XXXIX (the Red Seal release): names with nothing in them, in three caves no chapter had used
+	"frost": {-1: {"pool": [["straw_champion", 129, 129], ["scroll_form", 129, 129], ["empty_title", 129, 129]], "n": 10, "vis": "s_p39_home"}},
+	"dunes": {-1: {"pool": [["turnip_stamp", 130, 130], ["sold_name", 130, 130], ["ink_blot", 130, 130]], "n": 10, "vis": "s_p39_home"}},
+	"yanggu": {-1: {"pool": [["white_not_horse", 131, 131], ["feathered_egg", 131, 131], ["halved_stick", 131, 131]], "n": 10, "vis": "s_p39_home"}},
 }
 
 ## the things to do in a cave (props.gd), in the order a cave takes them; a cave has `PER_CAVE` of them

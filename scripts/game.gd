@@ -374,6 +374,30 @@ var bowed := 0
 ## and (memoir.gd) the pages written in their own words (page -> the day), and the ones not yet read out
 var pages := {}
 var page_due: Array = []
+## the Red Seal release: the papers of his Daos (seals.gd: rite id -> {grade, day}); the meets (lists.gd: meet ->
+## {round, day, place, crowd, best, times, said}), what he said to whom across a ring, and the tallies; the
+## auction rooms (auction.gd: lots sold to him, where today's bidding stands, sealed bids in the post); and what
+## else the post now carries (mail.gd: who he wrote to, parcels waiting for him)
+var seals := {}
+var seals_sat := 0
+var meets := {}
+var said_to := {}
+var bouts := 0
+var bouts_won := 0
+var words_said := 0
+var purses := 0
+var lots := {}
+var lot_at := {}
+var lots_won := 0
+var lot_spent := 0
+var lot_saved := 0
+var step_bid := 0
+var sealed_bids: Array = []
+var parcels: Array = []
+var wrote := {}
+var letters_sent := 0
+var parcels_sent := 0
+var remitted := 0
 
 func _process(d: float) -> void:
 	if started and not finished:
@@ -649,6 +673,26 @@ func reset() -> void:
 	bowed = 0
 	pages = {}
 	page_due = []
+	seals = {}
+	seals_sat = 0
+	meets = {}
+	said_to = {}
+	bouts = 0
+	bouts_won = 0
+	words_said = 0
+	purses = 0
+	lots = {}
+	lot_at = {}
+	lots_won = 0
+	lot_spent = 0
+	lot_saved = 0
+	step_bid = 0
+	sealed_bids = []
+	parcels = []
+	wrote = {}
+	letters_sent = 0
+	parcels_sent = 0
+	remitted = 0
 	UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
 	hp = [float(max_hp(0)), 0.0]
 	qi = [float(max_qi(0)), 0.0]
@@ -686,13 +730,16 @@ func fighter(i: int) -> Dictionary:
 	# (needs.gd: the famished and the worn out strike less hard; 1 with survival off)
 	a *= Needs.mod(self, "atk")
 	# (betters.gd: and somebody carrying what a better left him with)
-	a *= Betters.mod(self, "atk")
+	# (the Red Seal release: the wound is his: Yue Ling used to limp with him)
+	if i == 0:
+		a *= Betters.mod(self, "atk")
 	# the Wandering Dao and the friendship of the Feathered Folk make Lin Feng quicker
 	var spd: int = Data.speed(level) + (2 + int(Fashion.yue_gear(self, "spd")) if i == 1 else 0)
 	if i == 0:
 		spd += int(dao_mod("spd", 0.0) + boon("spd", 0.0) + talent_mod("spd") + Arms.mod(self, "spd", 0.0))
 	spd += int(Needs.mod(self, "spd"))
-	spd = int(round(float(spd) * Betters.mod(self, "spd")))
+	if i == 0:
+		spd = int(round(float(spd) * Betters.mod(self, "spd")))
 	return {
 		"id": "pc%d" % i, "name": member_name(i), "side": "party", "idx": i, "lv": level, "boss": false,
 		"hp": hp[i], "maxhp": float(max_hp(i)), "qi": qi[i], "maxqi": float(max_qi(i)),
@@ -1088,6 +1135,7 @@ func advance() -> void:
 	step_sunder = 0
 	step_cook = 0
 	step_phase = 0
+	step_bid = 0
 	# the Three Burrows release (hold.gd): the town is founded when its steward has been heard out
 	if str(s.id) == Hold.FOUND_STEP:
 		Hold.found(self)
@@ -1222,6 +1270,15 @@ func poll_steps() -> void:
 				# Part XXXVII (phases.gd): so many things of the land turned by a phase since the step began (or
 				# so many times one phase overcame another, or was fed by it)
 				ok = step_phase >= int(s.n)
+			"seal":
+				# Part XXXIX (seals.gd): so many papers of the Hall of Seals held
+				ok = Seals.count(self) >= int(s.n)
+			"meet":
+				# Part XXXIX (lists.gd): a meet fought to an end, at whatever place
+				ok = Lists.finished(self, str(s.meet))
+			"bid":
+				# Part XXXIX (auction.gd): so many lots won in an auction room since the step began
+				ok = step_bid >= int(s.n)
 			"weal":
 				# Part XXVIII: so many towns of the land left the better for his coming since the step
 				# began (weal.gd)
@@ -1345,6 +1402,12 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(step_fit, int(s.n)), int(s.n)]
 	elif s.kind == "haul":
 		t += "  (%d/%d, %d carried)" % [mini(step_haul, int(s.n)), int(s.n), Toil.on_hand(self, s)]
+	elif s.kind == "seal":
+		t += "  (%d/%d)" % [mini(Seals.count(self), int(s.n)), int(s.n)]
+	elif s.kind == "bid":
+		t += "  (%d/%d)" % [mini(step_bid, int(s.n)), int(s.n)]
+	elif s.kind == "meet" and Lists.entered(self, str(s.meet)):
+		t += "  (%s: %s)" % [str(Lists.ROUNDS[int(meets[str(s.meet)].round)].n), str(Data.ENEMIES[Lists.rival(self, str(s.meet))].n)]
 	elif s.kind == "fate":
 		t += "  - a fated encounter: Esc > Fates"
 	if Trials.trial_of_step(s) != "" or s.kind == "gates":

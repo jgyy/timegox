@@ -78,6 +78,10 @@ const SHUT := {
 	"fare": "They look at the driver, and then at the bill on the gatepost, and decide that they will walk.",
 	"bag": "\"The town's seal, in a hand the town has a price on? Go and see the watch first. They are looking for you.\"",
 	"coach": "\"The coach carries the post. The post does not travel with a man whose bill is nailed to my own door.\"",
+	# the Red Seal release (seals.gd, lists.gd, auction.gd)
+	"seal": "\"The Hall of Seals writes what is so. What is so, at present, is nailed to the gate. Settle that first.\"",
+	"lists": "\"There is a bill at the gate with that face on it. The board takes names, not bills.\"",
+	"room": "The auctioneer looks at the door-keeper, and the door-keeper looks at the bill on the gatepost, and the lantern over the next lot is not lit.",
 	"gift": "\"The chest takes nothing from a hand the town is still owed for. Settle with the watch, and then come back.\"",
 }
 
