@@ -11123,3 +11123,87 @@ func _red_seal() -> void:
 	check(not dsrc40.contains("on this mountain eighty years") and not dsrc40.contains("Harbour-Master's counter") and not dsrc40.contains("counted three nights running") and not mmsrc40.contains("as far as the road") and not mmsrc40.contains("Three days later he came to the door"),
 		"the Elder's years, the Toll-Master's title, the two fires, the turning and the mouth of the cave agree with what was said before")
 	check(not dsrc40.contains("sending boys") and not dsrc40.contains("like a man trying to hold a tray") and not mmsrc40.contains("a man told in red ink"), "nobody calls a hero who may be a woman a man or a boy")
+
+	print("== good deeds and bad ones (plights.gd) ==")
+	check(Plights.ORDER.size() == 12 and Plights.PLIGHTS.size() == 12, "twelve plights: twelve kind things and twelve wrong ones")
+	var charges := 0
+	var roles_in := {}
+	for pid9 in Plights.ORDER:
+		var pl9: Dictionary = Plights.PLIGHTS[pid9]
+		check(fits.call(str(pl9.see)) and fits.call(str(pl9.good.desc)) and fits.call(str(pl9.good.said)) and fits.call(str(pl9.bad.desc)) and fits.call(str(pl9.bad.said)) and str(pl9.good.label).length() <= 44 and str(pl9.bad.label).length() <= 44, "%s: what is seen, offered and said fits" % pid9)
+		for tx9 in [str(pl9.good.said), str(pl9.bad.said), str(pl9.good.desc), str(pl9.bad.desc)]:
+			check(not tx9.contains(" sir") and not tx9.contains("young man") and not tx9.contains("—"), "%s: nobody calls the hero a man" % pid9)
+		check(int(pl9.good.get("stones", 0)) + int(pl9.good.get("hours", 0)) > 0 and not pl9.good.has("gain"), "%s: the kind thing costs him something and pays nothing" % pid9)
+		check(int(pl9.bad.get("gain", 0)) <= 5 and not pl9.bad.has("stones") and not pl9.bad.has("hours"), "%s: the wrong thing costs nothing, and is worth less than the road" % pid9)
+		charges += int(bool(pl9.bad.get("charge", false)))
+		for r9 in pl9.who:
+			check(Folk.ROLES.has(str(r9)) and not str(r9) in Plights.NEVER, "%s: %s is somebody grown who could be in it" % [pid9, r9])
+			roles_in[str(r9)] = true
+	check(charges >= 3 and charges <= 6 and Crime.CRIMES.has("wrong") and int(Crime.CRIMES.wrong.base) < int(Crime.CRIMES.assault.base) and Weal.ACTS.has("kind") and int(Weal.ACTS.kind.per) > 0 and Weal.ACTS.has("wronged") and int(Weal.ACTS.wronged.per) < 0, "the heaviest wrongs are a charge, less than a sword drawn, and the towns keep count of both kinds")
+	check(roles_in.size() >= 20, "most trades can be found in a plight (%d)" % roles_in.size())
+	G = new_game.call()
+	G.level = 100
+	G.stones = 50000
+	G.day = 40
+	var wq: Dictionary = Atlas.world_of("surface")
+	var seen_p := {}
+	var kid_never := true
+	var met_n := 0
+	var ppl9: Array = Folk.people(wq, "qingshi")
+	for dd9 in 8:
+		G.day = 40 + dd9
+		for fp9 in ppl9:
+			var k9x := Plights.of(G, fp9)
+			if k9x != "":
+				met_n += 1
+				seen_p[k9x] = true
+				kid_never = kid_never and not bool(fp9.kid) and (Plights.PLIGHTS[k9x].who as Array).has(str(fp9.role))
+	check(kid_never and met_n >= ppl9.size() and met_n <= ppl9.size() * 3 and seen_p.size() >= 8, "over eight days in Qingshi: no child, each plight is of the trade it happens to, and about one person in four a day (%d meetings, %d kinds)" % [met_n, seen_p.size()])
+	G.day = 40
+	var who9: Dictionary = {}
+	var pk9 := ""
+	for fp8 in ppl9:
+		if who9.is_empty() and Plights.of(G, fp8) == "debt":
+			who9 = fp8
+			pk9 = "debt"
+	for dd8 in range(1, 40):
+		if who9.is_empty():
+			G.day = 40 + dd8
+			for fp7 in ppl9:
+				if who9.is_empty() and Plights.of(G, fp7) == "debt":
+					who9 = fp7
+					pk9 = "debt"
+	check(not who9.is_empty(), "somebody in Qingshi has a debt come due within forty days")
+	if not who9.is_empty():
+		check(Plights.of(G, who9) == Plights.of(G, who9), "who is in which plight on which day is not thrown for")
+		var s9a := int(G.stones)
+		var v9a := Creed.value(G, "virtue")
+		var r9a := Weal.acts(G, "qingshi", "kind")
+		var said8: Array = Plights.act(G, who9, pk9, "good")
+		check(said8.size() == 1 and str(said8[0][0]) == str(who9.n) and int(G.stones) == s9a - Plights.cost(G, pk9) and Plights.cost(G, pk9) == Plights.price(G, 6) and G.deeds_good == 1 and Weal.acts(G, "qingshi", "kind") == r9a + 1 and Creed.value(G, "virtue") > v9a and G.bounty.is_empty(),
+			"a debt paid: it costs him, the town and the Way hear of it, and nothing is paid to him")
+		check(Plights.of(G, who9) == "", "and nobody is in a plight twice in a day")
+		G.plights_met.clear()
+		var s9b := int(G.stones)
+		var v9b := Creed.value(G, "virtue")
+		var said7: Array = Plights.act(G, who9, pk9, "bad")
+		check(said7.size() == 2 and int(G.stones) == s9b + Plights.gain(G, pk9) and G.deeds_bad == 1 and G.deeds_took == Plights.gain(G, pk9) and Weal.acts(G, "qingshi", "wronged") == 1 and Creed.value(G, "virtue") < v9b and Crime.price(G, "qingshi") > 0 and Crime.count(G) == 0,
+			"a debt bought and pressed: it pays, the town and the Way hear of it, and it is a charge at the gate")
+		G.stones = 0
+		G.plights_met.clear()
+		check(Plights.blocked(G, pk9) != "" and Plights.act(G, who9, pk9, "good").is_empty() and G.deeds_good == 1, "a kindness that costs what he has not got is not done")
+	check(Plights.kinds_done(G, "good") == 1 and Plights.kinds_done(G, "bad") == 1 and Plights.summary(G).contains("1 kindnesses"), "what was done is counted by kind")
+	G.deeds_good = 100
+	G.deeds_bad = 0
+	var top9 := Creed.value(G, "virtue")
+	G.deeds_good = 8
+	check(Creed.value(G, "virtue") == top9, "kindnesses weigh in the Way up to a measure, and no further")
+	G.free()
+	var plsrc := FileAccess.get_file_as_string("res://scripts/plights.gd")
+	check(msrc.contains("func offer_plight(") and msrc.contains("\"label\": \"Walk on\"") and bsrc.contains("main.PLIGHT_ASK") and bsrc.contains("ids.find(\"walk\")") and not bsrc.contains("Plights.act"), "\"Walk on\" is the first answer, and the bot walks on")
+	var asked_deed := false
+	for st9x in Data.STEPS:
+		asked_deed = asked_deed or str(st9x.kind) in ["plight", "deed_good", "deed_bad"]
+	check(not asked_deed and not FileAccess.get_file_as_string("res://scripts/trials.gd").contains("deeds_bad") and plsrc.contains("Crime.record(g, \"wrong\""), "no step or trial asks for a deed of either kind")
+	for fid9 in ["ten_kindnesses", "every_kindness", "a_hard_name"]:
+		check(Feats.FEATS.has(fid9), "the feat %s" % fid9)

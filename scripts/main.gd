@@ -1032,6 +1032,11 @@ func talk_folk(e: Dictionary) -> void:
 			# (the Open Net release, wilds.gd: a hunter of a country hunted too hard can be paid to open
 			# three sides of his net; "Not today" first)
 			offer_net(fp)
+		elif Plights.of(Game, fp) != "":
+			# (the Two Roads release, plights.gd: somebody in the middle of something: a kind thing and a wrong
+			# thing can be done about it; "Walk on" first)
+			world.folk_talking = ""
+			offer_plight(fp, Plights.of(Game, fp))
 		elif Folk.is_role(fp, "leafer") and Game.prologue == "":
 			# (the Two Roads release, yezi.gd: somebody of the towns who plays leaves will play a hand; "Not
 			# today" first)
@@ -1041,6 +1046,31 @@ func talk_folk(e: Dictionary) -> void:
 			offer_home(fp)
 		else:
 			world.folk_talking = ""
+	)
+
+## Somebody of the towns in the middle of something (plights.gd): walk on, do the kind thing, or do the wrong one.
+const PLIGHT_ASK := Plights.ASK
+
+func offer_plight(fp: Dictionary, id: String) -> void:
+	var pl: Dictionary = Plights.PLIGHTS[id]
+	Game.plights_met[str(fp.id)] = int(Game.day)
+	var why := Plights.blocked(Game, id)
+	var gcost := Plights.cost(Game, id)
+	var gh := int(pl.good.get("hours", 0))
+	var gnote := ("%d stones" % gcost if gcost > 0 else "") + (", " if gcost > 0 and gh > 0 else "") + ("%d hour%s" % [gh, "" if gh == 1 else "s"] if gh > 0 else "")
+	var got := Plights.gain(Game, id)
+	var opts: Array = [
+		{"id": "walk", "label": "Walk on", "desc": told(str(pl.see)) + "\n\nIt is nobody's business that he can see, and it is not his.", "col": UI.C_DIM},
+		{"id": "good", "label": str(pl.good.label), "note": gnote, "desc": told(str(pl.see)) + "\n\n" + (why + "\n\n" if why != "" else "") + told(str(pl.good.desc)), "col": UI.C_JADE, "enabled": why == ""},
+		{"id": "bad", "label": str(pl.bad.label), "note": "+%d stones" % got if got > 0 else "", "desc": told(str(pl.see)) + "\n\n" + told(str(pl.bad.desc)) + ("\n\nIt would be a charge at the gate: the one wronged is the witness." if bool(pl.bad.get("charge", false)) else ""), "col": UI.C_RED.lightened(0.2)},
+	]
+	choose(PLIGHT_ASK, opts, func(pick: String):
+		if pick != "good" and pick != "bad":
+			return
+		var lines: Array = Plights.act(Game, fp, id, pick)
+		Feats.poll(Game)
+		Creed.poll(Game)
+		say(lines)
 	)
 
 ## A table of leaves (yezi.gd, leaves.gd): who to sit down with (the masters found here, or one of the people

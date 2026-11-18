@@ -1955,6 +1955,10 @@ func _choice() -> void:
 			want = ids.find("room")
 		_nav(ids.size(), c.cursor, want)
 		return
+	if str(c.title) == main.PLIGHT_ASK:
+		# somebody in the middle of something (plights.gd): the bot walks on
+		_nav(ids.size(), c.cursor, ids.find("walk"))
+		return
 	if str(c.title) == main.LEAVES_ASK:
 		# a table of leaves (yezi.gd): sat down at only while a step asks for hands won (the master it names, or
 		# whoever is here); else "Not today"
@@ -3536,6 +3540,7 @@ func _finish(reason: String) -> void:
 		places.append("%s %s" % [mid8, str(Lists.PLACES[Lists.best(Game, mid8)]) if Lists.finished(Game, mid8) else "not fought"])
 	print("the red seal    : %d papers held %s; meets: %s; %d bouts, %d won, %d things said across a ring, %d stones in purses; %d lots bought for %d stones" % [Seals.count(Game), str(Seals.held(Game)), "; ".join(places), Game.bouts, Game.bouts_won, Game.words_said, Game.purses, Game.lots_won, Game.lot_spent])
 	print("the leaves      : %s" % Yezi.summary(Game))
+	print("deeds           : %s" % Plights.summary(Game))
 	print("the roads       : %d held %s (the most at once %d); %s" % [Braid.count(Game), str(Braid.held(Game)), Game.braid_most, Braid.burden(Game)])
 	print("their own words : %d of %d pages written (Lin Feng %d, Yue Ling %d, Elder Qing Xuan %d)" % [Game.pages.size(), Memoir.ORDER.size(), Game.pages.keys().filter(func(k): return str(Memoir.PAGES[k].who) == "lin").size(), Game.pages.keys().filter(func(k): return str(Memoir.PAGES[k].who) == "yue").size(), Game.pages.keys().filter(func(k): return str(Memoir.PAGES[k].who) == "elder").size()])
 	var stood := 0

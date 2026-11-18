@@ -48,12 +48,21 @@ flowchart LR
     MORE[108 more people in 14 towns,<br/>made from a seed of their own:<br/>nobody who lived there has changed] --> KINDS[old hands at the tea-house table,<br/>hawkers on every street,<br/>storytellers in the square]
     KINDS -->|an old hand will play<br/>a hand with anybody| SIT
     end
+    subgraph DEEDS[Good deeds and bad: scripts/plights.gd]
+    MORE --> PL[about one day in four, somebody grown<br/>is in the middle of something:<br/>read from their seed and the day]
+    PL --> WHAT{what will he do?}
+    WHAT -->|Walk on: the first answer| NOTH[nothing]
+    WHAT -->|the kind thing| GOOD[costs stones or hours, pays nothing:<br/>the Way and the town's regard rise]
+    WHAT -->|the wrong thing| BAD[pays a little, or nothing:<br/>the Way and the town's regard fall]
+    BAD -.->|the five heaviest| CHG[a charge at the gate:<br/>the one wronged is the witness]
+    end
 ```
 
 | | | |
 |---|---|---|
 | ![a counter that keeps a table of leaves](docs/screenshots/counter_leaves.webp) | ![who is sat down with, and which game they keep](docs/screenshots/leaves_sit.webp) | ![a trick is settled: the phase takes it, whatever is written](docs/screenshots/leaves_trick.webp) |
 | ![Three in the Morning, counted against the keeper's](docs/screenshots/leaves_morning_shown.webp) | ![Esc > Leaves: the masters, and the leaves they painted](docs/screenshots/page_leaves.webp) | ![the street at Qingshi](docs/screenshots/street_fuller_qingshi.webp) |
+| ![a debt come due: walk on, pay it, or buy it and press it](docs/screenshots/plight_debt.webp) | ![a roof before the rain: the wrong thing](docs/screenshots/plight_roof.webp) | ![the Dawn Market in the afternoon](docs/screenshots/street_fuller_yanggu.webp) |
 | ![nine foes of Part XL](docs/screenshots/part40_foes.webp) | ![what each answer leaves standing among the tea](docs/screenshots/part40_marks.webp) | ![one heart, two roads: the crossroads](docs/screenshots/crossroads_two_roads.webp) |
 
 - **Card games** (`scripts/yezi.gd`, the rules; `scripts/leaves.gd`, the table; both new). A pack is **forty leaves**, eight of each of the five phases, numbered one to eight. Two games are played with it:
@@ -81,7 +90,27 @@ flowchart LR
   - **Storytellers** have the square in the afternoon, with a fan ("Open: he draws his sword. Shut: the door closes. Tap: somebody is at the gate").
   - And more of who was there already: children, porters, washers, farmers, fishers, casters, disciples.
   - **Nobody who lived there before has changed.** The newcomers are made after everybody else from a seed of their own, so every older name, body, day and errand is who it was (the tests check each town).
-- **Part XL: Three in the Morning** ([below](#part-xl-three-in-the-morning)): twenty-five steps at Azure Cloud Sect, the Mulberry Silk Woods, Yanggu, Glowcap Vale, Longmen, the Heights of the Magpie Bridge and Tushan, with two new kinds of step (`"cards"`: a master of the leaves beaten; `"braid"`: so many roads held at once); nine new foes in three caves no chapter had used (a monkey furious at three, a leaf kept up a sleeve, a road not taken); the keeper of monkeys, with a body built from a script; a crossroads (*may a disciple walk a second road?*) with three marks among the tea terraces, three letters, three fates and three pages; seven feats; and the forty-sixth realm.
+- **More good deeds and bad ones** (`scripts/plights.gd`, new). Until now what he could do for or to the people of the towns was an errand of the story, a lost thing carried home, a gift to a chest, a thing pocketed or a sword drawn. Now, on about one day in four, somebody grown of the towns is **in the middle of something**, and a word with them shows it. There are three things to do: **walk on** (always the first answer), the **kind thing**, which costs him stones or hours and never pays, and the **wrong thing**, which pays, or costs nothing, and is remembered.
+
+  | the plight | the kind thing | the wrong thing |
+  |---|---|---|
+  | a load spilled in the road | gather it up and carry the other end | name a price for the help |
+  | a debt come due tomorrow | pay what is owed | buy the debt, and press it tonight (a charge) |
+  | a weight that is not true | say so quietly, before the warden does | take silver to have seen nothing (a charge) |
+  | an empty bowl on a bench | fill it, and bring a second bowl for himself | take the bench, and the sun with it |
+  | two about to come to blows | stand between them | hold the stakes, and say when |
+  | a letter nobody there can read | read it as it is written | read it as would pay better (a charge) |
+  | a fever in the house | sit up with it, and send the nurse to bed | sell them well-water as an elixir (a charge) |
+  | the watch going through a hawker's baskets | ask to see the toll written up | take the cut that is offered |
+  | three tiles slipped before the rain | go up and set them | sell a talisman against rain |
+  | a story going round about a rival's stall | say what is so, aloud | add to it |
+  | a purse found, and nobody to ask | help find whose it is | say that it is his (a charge) |
+  | a stroke of the trade that will not come | show where it goes wrong | say it will never come |
+
+  - **Twelve good deeds and twelve bad ones**, each happening to somebody of a trade it could happen to, and each answered in that person's own words ("You have carried before. I can tell: you took the weight before I said lift"; "I have met a great many people on this road, and I shall remember which one you were").
+  - **Each is weighed where everything else is**: kindnesses and people wronged are in the Way he walks (`Creed.causes`, each up to a measure), the town hears of both (`Weal.ACTS.kind`, `wronged`: regard), and the five heaviest wrongs are a charge at the gate (`Crime.CRIMES.wrong`: the one wronged is the witness).
+  - **Nothing is random** (who is in which plight on which day is read from their seed and the day), **a child is never in one**, a wrong thing is worth less than the road, no step or trial asks for a deed of either kind, and the bot walks on. Three feats (one of them hidden).
+- **Part XL: Three in the Morning** ([below](#part-xl-three-in-the-morning)): twenty-five steps at Azure Cloud Sect, the Mulberry Silk Woods, Yanggu, Glowcap Vale, Longmen, the Heights of the Magpie Bridge and Tushan, with two new kinds of step (`"cards"`: a master of the leaves beaten; `"braid"`: so many roads held at once); nine new foes in three caves no chapter had used (a monkey furious at three, a leaf kept up a sleeve, a road not taken); the keeper of monkeys, with a body built from a script; a crossroads (*may a disciple walk a second road?*) with three marks among the tea terraces, three letters, three fates and three pages; ten feats in all; and the forty-sixth realm.
 - **Five bugs and nine plot holes fixed** ([Bugs found and fixed](#bugs-found-and-fixed)), from two audits of the last releases' rules and story run beside the work, each finding checked against the source before it was mended.
 - **Nothing older moved.** The chapter's packs, things to find and the keeper are stood in three more caves, after everything that was already there, and its tables are at counters that already stood. Every entity, peak, camp and building of the five realms and every floor was dumped from both checkouts: 8,542 lines before, 8,591 after, **none moved or removed**: thirty packs, twelve things to find, the keeper, and the three marks of the crossroads with whoever stands by them.
 - **1 hour 15 minutes 47 seconds longer**, verified by the playthrough bot twice: end to end (the whole game, seed 1234: 48:24:58, complete, the chapter being what follows 47:09:11) and from the chapter's first step to its last (`--bot-start=s_p40_home`: 1:26:05, 102 battles, no deaths). The bot sits down with all five masters and takes each table, takes up the Sword beside the Heart at a stele, performs a rite with both on its back, and answers the crossroads. The last release's whole run was 47:22:16: this one is **1 hour 2 minutes 42 seconds longer** end to end, the thirty-nine older parts having run thirteen minutes quicker than they did (47:09:11 where they took 47:22:16), in a land with a hundred and eight more people in its streets to ask the way of.

@@ -50,6 +50,9 @@ const CRIMES := {
 	"flight": {"n": "Running from the watch", "base": 200, "realm": 80, "bill": "for running from the watch of %s"},
 	"forbidden": {"n": "A forbidden art", "base": 4000, "realm": 1500, "bill": "for an art the precepts forbid, %s"},
 	# the Unpicked Road release (trifles.gd): what was somebody's, pocketed while somebody looked
+	# the Two Roads release (plights.gd): a debt pressed, silver taken for silence, a letter read false, water
+	# sold as an elixir, a found purse claimed: the one wronged is the witness
+	"wrong": {"n": "Wronging somebody of the town", "base": 90, "realm": 35, "bill": "for the wrong done to %s"},
 	"theft": {"n": "Walking off with what was somebody's", "base": 60, "realm": 25, "bill": "for walking off with %s"},
 }
 ## how many of the charges are remembered on the page

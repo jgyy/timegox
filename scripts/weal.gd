@@ -107,6 +107,9 @@ const ACTS := {
 	"restored": {"m": "regard", "per": 2, "max": 3, "why": "lost things carried to whose they were", "one": "One lost thing carried to whose it was."},
 	# the Higher Sky release (betters.gd): he was beaten by somebody above him, and the country heard
 	"bested": {"m": "peace", "per": -2, "max": 3, "why": "times he was beaten in its country by somebody above him", "one": "Once he was beaten in its country by somebody above him."},
+	# the Two Roads release (plights.gd): somebody of its streets helped in what they were in the middle of, or wronged
+	"kind": {"m": "regard", "per": 2, "max": 3, "why": "kindnesses done to its people in the street", "one": "One kindness done to somebody in its streets."},
+	"wronged": {"m": "regard", "per": -1, "max": 4, "why": "people of its streets wronged by him", "one": "One of its people wronged by him."},
 	"pilfer": {"m": "regard", "per": -1, "max": 4, "why": "things pocketed in its streets, and seen", "one": "One thing pocketed in its streets, and seen."},
 }
 ## how many lords put down in a town's country make one point of peace, and how many points at most;

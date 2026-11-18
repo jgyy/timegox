@@ -7191,6 +7191,30 @@ func _roads_shots(which: String = "1") -> void:
 		quiet.call()
 		await _wait(1.2)
 		await _shot("street_fuller_qingshi")
+	if want.call("plight"):
+		# (plights.gd: somebody of Qingshi in the middle of something, and the three things to do about it)
+		Game.rite_due = []
+		Game.page_due = []
+		main.set_stack(["world"])
+		w.load_area("village", Vector2i(30, 29))
+		w.banner_t = 0.0
+		quiet.call()
+		await _wait(0.3)
+		var shown_p := 0
+		for want_id in ["debt", "roof"]:
+			for dd in 12:
+				for fp2 in Folk.people(Atlas.world_of("surface"), "qingshi"):
+					if shown_p < 2 and Plights.of(Game, fp2) == want_id:
+						main.offer_plight(fp2, want_id)
+						main.choice.cursor = 1 + shown_p
+						await _wait(0.3)
+						await _shot("plight_" + want_id)
+						main.pop()
+						shown_p += 1
+						break
+				if shown_p > (0 if want_id == "debt" else 1):
+					break
+				Game.day += 1
 	if want.call("people"):
 		Game.rite_due = []
 		Game.page_due = []

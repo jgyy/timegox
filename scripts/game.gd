@@ -409,6 +409,13 @@ var cards := {}
 var leaves := {}
 var leaf := ""
 var step_cards := 0
+## the Two Roads release (plights.gd): good deeds and bad ones done in the street (plight:what -> how often), who
+## was met in one and on which day, and what the wrong ones put in his purse
+var deeds_done := {}
+var plights_met := {}
+var deeds_good := 0
+var deeds_bad := 0
+var deeds_took := 0
 var sealed_bids: Array = []
 var parcels: Array = []
 var wrote := {}
@@ -713,6 +720,11 @@ func reset() -> void:
 	leaves = {}
 	leaf = ""
 	step_cards = 0
+	deeds_done = {}
+	plights_met = {}
+	deeds_good = 0
+	deeds_bad = 0
+	deeds_took = 0
 	braid = []
 	dao_part = {}
 	braid_most = 0
