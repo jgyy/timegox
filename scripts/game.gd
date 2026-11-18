@@ -54,6 +54,11 @@ var seen := {}
 var dao := ""
 var dao_xp := {}
 var dao_switches := 0
+## the Two Roads release (braid.gd): the roads he holds besides the one he leads with, the hundredths of a point
+## each has towards its next (a battle's point is shared out when he holds several), and the most he ever held
+var braid: Array = []
+var dao_part := {}
+var braid_most := 0
 var standing := {}
 var met := {}
 ## Part XII: the branches of the Nine Heavens root Lin Feng has woken (talent id -> rank 1..3), the
@@ -392,6 +397,18 @@ var lots_won := 0
 var lot_spent := 0
 var lot_saved := 0
 var step_bid := 0
+## the Two Roads release (yezi.gd): hands of leaves dealt so far (every deal is drawn from this count), how it has
+## gone, who was sat with (id -> {won, lost, beat_day}), the painted leaves won and the one he brings to a table
+var card_n := 0
+var card_hands := 0
+var card_wins := 0
+var card_streak := 0
+var card_best := 0
+var card_tea := 0
+var cards := {}
+var leaves := {}
+var leaf := ""
+var step_cards := 0
 var sealed_bids: Array = []
 var parcels: Array = []
 var wrote := {}
@@ -686,6 +703,19 @@ func reset() -> void:
 	lots_won = 0
 	lot_spent = 0
 	lot_saved = 0
+	card_n = 0
+	card_hands = 0
+	card_wins = 0
+	card_streak = 0
+	card_best = 0
+	card_tea = 0
+	cards = {}
+	leaves = {}
+	leaf = ""
+	step_cards = 0
+	braid = []
+	dao_part = {}
+	braid_most = 0
 	step_bid = 0
 	sealed_bids = []
 	parcels = []
@@ -763,18 +793,19 @@ func dao_tier(id: String = "") -> int:
 			tier = k
 	return tier
 
-## A passive of the Dao Lin Feng walks at his rank in it, or `fallback` if it has none.
+## A passive of the roads Lin Feng holds at his rank in each (braid.gd), or `fallback` if none has it.
 func dao_mod(key: String, fallback: float) -> float:
-	if dao == "" or not Data.DAO_MODS.has(dao):
+	if dao == "":
 		return fallback
-	var m: Dictionary = Data.DAO_MODS[dao]
-	if not m.has(key):
-		return fallback
-	return float(m[key][dao_tier()])
+	return Braid.mod(self, key, fallback)
 
-## Start (or change) the road Lin Feng walks; each Dao keeps its own mastery.
+## Start (or change) the road Lin Feng leads with; each Dao keeps its own mastery.  A road he holds already
+## (braid.gd) comes to the front; any other takes the place of the one he led with.
 func choose_dao(id: String) -> void:
 	if not Data.DAOS.has(id) or id == dao:
+		return
+	if braid.has(id):
+		Braid.lead(self, id)
 		return
 	if dao != "":
 		dao_switches += 1
@@ -785,24 +816,24 @@ func choose_dao(id: String) -> void:
 	toast("You walk the %s" % Data.DAOS[id].n)
 	note("Walks the %s" % Data.DAOS[id].n)
 
-## A battle won while walking a Dao deepens it (a boss four times as much); reaching a rank is news.
+## A battle won while walking a Dao deepens it (a boss four times as much); reaching a rank is news.  Holding
+## several, the point is shared out among them (braid.gd): the more roads, the less each learns.
 func dao_battle_won(boss: bool) -> void:
 	if dao == "":
 		return
-	var before := dao_tier()
-	dao_xp[dao] = int(dao_xp.get(dao, 0)) + (4 if boss else 1)
-	var after := dao_tier()
-	if after > before:
-		toast("%s of the %s" % [Data.DAO_RANKS[after], Data.DAOS[dao].n])
-		note("Became %s of the %s" % [Data.DAO_RANKS[after], Data.DAOS[dao].n])
+	for up in Braid.won(self, boss):
+		var did := str(up[0])
+		var after := int(up[1])
+		toast("%s of the %s" % [Data.DAO_RANKS[after], Data.DAOS[did].n])
+		note("Became %s of the %s" % [Data.DAO_RANKS[after], Data.DAOS[did].n])
 		if after == 1:
-			toast("New technique: %s" % Data.SKILLS[Data.DAOS[dao].skill].n)
+			toast("New technique: %s" % Data.SKILLS[Data.DAOS[did].skill].n)
 
-## The Dao's own technique, for Lin Feng, once he is an Adept of the Dao he walks.
+## The techniques of the roads he holds, for Lin Feng, once he is an Adept of each.
 func dao_skills(i: int) -> Array:
-	if i != 0 or dao == "" or dao_tier() < 1:
+	if i != 0 or dao == "":
 		return []
-	return [Data.DAOS[dao].skill]
+	return Braid.skills(self)
 
 ## A technique as it stands now.  Most are what Data.SKILLS says; the technique of a weapon's Dao
 ## (arms.gd) is measured against the strongest technique of the same reach Lin Feng knows, so that a
@@ -834,7 +865,7 @@ func skill_of(id: String) -> Dictionary:
 
 ## What a technique costs to use (the Cauldron's Dao makes them cheaper).
 func skill_cost(id: String) -> float:
-	var c := float(skill_of(id).cost) * dao_mod("qi", 1.0) * Arms.mod(self, "qi", 1.0) * (1.0 - talent_mod("cost")) * (1.0 - Fashion.gear(self, "cost")) * Works.mod(self, "cost")
+	var c := float(skill_of(id).cost) * dao_mod("qi", 1.0) * Braid.qi(self) * Arms.mod(self, "qi", 1.0) * (1.0 - talent_mod("cost")) * (1.0 - Fashion.gear(self, "cost")) * Works.mod(self, "cost")
 	# the crown of the Five-Phase Root: techniques that strike every foe cost a fifth less
 	if talent_crown("five_phase") and str(Data.SKILLS[id].tgt) == "all":
 		c *= 0.8
@@ -934,7 +965,7 @@ func race_gain(race: String, n: int) -> void:
 		return
 	met[race] = true
 	var before := race_tier(race)
-	if dao != "" and Data.RACES[race].dao == dao:
+	if dao != "" and Braid.honours(self, race):
 		n = int(ceil(n * 1.5))
 	# (echoes.gd: the peoples warm faster to somebody known to belong to the wide world)
 	n = int(ceil(n * Echoes.lean_mod(self, "regard")))
@@ -1136,6 +1167,7 @@ func advance() -> void:
 	step_cook = 0
 	step_phase = 0
 	step_bid = 0
+	step_cards = 0
 	# the Three Burrows release (hold.gd): the town is founded when its steward has been heard out
 	if str(s.id) == Hold.FOUND_STEP:
 		Hold.found(self)
@@ -1279,6 +1311,12 @@ func poll_steps() -> void:
 			"bid":
 				# Part XXXIX (auction.gd): so many lots won in an auction room since the step began
 				ok = step_bid >= int(s.n)
+			"cards":
+				# Part XL (yezi.gd): so many hands of leaves won since the step began; with `of`, that master beaten
+				ok = (int(cards.get(str(s.of), {}).get("won", 0)) > 0) if s.has("of") else step_cards >= int(s.n)
+			"braid":
+				# Part XL (braid.gd): so many roads held at once
+				ok = Braid.count(self) >= int(s.n)
 			"weal":
 				# Part XXVIII: so many towns of the land left the better for his coming since the step
 				# began (weal.gd)
@@ -1406,6 +1444,10 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(Seals.count(self), int(s.n)), int(s.n)]
 	elif s.kind == "bid":
 		t += "  (%d/%d)" % [mini(step_bid, int(s.n)), int(s.n)]
+	elif s.kind == "cards" and not s.has("of"):
+		t += "  (%d/%d)" % [mini(step_cards, int(s.n)), int(s.n)]
+	elif s.kind == "braid":
+		t += "  (%d/%d)" % [mini(Braid.count(self), int(s.n)), int(s.n)]
 	elif s.kind == "meet" and Lists.entered(self, str(s.meet)):
 		t += "  (%s: %s)" % [str(Lists.ROUNDS[int(meets[str(s.meet)].round)].n), str(Data.ENEMIES[Lists.rival(self, str(s.meet))].n)]
 	elif s.kind == "fate":

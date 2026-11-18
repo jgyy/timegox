@@ -18,7 +18,7 @@ var finished := false
 var report_path := "build/bot_report.json"
 var shots_dir := ""
 var min_time := 3600.0
-var max_time := 49.0 * 3600.0
+var max_time := 51.0 * 3600.0
 var shots_taken := {}
 var logged := 0
 
@@ -50,6 +50,8 @@ const DIRS := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
 const HEALS := ["mazu_lantern", "jianmu_ward", "river_mother", "moon_dew", "magpie_wing", "homeward", "rebirth", "mending", "seal_bloom", "dawn", "starlight", "rain", "lotus_heart"]
 ## Part XI: the Dao the bot walks from each quest step on (it chooses the first from the Elder, and
 ## changes roads at a Dao Stele when it reaches the later steps, as a player trying the Daos would)
+## the roads the bot takes up as well as the one it walks when a step asks for roads held at once (braid.gd)
+const BRAID_PLAN := ["sword", "formation", "wander", "alchemy", "illusion", "heart"]
 const DAO_PLAN := [["s_p11_home", "sword"], ["s_ns_intro", "heart"]]
 ## Part XII: the order in which the bot wakes the branches of the root, as a sword-and-thunder fighter
 ## would: the Sword Bone and the Thunder Root first, then a body that can take a blow and a dantian
@@ -198,7 +200,7 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	"the_needle": ["turn"],
 	"the_belts": ["wait"], "the_stone": ["keep"], "the_ladle": ["teach"], "the_round": ["watch"], "the_higher_sky": ["ditch"],
 	# Part XXXIX: the desk is carried down to the Cloud Gate
-	"the_red_seal": ["open"]}
+	"the_red_seal": ["open"], "the_two_roads": ["ask"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -378,6 +380,16 @@ func _apply_start() -> void:
 		# with --yield given way to, and with --bot-up beaten, so that either branch can be played from its start)
 		# (the Red Seal release: the papers a step asked for were sat for, and a meet behind him was fought to its
 		# last bout and lost there, as somebody who came second would have left it)
+		# (the Two Roads release: the roads a step asked to be held at once are held, and a master a step asked to
+		# be beaten was)
+		if st2.kind == "braid":
+			for bd8 in BRAID_PLAN:
+				if Braid.count(Game) < int(st2.n) and not Braid.holds(Game, str(bd8)):
+					Game.braid.append(str(bd8))
+					Game.dao_xp[str(bd8)] = int(Game.dao_xp.get(str(bd8), 0))
+		if st2.kind == "cards" and st2.has("of"):
+			Game.cards[str(st2.of)] = {"won": 1, "lost": 0, "beat_day": 0}
+			Game.leaves[str(st2.of)] = true
 		if st2.kind == "seal":
 			for sid9 in Seals.order():
 				if Game.seals.size() < int(st2.n) and Seals.due(Game, sid9) > 0:
@@ -543,6 +555,8 @@ func _process(d: float) -> void:
 			_choice()
 		"field":
 			_field()
+		"leaves":
+			_leaves()
 		"ending":
 			cool = 2.0
 			await _shot("ending")
@@ -872,6 +886,17 @@ func _world(d: float) -> void:
 				_start_meditate("rest")
 			else:
 				_goto_entity(str(mt.area), str(mt.office))
+		"cards":
+			# Part XL (yezi.gd): to the table of the master the step names (the choice sits down, _choice; the
+			# screen is played by _leaves); beaten today already or short of the tea, to the wild
+			_cards_step(s)
+		"braid":
+			# Part XL (braid.gd): to a Dao Stele, to take up another road as well as the one he walks
+			var bst = _nearest_stele()
+			if bst != null:
+				_walk_to(bst.pos, "stele:" + str(bst.id))
+			else:
+				_travel("sect")
 		"bid":
 			# Part XXXIX (auction.gd): to the auction room, for the lot that goes cheapest today
 			if Auction.cheapest(Game, str(s.house)).is_empty():
@@ -1750,6 +1775,44 @@ func _job_done_already(id: String) -> bool:
 	return false
 
 ## The field of war (field.gd): the order Master Sun would give (War.best), a drum at a time.
+## A hand of leaves (yezi.gd, leaves.gd): the leaf `Yezi.best` names, through the same keys a player has.
+func _leaves() -> void:
+	var lv = main.leaves
+	match str(lv.state):
+		"play":
+			var want: int = lv.want()
+			if want < 0:
+				cool = 0.3
+			elif lv.cursor == want:
+				_press("confirm", 0.3)
+			else:
+				_nav(lv.count(), lv.cursor, want)
+		"show":
+			_press("confirm", 0.3)
+		"result":
+			_press("confirm", 0.6)
+		_:
+			cool = 0.3
+
+## Part XL (yezi.gd): where the hands a step asks for are played.
+func _cards_step(s: Dictionary) -> void:
+	if Game.stones < Yezi.tea(Game):
+		_grind()
+		return
+	if s.has("of"):
+		var m: Dictionary = Yezi.MASTERS[str(s.of)]
+		if Yezi.blocked(Game, str(s.of)) != "":
+			_grind()
+		else:
+			_goto_entity(str(m.area), str(m.at))
+		return
+	# any master who will sit down today, at a counter
+	for mid in Yezi.MASTER_ORDER:
+		if Offices.OFFICES.has(str(Yezi.MASTERS[mid].at)) and Yezi.blocked(Game, str(mid)) == "":
+			_goto_entity(str(Yezi.MASTERS[mid].area), str(Yezi.MASTERS[mid].at))
+			return
+	_grind()
+
 func _field() -> void:
 	var f = main.field
 	match str(f.state):
@@ -1885,8 +1948,31 @@ func _choice() -> void:
 					want = ids.find("lists")
 				elif ids.has("seals") and _seal_wanted() != "":
 					want = ids.find("seals")
+		elif not st.is_empty() and st.kind == "cards" and ids.has("leaves") and (not st.has("of") or (("At the counter of " + str(Offices.OFFICES.get(str(Yezi.MASTERS[str(st.of)].at), {}).get("n", ""))) == str(c.title) and Yezi.blocked(Game, str(st.of)) == "")):
+			# (the Two Roads release, yezi.gd: a hand of leaves while a step asks that the master here be beaten)
+			want = ids.find("leaves")
 		elif not st.is_empty() and st.kind == "bid" and ids.has("room") and ("At the counter of " + str(Offices.OFFICES[str(Auction.HOUSES[str(st.house)].office)].n)) == str(c.title):
 			want = ids.find("room")
+		_nav(ids.size(), c.cursor, want)
+		return
+	if str(c.title) == main.LEAVES_ASK:
+		# a table of leaves (yezi.gd): sat down at only while a step asks for hands won (the master it names, or
+		# whoever is here); else "Not today"
+		want = ids.find("later")
+		if not st.is_empty() and st.kind == "cards":
+			for kc in ids.size():
+				var cid := str(ids[kc])
+				if cid != "later" and c.options[kc].get("enabled", true) and (not st.has("of") or str(st.of) == cid):
+					want = kc
+					break
+		_nav(ids.size(), c.cursor, want)
+		return
+	if str(c.title) == main.BRAID_ASK:
+		# a road pointed at on a stele (braid.gd): walked as well while a step asks for roads held at once; else
+		# taken in place of the old one, as the bot always changed roads
+		want = ids.find("swap")
+		if not st.is_empty() and st.kind == "braid" and Braid.count(Game) < int(st.n) and ids.has("also") and c.options[ids.find("also")].get("enabled", true):
+			want = ids.find("also")
 		_nav(ids.size(), c.cursor, want)
 		return
 	if str(c.title) == main.SEALS_ASK:
@@ -2025,6 +2111,15 @@ func _choice() -> void:
 		want = ids.find(_planned_talent(ids))
 	elif ids.has("sword"):
 		want = ids.find(_planned_dao() if _planned_dao() != "" else "sword")
+		# (the Two Roads release, braid.gd: while a step asks for roads held at once, a road he does not hold)
+		if not st.is_empty() and st.kind == "braid" and Braid.count(Game) < int(st.n):
+			for bd9 in BRAID_PLAN:
+				if not Braid.holds(Game, str(bd9)) and ids.has(str(bd9)):
+					want = ids.find(str(bd9))
+					break
+		elif Game.dao != "" and want >= 0 and str(ids[want]) == Game.dao:
+			# (the road he wanted is the one he leads with already: nothing to do at the stele)
+			want = -1
 	elif ids.has("help"):
 		# a townsperson's request: help when it can be done
 		want = ids.find("help") if c.options[ids.find("help")].get("enabled", true) else ids.find("later")
@@ -3440,6 +3535,8 @@ func _finish(reason: String) -> void:
 	for mid8 in Lists.ORDER:
 		places.append("%s %s" % [mid8, str(Lists.PLACES[Lists.best(Game, mid8)]) if Lists.finished(Game, mid8) else "not fought"])
 	print("the red seal    : %d papers held %s; meets: %s; %d bouts, %d won, %d things said across a ring, %d stones in purses; %d lots bought for %d stones" % [Seals.count(Game), str(Seals.held(Game)), "; ".join(places), Game.bouts, Game.bouts_won, Game.words_said, Game.purses, Game.lots_won, Game.lot_spent])
+	print("the leaves      : %s" % Yezi.summary(Game))
+	print("the roads       : %d held %s (the most at once %d); %s" % [Braid.count(Game), str(Braid.held(Game)), Game.braid_most, Braid.burden(Game)])
 	print("their own words : %d of %d pages written (Lin Feng %d, Yue Ling %d, Elder Qing Xuan %d)" % [Game.pages.size(), Memoir.ORDER.size(), Game.pages.keys().filter(func(k): return str(Memoir.PAGES[k].who) == "lin").size(), Game.pages.keys().filter(func(k): return str(Memoir.PAGES[k].who) == "yue").size(), Game.pages.keys().filter(func(k): return str(Memoir.PAGES[k].who) == "elder").size()])
 	var stood := 0
 	for lid9 in ["surface", "heaven", "under", "sea"]:

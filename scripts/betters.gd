@@ -184,7 +184,9 @@ static func over(g, id: String, how: String, area: String = "") -> String:
 	if not up:
 		b.wound = true
 		g.day += int(c.days)
-		var town := Weal.town_of(area) if area != "" else ""
+		# (the Two Roads release: those above him stand out in the country, where `Weal.town_of` names no town, and
+		# the peace of the town that hears of that country was never taken: `Crime.town_for` falls back to it)
+		var town := Crime.town_for(area) if area != "" else ""
 		if town != "":
 			Weal.act(g, town, "bested")
 	for i in g.party_size():

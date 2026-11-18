@@ -14,6 +14,7 @@ var ending
 var choice
 var create
 var field
+var leaves
 var bot = null
 var bot_active := false
 var args := {}
@@ -45,6 +46,7 @@ func _ready() -> void:
 	choice = _make("choice")
 	create = _make("create")
 	field = _make("field")
+	leaves = _make("leaves")
 	if DisplayServer.get_name() != "headless" and not args.has("no-post"):
 		post = PostFX.new()
 		post.name = "post"
@@ -416,8 +418,10 @@ func open_dao_choice(from: String) -> void:
 		if not hon.is_empty():
 			desc += "\nHonoured by the %s." % ", ".join(hon)
 		if id == Game.dao:
-			desc += "\n\nThe road you walk now."
-		opts.append({"id": id, "label": d.n, "sub": d.motto, "desc": desc, "note": rank, "col": d.col, "current": id == Game.dao})
+			desc += "\n\nThe road you lead with now." if Braid.count(Game) > 1 else "\n\nThe road you walk now."
+		elif Braid.holds(Game, id):
+			desc += "\n\nA road you hold as well."
+		opts.append({"id": id, "label": d.n, "sub": d.motto, "desc": desc, "note": rank + (" (held)" if Braid.holds(Game, id) and id != Game.dao else ""), "col": d.col, "current": id == Game.dao})
 	var first := Game.dao == ""
 	# (the Uncarved Block release, rites.gd: at a stele the rite of a Dao that is his can be performed again)
 	if not first and Rites.ready(Game) != "":
@@ -427,14 +431,50 @@ func open_dao_choice(from: String) -> void:
 		if id == "rite":
 			play_rite(Rites.ready(Game))
 			return
-		if id == "" or id == Game.dao:
+		if id == "":
 			return
-		Game.choose_dao(id)
 		if first:
+			Game.choose_dao(id)
 			say(Data.DAO_LINES.get("dao_chosen", {}).get(id, []))
 		else:
-			say([["Dao Stele", str(Data.DAOS[id].motto)]])
+			offer_braid(id)
 	, not first)
+
+## The Two Roads release (braid.gd): what a stele offers for the road he has pointed at.  One he does not hold may
+## be walked as well as what he walks (the more he holds, the harder each is), or taken in place of the road he
+## leads with, as it always could; one he holds may be led with, or set down.
+const BRAID_ASK := "The Dao Stele: how will you walk it?"
+
+func offer_braid(id: String) -> void:
+	var d: Dictionary = Data.DAOS[id]
+	var opts: Array = [{"id": "", "label": "Leave it", "desc": Braid.SAID[clampi(Braid.count(Game), 0, Braid.MOST)] + "\n\n" + Braid.burden(Game), "col": UI.C_DIM}]
+	if not Braid.holds(Game, id):
+		var why := Braid.blocked(Game, id)
+		var n := Braid.count(Game) + 1
+		var then := "Then: a battle deepens each road by %d parts in a hundred, you have %d parts in a hundred of each road's gifts, and every technique costs %d in a hundred more." % [int(Braid.GAIN[mini(n, Braid.MOST) - 1]), int(round(float(Braid.SHARE[mini(n, Braid.MOST) - 1]) * 100.0)), int(round((float(Braid.QI[mini(n, Braid.MOST) - 1]) - 1.0) * 100.0))]
+		opts.append({"id": "also", "label": "Walk it as well", "note": "%d roads" % n, "desc": (why + "\n\n" if why != "" else "") + "Hold the %s together with what you walk. Its gifts and, from Adept, its technique are yours with the others'. The more roads are held, the harder each is to walk.\n\n%s" % [str(d.n), then], "col": d.col, "enabled": why == ""})
+		opts.append({"id": "swap", "label": "Leave the %s for it" % str(Data.DAOS[Game.dao].n).trim_prefix("Dao of the ").trim_prefix("Dao of "), "desc": "Set down the road you lead with and take this one in its place, as a road was always changed. What was learned on the old road is kept for the day it is taken up again.", "col": UI.C_TEXT})
+	else:
+		if id != Game.dao:
+			opts.append({"id": "lead", "label": "Lead with it", "desc": "Walk in front with the %s: it is the road the peoples speak to, and the one whose rite is yours to show." % str(d.n), "col": d.col})
+		opts.append({"id": "drop", "label": "Set it down", "desc": "Stop walking the %s. What was learned on it is kept. The roads still held are each a little easier for it." % str(d.n), "col": UI.C_TEXT, "enabled": Braid.count(Game) > 1})
+	choose(BRAID_ASK, opts, func(pick: String):
+		match pick:
+			"also":
+				if Braid.take(Game, id):
+					Feats.poll(Game)
+					Game.poll_steps()
+					say([["Dao Stele", str(d.motto)], ["Narrator", Braid.SAID[clampi(Braid.count(Game), 0, Braid.MOST)]]])
+			"swap":
+				Game.choose_dao(id)
+				say([["Dao Stele", str(d.motto)]])
+			"lead":
+				Braid.lead(Game, id)
+				say([["Dao Stele", str(d.motto)]])
+			"drop":
+				Braid.drop(Game, id)
+				Game.poll_steps()
+	)
 
 ## A conversation with the lines the Dao Lin Feng walks adds to it (Part XI): the Elder's answer,
 ## what Chong and Li make of it, the ending; and when one of the peoples of the realms first speaks to
@@ -992,11 +1032,54 @@ func talk_folk(e: Dictionary) -> void:
 			# (the Open Net release, wilds.gd: a hunter of a country hunted too hard can be paid to open
 			# three sides of his net; "Not today" first)
 			offer_net(fp)
+		elif Folk.is_role(fp, "leafer") and Game.prologue == "":
+			# (the Two Roads release, yezi.gd: somebody of the towns who plays leaves will play a hand; "Not
+			# today" first)
+			world.folk_talking = ""
+			offer_leaves([], fp)
 		elif ask_home:
 			offer_home(fp)
 		else:
 			world.folk_talking = ""
 	)
+
+## A table of leaves (yezi.gd, leaves.gd): who to sit down with (the masters found here, or one of the people
+## of the towns who plays), "Not today" first; then the hand, on a screen of its own; then what is said.
+const LEAVES_ASK := Yezi.ASK
+
+func offer_leaves(ids: Array, fp: Dictionary = {}) -> void:
+	var opts: Array = [{"id": "later", "label": "Not today", "desc": "The leaves will still be there. They have been there since before the tea-house had a roof.\n\n" + Yezi.summary(Game), "col": UI.C_DIM}]
+	var foes := {}
+	if not fp.is_empty():
+		foes[str(fp.id)] = Yezi.foe(str(fp.id), fp)
+	for id in ids:
+		foes[str(id)] = Yezi.foe(str(id))
+	for fid in foes:
+		var f: Dictionary = foes[fid]
+		var game := Yezi.game_of(Game, f)
+		var why := Yezi.blocked(Game, str(fid))
+		var rec: Dictionary = Game.cards.get(str(fid), {})
+		opts.append({"id": str(fid), "label": "Sit down with %s" % str(f.n), "sub": str(Yezi.GAMES[game].n), "note": "%d-%d" % [int(rec.get("won", 0)), int(rec.get("lost", 0))] if not rec.is_empty() else "",
+			"desc": (why + "\n\n" if why != "" else "") + str(Yezi.GAMES[game].desc) + "\n\nNothing is staked. Whoever loses pours: %d spirit stones for the pot." % Yezi.tea(Game), "col": UI.C_JADE if why == "" else UI.C_DIM, "enabled": why == ""})
+	choose(LEAVES_ASK, opts, func(pick: String):
+		if pick == "" or pick == "later" or not foes.has(pick):
+			return
+		var f2: Dictionary = foes[pick]
+		say([[str(f2.n), str(f2.sit)]], func():
+			leaves.start(f2, {})
+			push("leaves")
+		)
+	)
+
+## The hand is over (leaves.gd): the tea is paid, who beat whom is remembered, and it is said.
+func leaves_done(st: Dictionary, _ctx: Dictionary) -> void:
+	pop()
+	var lines: Array = Yezi.finish(Game, st)
+	Feats.poll(Game)
+	Game.poll_steps()
+	if str(st.over) == "won":
+		Game.toast("The table is yours: %s" % str(st.foe.n))
+	say(lines)
 
 const PEDLAR_ASK := "The pedlar's pack is open on the grass. What will it be?"
 
@@ -1334,6 +1417,9 @@ func talk_npc(e: Dictionary) -> void:
 	elif Game.survival and str(e.id) in Needs.COOKS and deed == "" and not (race != "" and Game.inv.get(str(Data.RACES[race].gift), 0) > 0):
 		# with survival on, the cooks and innkeepers of the land sell food for the road (needs.gd)
 		after = func(): offer_food(e)
+	elif not Yezi.at(str(e.id)).is_empty() and deed == "" and Game.prologue == "":
+		# (the Two Roads release, yezi.gd: somebody who stands in the land and keeps a table of leaves)
+		after = func(): offer_leaves(Yezi.at(str(e.id)))
 	elif str(e.id) == Gamble.DEALER and deed == "":
 		# Old Du's mat (gamble.gd)
 		after = func(): offer_gamble()
@@ -1709,6 +1795,10 @@ func offer_carriage(e: Dictionary) -> void:
 			var rb := int(round(int(r.buy) * Crime.heir_k(Game, str(e.id))))
 			opts.append({"id": rid, "label": "Buy the %s" % str(r.n), "note": "%d stones" % rb, "desc": "%s\n\nDriven, seats %d, %d%% faster than running. %d spirit stones (you have %d)." % [told(str(r.desc)), Fashion.seats(rid), int(round((float(r.speed) - 1.0) * 100.0)), rb, Game.stones],
 				"col": UI.C_GOLD, "enabled": Game.stones >= rb})
+	# (the Two Roads release, yezi.gd: a table of leaves kept beside the counter, and who sits at it)
+	if not Yezi.at(office).is_empty():
+		var cm: Dictionary = Yezi.MASTERS[Yezi.at(office)[0]]
+		opts.append({"id": "leaves", "label": "Sit down at the table of leaves", "note": str(cm.n), "desc": "A low table by the stove with a pack of forty leaves on it, and %s on the far side of it, shuffling. Nothing is staked: whoever loses pours the tea (%d spirit stones).\n\n%s" % [str(cm.n), Yezi.tea(Game), Yezi.summary(Game)], "col": UI.C_JADE})
 	if opts.size() < 2:
 		return
 	choose("At the counter of %s" % str(e.n), opts, func(oid: String):
@@ -1772,6 +1862,8 @@ func offer_carriage(e: Dictionary) -> void:
 						Feats.poll(Game)
 						Game.toast("The ark lets her ladder down at %s" % str(ao2.n))
 					)
+		elif oid == "leaves":
+			offer_leaves(Yezi.at(office))
 		elif oid == "seals":
 			offer_seals(e)
 		elif oid == "lists":
@@ -1945,6 +2037,10 @@ func bid_on(e: Dictionary, hid: String, k: int) -> void:
 func offer_post(e: Dictionary) -> void:
 	var office := str(e.office)
 	var here := Weal.of_office(office)
+	# (the Two Roads release: the sect's post is at the Treasurer's counter and its chest at another: standing in
+	# the sect, the sect's own chest was offered as somewhere else, at the carrier's tenth)
+	if here == "":
+		here = Weal.town_of(Mail.area_of(office))
 	var opts: Array = [{"id": "later", "label": "Not today", "desc": "There is a road waiting.", "col": UI.C_DIM}]
 	if not Game.parcels.is_empty():
 		opts.append({"id": "collect", "label": "Take what has come for him", "note": "%d parcel%s" % [Game.parcels.size(), "" if Game.parcels.size() == 1 else "s"], "desc": "Tied in oiled paper with the seal of an auction room on the knot.", "col": UI.C_GOLD})
@@ -2942,7 +3038,7 @@ const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "reca
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
 	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
-	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31", "s_break38": "recall32", "s_break39": "recall33", "s_break40": "recall34", "s_break41": "recall35", "s_break42": "recall36", "s_break43": "recall37"}
+	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31", "s_break38": "recall32", "s_break39": "recall33", "s_break40": "recall34", "s_break41": "recall35", "s_break42": "recall36", "s_break43": "recall37", "s_break44": "recall38"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,

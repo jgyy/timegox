@@ -221,7 +221,12 @@ static func bout_over(g, id: String, won: bool, crowd: int = 0, said: Dictionary
 	st.crowd = clampi(int(st.crowd) + settle(crowd, said, won), -CROWD_MAX, CROWD_MAX)
 	for w in said:
 		st.said[rid] = str(w)
-		g.said_to[rid] = str(w)
+		# (the Two Roads release: every word said to a rival is remembered, not only the last: a letter that waits
+		# on one word was lost when another was said after it in the same bout)
+		var was: PackedStringArray = str(g.said_to.get(rid, "")).split(",", false)
+		if not was.has(str(w)):
+			was.append(str(w))
+		g.said_to[rid] = ",".join(was)
 		g.words_said = int(g.words_said) + 1
 	g.bouts = int(g.bouts) + 1
 	lines.append([str(Data.ENEMIES[rid].n), str(RIVALS[rid].won if won else RIVALS[rid].lost)])

@@ -278,6 +278,15 @@ const MARKS := {
 		"blank": {"area": "mountain", "m": ["seal", "blank"], "k": 3, "n": "The Washed Leaves", "desc": "A line strung between two posts beside the mountain path with leaves of good paper pegged along it, washed grey and dried stiff, lifting a little in the wind off the sea of clouds. There is nothing on any of them. One, at the end, has a red seal in its corner.",
 			"who": ["Mian of the East Wall", "folk_youth", Color("d8d4c8"), "I am the one who missed, Senior. I peg them out when the wind takes one. Two hundred and six. I know which was mine by a tear in the corner. It says the same as everybody's.", "A farmer asked me what I am, with no paper. I put out his chimney. He said: that, then. It is the only examination I have ever passed, Senior, and I did not know I was sitting it.", "The registrar comes back, some evenings, without his box. He stands and reads them. All of them, one by one. He told me it is the most accurate register he ever compiled."]},
 	},
+	# Part XL (the Two Roads release): whether a disciple may walk a second road
+	"the_two_roads": {
+		"one": {"area": "terraces", "m": ["roads", "one"], "k": 3, "n": "The Single Stones", "desc": "A row of flat stepping-stones laid up between two rows of tea, one behind the other, each cut with a single line. Where the path divides the stones go left and nothing has been laid to the right. Moss has begun on the first of them.",
+			"who": ["Mian, on the Flame", "folk_youth", Color("b8562a"), "I am the one who missed, Senior. I asked for a second road and was told: finish the first. I was angry for nine days. On the tenth I got the palm right, the part I always rushed.", "The pickers set these stones. They said a path that goes one way gets you to the top with your basket full. They have never heard of a Dao. They pick tea.", "I shall ask again when the Flame is done. I have told the Elder so. He said he would be disappointed if I did not."]},
+		"two": {"area": "terraces", "m": ["roads", "two"], "k": 3, "n": "The Posts with Two Arms", "desc": "A signpost at a turn of the path between the tea, with two arms pointing two ways and a different road carved on each. Somebody has hung a picking-basket on one arm and a sword-knot on the other, and neither has been taken down.",
+			"who": ["Mian of Two Roads", "folk_youth", Color("d87a8a"), "I am the one who missed, Senior. I have the Heart beside the Flame now. I am worse at the Flame than I was. I burnt a hand last week, mine, and mended it, mine. I count that a draw.", "The terraces put these up when they heard. A picker told me she has always had two roads: the tea, and her mother. She asked what took the mountain so long.", "It is like carrying two full buckets, Senior. You told the Elder so. I heard. Nobody told me the trick is not to look at either of them."]},
+		"ask": {"area": "terraces", "m": ["roads", "ask"], "k": 3, "n": "The Tables of Seven", "desc": "A low stone table at a turn of the path between the tea, with seven acorns on it in two heaps. Whoever passes moves one from heap to heap, as they please. It has been three and four, and four and three, and nobody has yet found a way to make it eight.",
+			"who": ["Mian, Guest of the Heart", "folk_youth", Color("6a8a4a"), "I am the one who missed, Senior. I am a guest on the Heart until autumn. In autumn I must lay one down or ask again. I find I practise both as if I were to lose them.", "The pickers move an acorn every time they pass. I asked one why. She said: so that it is mine for the morning. Then her sister moved it back.", "Hall Master Shen says the rule has not changed. I have a second road, Senior, and the rule has not changed. I have stopped trying to see how. I think that is the lesson."]},
+	},
 	# Part XXXVIII (the Higher Sky release): what the sect teaches about those above it
 	"the_higher_sky": {
 		"gall": {"area": "mountain", "m": ["sky", "gall"], "k": 3, "n": "The Galls of the Outer Court", "desc": "A post as high as a seated man's head with a crossbar, and on the crossbar a dried gall on a loop of hemp, at exactly the height of a mouth. A board under it has three names on it, and room left for more.",
@@ -443,7 +452,7 @@ static func who_stands(g, e: Dictionary) -> bool:
 ## The crossroads of a later release whose marks are stood after the late bands of an older one
 ## (`"warband5"`, `"warband6"`), in a second pass (`after_bands`): a mark stood before them would take
 ## ground a band of an older map stood on, and the band would move.
-const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round", "the_higher_sky", "the_red_seal"]
+const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round", "the_higher_sky", "the_red_seal", "the_two_roads"]
 
 static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, ids: Array, ents: Array, layer: String, reach: Dictionary, peaks: Array, camps: Dictionary, after_bands: bool = false) -> void:
 	var near := {}
@@ -891,6 +900,35 @@ static func model(sp: Dictionary, i: int = 0) -> Node3D:
 					_stick(b, Vector3(cos(a22) * 0.6, 0.12, sin(a22) * 0.6), Vector3(cos(a22) * 1.5, 0.05, sin(a22) * 1.5), 0.03, MB.tag(Color("e8f0e8"), MB.CRYSTAL))
 					b.torus(Vector3(cos(a22) * 1.5, 0.06, sin(a22) * 1.5), 0.12, 0.02, MB.tag(Color("e8f0e8"), MB.CRYSTAL))
 				g.ball(Vector3(0, 1.0, 0.62), 0.16, Color(1.0, 0.5, 0.2, 0.8), true)
+		"roads":
+			# whether a heart may walk two roads (the Two Roads release): stepping-stones that go one way, a post with
+			# two arms, or a table with seven acorns in two heaps
+			var r_stone := MB.tag(Color("9a968a"), MB.STONE)
+			match str(a[1]):
+				"one":
+					for r40 in 4:
+						b.box(Vector3(-0.1 + 0.05 * float(r40 % 2), 0.03, -0.75 + 0.5 * float(r40)), Vector3(0.42, 0.06, 0.34), MB.tag(Color("9a968a").darkened(0.05 * float((r40 + i) % 3)), MB.STONE), Vector3(0, 0.2 * float((r40 + i) % 3 - 1), 0))
+						b.box(Vector3(-0.1 + 0.05 * float(r40 % 2), 0.062, -0.75 + 0.5 * float(r40)), Vector3(0.03, 0.006, 0.22), MB.tag(Color("3a3832"), MB.STONE), Vector3(0, 0.2 * float((r40 + i) % 3 - 1), 0))
+					b.box(Vector3(-0.12, 0.012, -0.9), Vector3(0.3, 0.02, 0.16), MB.tag(Color("5a7a3a"), MB.CLOTH))
+				"two":
+					b.cyl(Vector3(0, 0.8, 0), 0.05, 1.6, wd, Vector3.ZERO, 6)
+					b.box(Vector3(0.3, 1.42, 0.02), Vector3(0.6, 0.12, 0.03), w, Vector3(0, 0.25, 0.06))
+					b.box(Vector3(-0.3, 1.24, -0.02), Vector3(0.6, 0.12, 0.03), w, Vector3(0, -0.25, -0.06))
+					b.cone(Vector3(0, 1.66, 0), 0.07, 0.12, wd, Vector3.ZERO, 6)
+					# a picking-basket on one arm and a sword-knot on the other
+					b.lathe(Vector3(0.5, 1.12, 0.06), [Vector2(0.06, 0.0), Vector2(0.1, 0.1), Vector2(0.11, 0.2)], MB.tag(Color("b89a5a"), MB.WOOD), 8)
+					b.limb(Vector3(0.5, 1.32, 0.06), Vector3(0.5, 1.4, 0.04), 0.006, 0.006, MB.tag(Color("7a6a3a"), MB.CLOTH), 3)
+					b.limb(Vector3(-0.5, 1.2, -0.05), Vector3(-0.5, 0.96 - 0.04 * float(i % 2), -0.05), 0.012, 0.02, MB.tag(Color("b83a2a"), MB.CLOTH), 4)
+				_:
+					b.box(Vector3(0, 0.36, 0), Vector3(0.8, 0.08, 0.5), r_stone)
+					for lx in [-0.28, 0.28]:
+						b.box(Vector3(lx, 0.16, 0), Vector3(0.14, 0.32, 0.4), MB.tag(Color("8a867a"), MB.STONE))
+					var morn := 3 + (i % 2)
+					for r40 in 7:
+						var left := r40 < morn
+						var k40 := r40 if left else r40 - morn
+						b.ball(Vector3((-0.22 if left else 0.2) + 0.07 * float(k40 % 2), 0.425, -0.06 + 0.065 * float(k40 / 2)), 0.03, MB.tag(Color("8a6a34"), MB.WOOD), true)
+						b.ball(Vector3((-0.22 if left else 0.2) + 0.07 * float(k40 % 2), 0.45, -0.06 + 0.065 * float(k40 / 2)), 0.022, MB.tag(Color("4a3a20"), MB.WOOD), true)
 		"seal":
 			# what the column beside the Roll is for (the Red Seal release): a desk with its red cloth and what the
 			# last sitter left, a post with one sentence and its cuts, or washed leaves pegged on a line

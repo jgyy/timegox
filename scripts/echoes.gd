@@ -1572,6 +1572,12 @@ const CROSSROADS := {
 			"blank": [["Narrator", "The leaves of the Roll are washed in the lotus pond and pegged along the east wall, two hundred and six of them, with the ink running down in grey threads. The registrar watches the whole of it. Then he asks for a leaf, and seals it blank, and puts it in his own sleeve, and goes down the steps without his box."]],
 		},
 		"echo": {
+			# (the Two Roads release: and when the outer court sits down on the steps with a pack of leaves)
+			"s_p40_home": {
+				"open": [["Elder Qing Xuan", "The registrar came up on the first of the month and found them at it. He asked whether leaves was a thing a person could do. Du said: come and lose. He sat. He has sealed Du in it. Proven. I am told it is the first paper Du has ever framed."]],
+				"strict": [["Elder Qing Xuan", "The eleven who failed still come to their posts at the hour nobody wants. I looked this morning. They were there. They had a pack. They were playing in complete silence, and one of them was reading his sentence between tricks."]],
+				"blank": [["Elder Qing Xuan", "They have painted a pack on the washed leaves of the Roll, child. Off my east wall. Two hundred and six blank sheets, and forty of them are now fire sevens. I asked who. Nobody has a paper to say who they are, so I could not be told."]],
+			},
 			"s_p39_end": {
 				"open": [["Elder Qing Xuan", "And I am to sit next month, child, behind a ferryman. For sweeping. I have asked what grade a man gets who has done the top ten steps badly for a season. The registrar said he would have to watch. I find I am practising."]],
 				"strict": [["Elder Qing Xuan", "And he failed me, child. Did you hear? In one sentence. I shall not tell you what it was. It was true, and I have known it for fifty years, and nobody had the office to say it. I sit again in the spring, with Mian."]],
@@ -1879,6 +1885,37 @@ const CROSSROADS := {
 			"take": "On Frostpeak the Cold Pine has a patriarch who beat the last one, and three hundred who are learning, slowly, to look up.",
 			"serve": "At Guiyun the Hall of the Broom hangs the Azure Cloud's oldest board, and sends its children up the steps every spring.",
 		}},
+	# Part XL (the Two Roads release): whether a disciple may walk a second road
+	"the_two_roads": {"step": "s_p40_court", "part": "XL", "n": "One Heart, Two Roads",
+		"ask": "Forty disciples of the outer court have petitioned to walk a second road as well as their first. The rule of Azure Cloud is one road to a heart, and Hall Master Shen has written it above their names in red. Lin Feng has carried two for a month and knows what it weighs. The Elder will rule as he advises.",
+		"options": [
+			{"id": "one", "label": "One road, to its end", "tilt": {"craft": -3, "heart": -1}, "creed": {"rule": 6}, "gain": {"renown": 6},
+				"desc": "Keep the rule. A second road is slower under the feet and thins the first, and a disciple of nineteen cannot know what that costs until it has been paid. Let them finish one road and then ask again. Forty will be refused, and some of them were right to ask (the land will hear that Azure Cloud does not change its mind in a season).",
+				"log": "Had the rule of one road kept at Azure Cloud, and the petition of the forty answered: finish the first."},
+			{"id": "two", "label": "Whoever can carry two", "tilt": {"craft": 3, "reach": 1}, "creed": {"rule": -6}, "gain": {"hearth": {"valley": 3}},
+				"desc": "Strike the rule. Let any disciple take up a second road at the stele, be told plainly what it weighs, and find out. Some will be wider for it. Some will be on two roads and good at neither for ten years, and will have chosen it (the Rice Hearth, where everybody has always had two trades, will not see what the fuss was).",
+				"log": "Had the rule of one road struck at Azure Cloud: whoever can carry two may carry two."},
+			{"id": "ask", "label": "Four in the morning", "tilt": {"heart": 3, "reach": -1}, "creed": {"virtue": 8}, "gain": {"stones": 9900},
+				"desc": "Change neither the name nor the thing. The rule stays: one road. And each spring a disciple may walk a second for a season, as a guest on it, and in the autumn lay one of the two down or be heard again. It is the same seven acorns. Shen will know it, and will not be able to say what he has lost (spirit stones: the outer court's thanks, collected in a rice bowl).",
+				"log": "Had the forty given four in the morning: one road by rule, and a second for a season, to be laid down or asked for again."},
+		],
+		"after": {
+			"one": [["Narrator", "Hall Master Shen reads the ruling out in the yard, and does not raise his voice, and does not look pleased. Forty disciples bow. That evening the stele has forty palm-prints on it in the frost, each laid flat for a moment and taken away, and by morning the frost has closed over them."]],
+			"two": [["Narrator", "The rule is scraped off the board by the library door, and the board is left bare. By the new moon there is a queue at the stele. Mian is fourth in it. He comes away with the Heart on him beside the Flame, walking carefully, like somebody carrying two full buckets, and he does not spill."]],
+			"ask": [["Narrator", "Hall Master Shen reads it twice. One road, by rule. A second, for a season, as a guest. He says: this is what they asked for. The Elder says: it is what you asked for. Shen reads it a third time, and then, for the first time in anybody's memory, he laughs, once, like a door."]],
+		},
+		"echo": {
+			"s_p40_end": {
+				"one": [["Elder Qing Xuan", "Mian came to me after. He said: I shall finish the Flame, Elder, and then I shall ask again, and you will have no reason left. He is quite right. I have nine years to think of one. I do not believe I shall try very hard."]],
+				"two": [["Elder Qing Xuan", "Eleven of them have taken a second already. Three are worse at both. They know it, and get up earlier. And Shen has a second road himself, child, since Thursday. He will not say which. He practises it behind the woodshed, in a temper."]],
+				"ask": [["Elder Qing Xuan", "Forty guests on forty second roads, until autumn. Shen keeps the list. He tells me it is the same rule as before. I tell him it is, exactly. We are both delighted, and I do not think either of us is the keeper."]],
+			},
+		},
+		"end": {
+			"one": "At Azure Cloud Sect a heart has one road, and walks it to the end before it is given another. Its disciples are slow to be two things and very hard to turn from the one. It is said in the towns that you may know them by their backs. Some who were refused a second road at nineteen were given it at forty, and said the wait had been the first half of it.",
+			"two": "At Azure Cloud Sect a disciple may hold as many roads as can be carried, and is told at the stele what each will weigh. There are cooks there who mend with the Heart and fight with the Flame. There are also a number of people who are nearly two things. Nobody has been heard to say which of the two kinds the sect is prouder of.",
+			"ask": "At Azure Cloud Sect the rule is one road, and every spring whoever asks is a guest on a second until autumn. In autumn most lay one down. A few ask again, and are heard. Nobody can say whether the rule was changed. Hall Master Shen kept the list for thirty years and maintained to the end that it had not been.",
+		}},
 }
 const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawings", "nineteen", "ancestor", "widow", "crows", "axe", "cauldron_map", "furnace",
 	"the_wheel", "the_player", "the_works", "the_mountain", "the_echoes", "the_hollow",
@@ -1891,7 +1928,7 @@ const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawin
 	"the_sack",
 	"the_knot",
 	"the_mat",
-	"the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round", "the_higher_sky", "the_red_seal"]
+	"the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round", "the_higher_sky", "the_red_seal", "the_two_roads"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:

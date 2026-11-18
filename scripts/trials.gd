@@ -2123,9 +2123,10 @@ static func need_met(n: Array, g, paid: bool = false) -> bool:
 		"renown":
 			return g.renown >= int(n[1])
 		"dao":
-			if g.dao == "" or (str(n[1]) != "" and g.dao != str(n[1])):
+			# (the Two Roads release, braid.gd: any road he holds meets it, not only the one he leads with)
+			if g.dao == "" or (str(n[1]) != "" and not Braid.holds(g, str(n[1]))):
 				return false
-			return g.dao_tier() >= int(n[2])
+			return Braid.tier(g, str(n[1])) >= int(n[2])
 		"standing":
 			return int(g.standing.get(str(n[1]), 0)) >= int(n[2])
 		"friends":

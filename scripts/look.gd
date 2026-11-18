@@ -225,6 +225,8 @@ const PICKUP_COLORS := {
 	"wet_cinder": Color("8a8a90"), "boundary_stake": Color("4a4238"), "scorched_peg": Color("c8a868"),
 	# Part XXXIX (the Red Seal release)
 	"entry_tally": Color("c8b070"), "turnip_seal": Color("c83a2a"), "half_stick": Color("8a6a44"),
+	# Part XL (the Two Roads release)
+	"keeper_acorn": Color("9a7a3a"), "pricked_leaf": Color("d85a3a"), "fork_stone": Color("a8a498"),
 	# Part XXXVIII (the Higher Sky release)
 	"bed_gall": Color("5a6a3a"), "war_slip": Color("c8b070"), "linchpin": Color("5a5a62"),
 	"charred_shingle": Color("4a3a30"), "crane_feather": Color("f4f4f8"), "furrow_piece": Color("e8c040"),

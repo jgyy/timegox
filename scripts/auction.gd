@@ -90,7 +90,9 @@ static func lots_on(g, house: String, day: int) -> Array:
 			var cs: Array = h.curios
 			for j in cs.size():
 				var c := str(cs[(day + j) % cs.size()])
-				if item == "" and int(g.inv.get(c, 0)) == 0:
+				# (the Two Roads release: a curio won by a sealed bid and still lying at the post is his already:
+				# there is only the one of each)
+				if item == "" and int(g.inv.get(c, 0)) == 0 and not g.parcels.any(func(pc): return str(pc.get("item", "")) == c):
 					item = c
 			if item == "":
 				item = "ess_dark"
@@ -166,7 +168,9 @@ static func _won(g, house: String, lot: Dictionary, paid: int) -> void:
 	g.lots_won = int(g.lots_won) + 1
 	g.lot_spent = int(g.lot_spent) + paid
 	g.lot_saved = int(g.lot_saved) + int(lot.value) - paid
-	g.step_bid = int(g.step_bid) + 1
+	# (the Two Roads release: a step that sends him to one room is not done by a lot won in another)
+	if str(g.cur_step().get("house", house)) == house:
+		g.step_bid = int(g.step_bid) + 1
 	g.note("Bought at %s: %s x%d (%d spirit stones)" % [str(HOUSES[house].n), str(Data.ITEMS[str(lot.item)].n), int(lot.n), paid])
 
 ## The least that wins `lot` today: the first call he may make that nobody will top.
@@ -233,7 +237,8 @@ static func settle(g) -> Array:
 			g.lots_won = int(g.lots_won) + 1
 			g.lot_spent = int(g.lot_spent) + int(b.amount)
 			g.lot_saved = int(g.lot_saved) + int(lot.value) - int(b.amount)
-			g.step_bid = int(g.step_bid) + 1
+			if str(g.cur_step().get("house", house)) == house:
+				g.step_bid = int(g.step_bid) + 1
 			out.append("%s: your sealed bid of %d took the lot. It is in the post: %s x%d." % [str(HOUSES[house].n), int(b.amount), str(Data.ITEMS[str(lot.item)].n), int(lot.n)])
 		else:
 			g.stones += int(b.amount)

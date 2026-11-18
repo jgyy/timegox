@@ -84,9 +84,17 @@ const FEATS := {
 	# the Higher Sky release: the last realm, and the three who stood above him (Part XXXVIII)
 	"low_as_sea": {"n": "King of a Hundred Valleys", "kind": "road", "pts": 20, "test": ["level", 129], "desc": "Reach Low as the Sea."},
 	# the Red Seal release: the last realm, the lists, the hammer and the horse (Part XXXIX)
-	"no_name": {"n": "Sealed, and Blank", "kind": "road", "pts": 20, "test": ["level", 132], "desc": "Reach Hidden and Nameless: the last realm there is."},
+	"no_name": {"n": "Sealed, and Blank", "kind": "road", "pts": 20, "test": ["level", 132], "desc": "Reach Hidden and Nameless."},
 	"on_the_board": {"n": "A Name on the Board", "kind": "road", "pts": 10, "test": ["step", "s_p39_outer"], "desc": "Fight the Lists of the Outer Court to an end, at whatever place."},
 	"the_hammer": {"n": "Wanted It When He Did", "kind": "road", "pts": 10, "test": ["step", "s_p39_room"], "desc": "Win a lot in an auction room."},
+	# the Two Roads release: the last realm, the leaves and the roads (Part XL)
+	"two_roads": {"n": "Seven Either Way", "kind": "road", "pts": 20, "test": ["level", 135], "desc": "Reach Walking Two Roads: the last realm there is."},
+	"the_loser_pours": {"n": "The Loser Pours", "kind": "road", "pts": 10, "test": ["step", "s_p40_du"], "desc": "Win a hand of leaves from Hall Master Du."},
+	"the_keepers_table": {"n": "Without a Tail", "kind": "road", "pts": 10, "test": ["step", "s_p40_ju"], "desc": "Take the table from the keeper of monkeys, at Three in the Morning."},
+	"both_at_once": {"n": "Neither Promised the Morning", "kind": "road", "pts": 10, "test": ["step", "s_p40_two"], "desc": "Walk a second road as well as the first."},
+	"leaves_ten": {"n": "Has Not Poured Since the New Year", "kind": "odd", "pts": 10, "test": ["card_wins", 10], "desc": "Win ten hands of leaves."},
+	"five_painted": {"n": "A Hand of Nines", "kind": "odd", "pts": 20, "test": ["masters", 5], "desc": "Win a hand from every master of the leaves."},
+	"three_roads": {"n": "Three Hares", "kind": "odd", "pts": 10, "test": ["roads", 3], "desc": "Walk three roads at once."},
 	"not_a_horse": {"n": "White; Not a Horse", "kind": "road", "pts": 10, "test": ["step", "s_p39_schools"], "desc": "Stand in the last meet of the three, with every school that has a name."},
 	"the_stirrup": {"n": "Whose Stirrup", "kind": "road", "pts": 10, "test": ["step", "s_p38_fuchai"], "desc": "Stand in front of a king four realms above you, however it goes."},
 	"white_tree": {"n": "He Cannot Leave It Unread", "kind": "road", "pts": 10, "test": ["step", "s_p38_pang"], "desc": "Stand in front of a general who has you numbered."},
@@ -243,6 +251,12 @@ static func value(g, t: Array) -> float:
 	match str(t[0]):
 		"level":
 			return float(g.level)
+		"card_wins":
+			return float(g.card_wins)
+		"masters":
+			return float(Yezi.beaten(g))
+		"roads":
+			return float(g.braid_most)
 		"realm":
 			return float(g.realm())
 		"step":

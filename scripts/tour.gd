@@ -2359,6 +2359,10 @@ func _run() -> void:
 		# the Iron Pestle release (--pestle, or --pestle=a,b): the people, foes and lords of Part XXXIII, what each
 		# answer of its crossroads leaves standing, the lords in battle, and the crossroads
 		await _pestle_shots(str(main.args.pestle))
+	if main.args.has("roads"):
+		# the Two Roads release (--roads, or --roads=a,b): the table of leaves in both games, the counter that keeps
+		# one, the page of leaves, a stele offering a second road, the page of the Daos, a fuller street, and Part XL
+		await _roads_shots(str(main.args.roads))
 	if main.args.has("seal"):
 		# the Red Seal release (--seal, or --seal=a,b): the desk of the Hall of Seals and a paper sealed, the page of
 		# papers, a board of the lists, bouts and what is said in them, an auction room, the post, and Part XXXIX
@@ -7057,6 +7061,176 @@ func _seal_shots(which: String = "1") -> void:
 		main.choice.cursor = 1
 		await _wait(1.0)
 		await _shot("crossroads_red_seal")
+		main.pop()
+		Game.cross_pending = []
+	get_tree().quit(0)
+
+## The Two Roads release: the table of leaves (yezi.gd, leaves.gd), walking two roads (braid.gd), the fuller
+## towns (folk.gd MORE), and the people, foes and marks of Part XL.
+func _roads_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_burrows_state()
+	Game.level = 133
+	Game.step = Data.step_index("s_p40_zhen")
+	Game.companion = true
+	Game.day = 320
+	Game.stones = 101000
+	Game.dao = "sword"
+	Game.dao_xp = {"sword": 60, "heart": 14, "formation": 3}
+	for a9 in ["village", "longmen", "tushan", "yanggu", "mountain"]:
+		Game.seen[a9] = true
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	var quiet := func():
+		Game.toasts.clear()
+		main.toast_list.clear()
+		Game.mail_told = 999
+		Game.fame_told = Fame.rank(Game)
+	var counter := func(office: String) -> Dictionary:
+		return {"kind": "office", "id": office, "office": office, "n": str(Offices.OFFICES[office].n), "area": str(Offices.OFFICES[office].area), "pos": Vector2i.ZERO}
+	if want.call("table"):
+		w.load_area("yanggu", Vector2i(34, 32))
+		w.banner_t = 0.0
+		quiet.call()
+		await _wait(0.3)
+		main.offer_carriage(counter.call("warden_yanggu"))
+		main.choice.cursor = maxi(0, main.choice.ids().find("leaves"))
+		await _wait(0.3)
+		await _shot("counter_leaves")
+		main.pop()
+		Game.cards = {"du_outer": {"won": 1, "lost": 1, "beat_day": 300}}
+		Game.leaves = {"du_outer": true}
+		Game.leaf = "du_outer"
+		main.offer_leaves(Yezi.at("warden_yanggu"))
+		main.choice.cursor = 1
+		await _wait(0.3)
+		await _shot("leaves_sit")
+		main.pop()
+		Game.card_n = 4
+		main.leaves.start(Yezi.foe("zhen_lantern"), {})
+		main.push("leaves")
+		await _wait(0.2)
+		for k in 3:
+			main.leaves.cursor = main.leaves.want()
+			main.leaves.press("confirm")
+			main.leaves.press("confirm")
+			await _wait(0.1)
+		main.leaves.cursor = main.leaves.want()
+		await _wait(0.15)
+		await _shot("leaves_round")
+		main.leaves.press("confirm")
+		await _wait(0.2)
+		await _shot("leaves_trick")
+		main.pop()
+		main.leaves.state = "idle"
+		Game.card_n = 9
+		main.leaves.start(Yezi.foe("ju_gong"), {})
+		main.push("leaves")
+		await _wait(0.2)
+		for k2 in 3:
+			main.leaves.cursor = main.leaves.want()
+			main.leaves.press("confirm")
+			await _wait(0.3)
+		main.leaves.cursor = main.leaves.want()
+		await _wait(0.15)
+		await _shot("leaves_morning")
+		main.leaves.press("confirm")
+		await _wait(0.2)
+		await _shot("leaves_morning_shown")
+		main.pop()
+		main.leaves.state = "idle"
+		Game.card_hands = 7
+		Game.card_wins = 4
+		Game.card_tea = 1656
+		Game.cards = {"du_outer": {"won": 2, "lost": 1}, "zhen_lantern": {"won": 1, "lost": 2}, "ban_netloft": {"won": 1, "lost": 0}}
+		Game.leaves = {"du_outer": true, "zhen_lantern": true, "ban_netloft": true}
+		main.push("menu")
+		main.menu.mode = "leaves"
+		main.menu._build()
+		main.menu.cursor = 1
+		await _wait(0.3)
+		await _shot("page_leaves")
+		main.pop()
+	if want.call("stele"):
+		main.set_stack(["world"])
+		w.load_area("sect", Vector2i(16, 12))
+		w.banner_t = 0.0
+		quiet.call()
+		Game.braid = []
+		await _wait(0.3)
+		main.offer_braid("heart")
+		main.choice.cursor = 1
+		await _wait(0.3)
+		await _shot("stele_two_roads")
+		main.pop()
+		Braid.take(Game, "heart")
+		Braid.take(Game, "formation")
+		Game.rite_due = []
+		quiet.call()
+		main.push("menu")
+		main.menu.mode = "dao"
+		main.menu._build()
+		await _wait(0.3)
+		await _shot("page_three_roads")
+		main.pop()
+	if want.call("street"):
+		Game.rite_due = []
+		Game.page_due = []
+		Game.done_pending = []
+		main.set_stack(["world"])
+		Game.clock = 15.9 * 60.0
+		w.load_area("yanggu", Vector2i(34, 31))
+		w.banner_t = 0.0
+		quiet.call()
+		await _wait(1.2)
+		await _shot("street_fuller_yanggu")
+		w.load_area("village", Vector2i(30, 29))
+		w.banner_t = 0.0
+		quiet.call()
+		await _wait(1.2)
+		await _shot("street_fuller_qingshi")
+	if want.call("people"):
+		Game.rite_due = []
+		Game.page_due = []
+		main.set_stack(["world"])
+		var lf: Dictionary = {}
+		var hw: Dictionary = {}
+		var stl: Dictionary = {}
+		for fp in Folk.people(Atlas.world_of("surface"), "yanggu"):
+			if str(fp.role) == "leafer" and lf.is_empty():
+				lf = fp
+			elif str(fp.role) == "hawker" and hw.is_empty():
+				hw = fp
+			elif str(fp.role) == "storyteller" and stl.is_empty():
+				stl = fp
+		await _gallery("part40_people", [Assets.person("ju_gong"), Folk.model(lf), Folk.model(hw), Folk.model(stl)], 0.5, 0.2)
+	if want.call("foes"):
+		Game.rite_due = []
+		Game.page_due = []
+		var fs: Array = []
+		for fid2 in ["furious_monkey", "counted_acorn", "morning_three", "marked_leaf", "sleeve_leaf", "faceless_dealer", "forked_shadow", "road_untaken", "two_minded"]:
+			fs.append(_foe(fid2))
+		await _gallery("part40_foes", fs, 1.0, 0.25)
+	if want.call("marks"):
+		Game.rite_due = []
+		Game.page_due = []
+		var mk: Array = []
+		for oid in ["one", "two", "ask"]:
+			mk.append(Marks.model(Marks.MARKS.the_two_roads[oid], 0))
+		await _gallery("part40_marks", mk, 1.6, 0.3)
+	if want.call("cross"):
+		Game.rite_due = []
+		Game.page_due = []
+		main.set_stack(["world"])
+		Game.step = Data.step_index("s_p40_court") + 1
+		Game.picks.erase("the_two_roads")
+		Game.cross_pending = ["the_two_roads"]
+		main.ask_crossroads()
+		main.choice.cursor = 2
+		await _wait(0.3)
+		await _shot("crossroads_two_roads")
 		main.pop()
 		Game.cross_pending = []
 	get_tree().quit(0)

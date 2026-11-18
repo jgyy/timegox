@@ -120,6 +120,10 @@ const LATE := {
 	"frost": {-1: {"pool": [["straw_champion", 129, 129], ["scroll_form", 129, 129], ["empty_title", 129, 129]], "n": 10, "vis": "s_p39_home"}},
 	"dunes": {-1: {"pool": [["turnip_stamp", 130, 130], ["sold_name", 130, 130], ["ink_blot", 130, 130]], "n": 10, "vis": "s_p39_home"}},
 	"yanggu": {-1: {"pool": [["white_not_horse", 131, 131], ["feathered_egg", 131, 131], ["halved_stick", 131, 131]], "n": 10, "vis": "s_p39_home"}},
+	# Part XL (the Two Roads release): what a count that changes nothing leaves behind it, in three more
+	"silk": {-1: {"pool": [["furious_monkey", 132, 132], ["counted_acorn", 132, 132], ["morning_three", 132, 132]], "n": 10, "vis": "s_p40_home"}},
+	"fungal": {-1: {"pool": [["marked_leaf", 133, 133], ["sleeve_leaf", 133, 133], ["faceless_dealer", 133, 133]], "n": 10, "vis": "s_p40_home"}},
+	"magpie": {-1: {"pool": [["forked_shadow", 134, 134], ["road_untaken", 134, 134], ["two_minded", 134, 134]], "n": 10, "vis": "s_p40_home"}},
 }
 
 ## the things to do in a cave (props.gd), in the order a cave takes them; a cave has `PER_CAVE` of them
