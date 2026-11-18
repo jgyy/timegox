@@ -216,9 +216,14 @@ static func mod(g, key: String) -> float:
 			m *= float(COST[id].mods.get(key, 1.0))
 	return m
 
-## Whether he may ask `id` for another bout: lost to, and still standing.
+## Whether he may ask `id` for another bout: lost to, and still standing.  Somebody the story itself brings
+## him back to (Pang Juan, under the tree: the step that mends the wound is a "kill") is met again there and
+## nowhere else: beaten early, he would be gone from the land with the step that needs him still to do.
 static func again(g, id: String) -> bool:
-	return g.bested.has(id) and str(g.bested[id].get("last", "")) != "won" and not g.boss_done.has(id)
+	if not g.bested.has(id) or str(g.bested[id].get("last", "")) == "won" or g.boss_done.has(id):
+		return false
+	var ms: Dictionary = Data.STEPS[Data.step_index(str(COST[id].mend))]
+	return not (str(ms.kind) == "kill" and str(ms.get("boss", "")) == id)
 
 ## How many betters of the story he has stood in front of, and how many he has beaten.
 static func met(g) -> int:

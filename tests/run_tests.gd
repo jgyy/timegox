@@ -10107,6 +10107,7 @@ func _higher_sky() -> void:
 	var fh: Dictionary = GH.fighter(0)
 	var fw: Dictionary = G.fighter(0)
 	check(float(fw.atk) < float(fh.atk) and int(fw.spd) < int(fh.spd) and float(fw.atk) > float(fh.atk) * 0.85, "the knee: he strikes a little less hard and is slower to the first blow (%.0f against %.0f)" % [float(fw.atk), float(fh.atk)])
+	check(not Betters.again(G, "pang_juan") and Data.STEPS[Data.step_index("s_p38_maling")].kind == "kill", "Pang Juan is met again where the story meets him, under the tree, and nowhere sooner: the step would be left with nobody to fight")
 	G.step = Data.step_index("s_p38_maling") + 1
 	check(not Betters.wounded(G, "pang_juan") and is_equal_approx(float(G.fighter(0).atk), float(fh.atk)), "and it is mended under the white tree")
 	GH.free()

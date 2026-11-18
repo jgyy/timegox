@@ -12,7 +12,7 @@ jobs:
   art:
     name: Rebuild Blender assets from art/
     runs-on: ubuntu-latest
-    timeout-minutes: 60  # 371 assets with four workers: about 29 minutes on a hosted runner (every person carries a body under the clothes)
+    timeout-minutes: 60  # 377 assets with four workers: about 30 minutes on a hosted runner (every person carries a body under the clothes)
     steps:
       - uses: actions/checkout@v4
 
@@ -36,7 +36,7 @@ jobs:
 
   test-and-playthrough:
     runs-on: ubuntu-latest
-    timeout-minutes: 90  # the bot plays about forty-five and a half hours of game time: half an hour or so since the Iron Pestle release taught it not to read the whole realm every frame (seventy to ninety-five minutes before)
+    timeout-minutes: 90  # the bot plays about forty-six and a half hours of game time: half an hour or so since the Iron Pestle release taught it not to read the whole realm every frame (seventy to ninety-five minutes before)
     steps:
       - uses: actions/checkout@v4
 
