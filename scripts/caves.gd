@@ -111,6 +111,11 @@ const LATE := {
 	"volcano": {-1: {"pool": [["carried_faggot", 123, 123], ["thrown_cup", 123, 123], ["fed_ember", 123, 123]], "n": 11, "vis": "s_p37_home"}},
 	"drowned": {-1: {"pool": [["raised_dyke", 124, 124], ["sent_flood", 124, 124], ["drowned_furrow", 124, 124]], "n": 11, "vis": "s_p37_home"}},
 	"thunder": {-1: {"pool": [["deaf_stove", 125, 125], ["split_billet", 125, 125], ["lost_note", 125, 125]], "n": 11, "vis": "s_p37_home"}},
+	# Part XXXVIII (the Higher Sky release): what losing left in the road, in the caves where the three who are above him wait
+	# (as many packs as each cave had room for: the cave under the Dragon Palace is a small one)
+	"dragon": {-1: {"pool": [["stable_fork", 126, 126], ["tribute_chest", 126, 126], ["hung_gall", 126, 126]], "n": 6, "vis": "s_p38_home"}},
+	"maple": {-1: {"pool": [["counted_fire", 127, 127], ["forced_march", 127, 127], ["barked_tree", 127, 127]], "n": 9, "vis": "s_p38_home"}},
+	"terraces": {-1: {"pool": [["barred_lane", 128, 128], ["old_scar", 128, 128], ["turned_cart", 128, 128]], "n": 10, "vis": "s_p38_home"}},
 }
 
 ## the things to do in a cave (props.gd), in the order a cave takes them; a cave has `PER_CAVE` of them

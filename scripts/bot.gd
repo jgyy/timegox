@@ -137,6 +137,8 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	"the_drained": "relic", "the_tugger": "relic", "the_grasper": "relic",
 	# Part XXXVII: the cinders that stayed out, the stakes of the old boundary and the pieces that still answer
 	"the_fed_fire": "relic", "the_next_door": "relic", "the_kindling": "relic",
+	# Part XXXVIII: the slips Sun Bin kept back
+	"pang_juan": "relic",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -194,7 +196,7 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	"the_mirror": ["rivet"],
 	# Part XXXIII: sent to take a turn at the stone
 	"the_needle": ["turn"],
-	"the_belts": ["wait"], "the_stone": ["keep"], "the_ladle": ["teach"], "the_round": ["watch"]}
+	"the_belts": ["wait"], "the_stone": ["keep"], "the_ladle": ["teach"], "the_round": ["watch"], "the_higher_sky": ["ditch"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -370,6 +372,13 @@ func _apply_start() -> void:
 			Game.inv[st2.item] = maxi(int(Game.inv.get(st2.item, 0)), st2.n)
 		if st2.kind == "kill" and Trials.TRIALS.has(st2.boss):
 			Game.trials[st2.boss] = str(TRIAL_PLAN.get(st2.boss, "might"))
+		# (the Higher Sky release, betters.gd: those above him were met as the bot meets them: fought, and lost to;
+		# with --yield given way to, and with --bot-up beaten, so that either branch can be played from its start)
+		if st2.kind == "dare":
+			var bhow := "won" if main.args.has("bot-up") else ("gave" if main.args.has("yield") else "lost")
+			Game.bested[str(st2.boss)] = {"first": bhow, "last": bhow, "base": lv + 3 * int(Betters.BETTERS[str(st2.boss)].over), "day": 1, "took": 0, "wound": bhow != "won" and not (bhow == "gave" and bool(Betters.BETTERS[str(st2.boss)].bow)), "bouts": 1}
+			if bhow == "won":
+				Game.boss_done[str(st2.boss)] = true
 		# the fated encounters met so far, as the plan would have chosen (what they give included)
 		if st2.kind == "fate":
 			var fv := Fate.variant(Game, str(st2.id))
@@ -405,6 +414,13 @@ func _apply_start() -> void:
 			for jid in ["job_tally", "job_mill"]:
 				Game.jobs[jid] = "done"
 	# Part XXV: the town that is his own, as far along as the steps behind would have left it (hold.gd)
+	# (betters.gd: with --bot-watch each of those above him has been watched as often as he can be, as a player
+	# who took the days for it would have: the bot itself never spends them)
+	if main.args.has("bot-watch"):
+		for bw in Betters.ORDER:
+			Game.watched[bw] = Betters.WATCH_MAX
+	# (betters.gd: a start on a step of the branch this journey did not take begins at the next it walks)
+	Game.step = Betters.skip(Game, Game.step)
 	Hold.catch_up(Game, idx)
 	if idx > Data.step_index("s_p19_home"):
 		for wid in ["well_sweep", "fire_kit", "cords", "sling", "trip_hammer", "water_bellows", "crossbow", "chariot"]:
@@ -815,6 +831,13 @@ func _world(d: float) -> void:
 			if not _cult_met():
 				_grind()
 			elif _hp_ratio() < 0.85 or _qi_ratio() < 0.6:
+				_start_meditate("rest")
+			else:
+				_goto_entity(s.area, "boss_" + s.boss)
+		"dare":
+			# Part XXXVIII (betters.gd): somebody several realms above him.  The bot watches nobody: it goes to him
+			# rested, stands in front of him (the choice draws, _choice), and takes what comes of it
+			if _hp_ratio() < 0.85 or _qi_ratio() < 0.6:
 				_start_meditate("rest")
 			else:
 				_goto_entity(s.area, "boss_" + s.boss)
@@ -1771,6 +1794,12 @@ func _choice() -> void:
 			if want < 0 and k0 >= 0 and c.options[k0].get("enabled", true):
 				want = k0
 		_nav(ids.size(), c.cursor, maxi(want, 0))
+		return
+	if ids.has("draw") and ids.has("watch"):
+		# somebody above him (betters.gd): the bot stands in front of him at once (--bot-watch plays it as
+		# somebody who had watched each of them three times: see _ready)
+		want = ids.find("draw")
+		_nav(ids.size(), c.cursor, want)
 		return
 	if str(c.title).begins_with(main.TRIFLE_ASK):
 		# a small thing at his feet (trifles.gd): picked up when it is a lost thing a step wants carried home;
@@ -3096,7 +3125,7 @@ func _battle_menu(b) -> void:
 
 func _plan(b) -> Dictionary:
 	var me: Dictionary = b.cur
-	if b.doomed and give_way:
+	if (b.doomed or str(b.better) != "") and give_way:
 		return {"top": "yield"}
 	var allies: Array = b.alive(b.party)
 	var foes: Array = b.alive(b.foes)

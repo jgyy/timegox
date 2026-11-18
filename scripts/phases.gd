@@ -157,7 +157,9 @@ static func come(cur: String, el: String, gr: String) -> Array:
 		if str(FEEDS[was]) == el:
 			return [] if cur == str(FED[el]) else [str(FED[el]), "feed"]
 		if str(QUELLS[el]) == was:
-			return [str(QUELLED[el]), "quell"]
+			# (the Higher Sky release: what a quelling leaves is not quelled again by the same phase: water on
+			# steam used to lay the same steam and count as another fire put out, on one tile, for ever)
+			return [] if cur == str(QUELLED[el]) else [str(QUELLED[el]), "quell"]
 		if was == el:
 			return []
 		# (what lies there overcomes what he struck with: the blow is spent.  Fire on what is wet dries it)

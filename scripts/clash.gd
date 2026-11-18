@@ -200,7 +200,7 @@ static func span(e: Dictionary) -> Array:
 		# a lord is gone when the step that sends the hero to him is done
 		for i in Data.STEPS.size():
 			var s: Dictionary = Data.STEPS[i]
-			if str(s.kind) in ["kill", "fall"] and "boss_" + str(s.get("boss", "")) == str(e.id):
+			if str(s.kind) in ["kill", "fall", "dare"] and "boss_" + str(s.get("boss", "")) == str(e.id):
 				until = i + 1
 	return [from, until]
 

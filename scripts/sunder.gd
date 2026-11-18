@@ -158,7 +158,8 @@ static func blow(g, layer: String, wd: Dictionary, from: Vector2i, f: Vector2i) 
 	# (a blow that parts the wood leaves a hollow in front of where he stood, if that is open ground)
 	if bool(RANKS[r].crater) and int(out.n) > 0:
 		var ct: Vector2i = from + f
-		if what(wd, from, ct, r) == "ground" or scar(g, layer, ct) == "ground":
+		# (the Higher Sky release: a hollow that already lies there is not dug again, nor counted again)
+		if (what(wd, from, ct, r) == "ground" or scar(g, layer, ct) == "ground") and scar(g, layer, ct) != "crater":
 			g.scars[key(layer, ct)] = ["crater", int(g.day)]
 			g.sundered["crater"] = int(g.sundered.get("crater", 0)) + 1
 			out.crater = ct

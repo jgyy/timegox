@@ -269,6 +269,15 @@ const MARKS := {
 			"who": ["Old Gardener Kang", "folk_grandpa", Color("8a8a7a"), "They wanted it taken to the treasury. I said leave it where it fell; I shall weed round it. I have weeded round worse. It never told me anything, you know. I was let in to carry slops, sixty years ago, and nobody thought to lay my hand on it. So I have nothing against it and nothing for it.", "A girl asked me what is under it. I said: the side with the answer on. She tried to lift it. Could not. She has gone off to get stronger. I thought that was a better use of a stone than the one it had before, and I told the Elder so, and he laughed until he had to sit on it."]},
 	},
 	# Part XXXVII (the Five Hands release): what the sect did before the next dry wind
+	# Part XXXVIII (the Higher Sky release): what the sect teaches about those above it
+	"the_higher_sky": {
+		"gall": {"area": "mountain", "m": ["sky", "gall"], "k": 3, "n": "The Galls of the Outer Court", "desc": "A post as high as a seated man's head with a crossbar, and on the crossbar a dried gall on a loop of hemp, at exactly the height of a mouth. A board under it has three names on it, and room left for more.",
+			"who": ["Mian of the Bitter Mornings", "folk_youth", Color("5a6a3a"), "I am the one who missed, Senior. I taste it twice. Once for them, as the Elder says, and once for the Crimson Flame Palm below the east wall. I have not missed since.", "The board has three names and a great deal of space. I asked the Elder why so much. He said: because I have learned something. I think he meant about boards.", "It does not get less bitter. I had hoped it would. Auntie Zhou says that is the one thing about it she approves of."]},
+		"ditch": {"area": "mountain", "m": ["sky", "ditch"], "k": 3, "n": "The Way Round the Gate", "desc": "A path of trodden clay that leaves the paved road, goes round through the wet, and comes back to it thirty paces on. It gets nobody anywhere sooner. A flat stone at the low place has been set there by somebody, to stand on while a cart goes by.",
+			"who": ["Mian of the Clay Path", "folk_youth", Color("7a8a6a"), "I am the one who missed, Senior. I keep the path. It wants a basket of gravel after every rain or it is a pond, and then nobody can give way with any dignity.", "A carter thanked me yesterday. I had not done anything. I had only been standing in the clay when he came up with a full load. I think that is the technique.", "Some of the seniors will not walk it. They say you never did. I tell them you went through a ditch for an old man with forty scars. They do not believe me."]},
+		"road": {"area": "mountain", "m": ["sky", "road"], "k": 3, "n": "The Tablets of Who Beat Whom", "desc": "A wayside stand of pale wooden tablets on pegs, each with two names and a thing: out-rowed by a ferryman of Longmen; out-carried by a girl of the Felt Hearth; beaten at dumplings, Cloudfoot, three times. A brush hangs on a string for the next.",
+			"who": ["Mian, Back from Longmen", "folk_youth", Color("5a6a8a"), "I am the one who missed, Senior. I went down first. A ferryman out-rowed me every day for a month. He is sixty. He never once looked as if he were trying.", "I wrote my own tablet. The Elder says we must. It is harder than losing. You have to choose the words, and they hang where the kitchen-girls can read them.", "I asked the ferryman how long it took him. He said: I am still not as good as my father. He said it quite cheerfully. I have thought about that all the way up the mountain."]},
+	},
 	"the_round": {
 		"break": {"area": "mountain", "m": ["round", "break"], "k": 3, "n": "The Firebreaks of Azure Cloud", "desc": "A strip of bare raked earth as wide as a cart, with a low bank of raised stone down either side, and black on it where it was burnt clean this spring. A tub of water stands at the head of it with a dipper hung on its rim.",
 			"who": ["Torch-Bearer Mian", "folk_youth", Color("8a5a3a"), "I am the one who missed, Senior. The Crimson Flame Palm, below the east wall. They gave me the torch for it. I thought it was a punishment. It is the first fire I ever set that stopped where I meant.", "I burn the lower lane on the first wet morning. A mat at a time. You stand upwind with the tub and you do not look away. That is the whole technique. It took the sect three hundred years to write it down.", "The pines either side have dropped more cones this year than I have ever seen. I think they like the smoke. Nobody told me trees could like a thing."]},
@@ -425,7 +434,7 @@ static func who_stands(g, e: Dictionary) -> bool:
 ## The crossroads of a later release whose marks are stood after the late bands of an older one
 ## (`"warband5"`, `"warband6"`), in a second pass (`after_bands`): a mark stood before them would take
 ## ground a band of an older map stood on, and the band would move.
-const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round"]
+const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round", "the_higher_sky"]
 
 static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, ids: Array, ents: Array, layer: String, reach: Dictionary, peaks: Array, camps: Dictionary, after_bands: bool = false) -> void:
 	var near := {}
@@ -873,6 +882,32 @@ static func model(sp: Dictionary, i: int = 0) -> Node3D:
 					_stick(b, Vector3(cos(a22) * 0.6, 0.12, sin(a22) * 0.6), Vector3(cos(a22) * 1.5, 0.05, sin(a22) * 1.5), 0.03, MB.tag(Color("e8f0e8"), MB.CRYSTAL))
 					b.torus(Vector3(cos(a22) * 1.5, 0.06, sin(a22) * 1.5), 0.12, 0.02, MB.tag(Color("e8f0e8"), MB.CRYSTAL))
 				g.ball(Vector3(0, 1.0, 0.62), 0.16, Color(1.0, 0.5, 0.2, 0.8), true)
+		"sky":
+			# what the sect teaches about those above it (the Higher Sky release): a gall on its post with the board
+			# of names, a flat stone in a clay path, or a stand of tablets with a brush on a string
+			match str(a[1]):
+				"gall":
+					b.cyl(Vector3(0, 0.6, 0), 0.04, 1.2, w, Vector3.ZERO, 6)
+					b.box(Vector3(0.15, 1.17, 0), Vector3(0.5, 0.04, 0.04), w)
+					b.limb(Vector3(0.34, 1.15, 0), Vector3(0.34, 0.98, 0), 0.004, 0.004, MB.tag(Color("b8a878"), MB.CLOTH), 3)
+					b.sph(Vector3(0.34, 0.93, 0), Vector3(0.035, 0.06, 0.035), MB.tag(Color("3a4a22"), MB.CLOTH))
+					b.box(Vector3(0, 0.55, 0.05), Vector3(0.3, 0.42, 0.025), wp, Vector3(0, 0.15 * (i % 3 - 1), 0))
+					for r38 in 3:
+						b.box(Vector3(-0.08 + 0.08 * r38, 0.62, 0.066), Vector3(0.02, 0.2, 0.004), MB.tag(Color("1c1814"), MB.WOOD))
+				"ditch":
+					b.box(Vector3(0, 0.015, 0), Vector3(0.9, 0.03, 1.5), MB.tag(Color("7a5a3a"), MB.STONE), Vector3(0, 0.3 * (i % 3 - 1), 0))
+					b.box(Vector3(0.05, 0.06, 0.1), Vector3(0.5, 0.07, 0.42), st, Vector3(0, 0.4, 0.02))
+					for r38 in 4:
+						b.sph(Vector3(-0.3 + 0.2 * r38, 0.03, -0.5 + 0.07 * ((r38 + i) % 3)), Vector3(0.05, 0.03, 0.05), st)
+				_:
+					for sx in [-0.4, 0.4]:
+						b.cyl(Vector3(sx, 0.55, 0), 0.035, 1.1, w, Vector3.ZERO, 6)
+					for h38 in [0.5, 0.95]:
+						b.box(Vector3(0, h38, 0), Vector3(0.86, 0.035, 0.035), w)
+					for r38 in 5:
+						b.box(Vector3(-0.3 + 0.15 * r38, (0.72 if r38 % 2 == 0 else 0.3) + 0.02 * ((r38 + i) % 2), 0.03), Vector3(0.1, 0.34, 0.012), wp, Vector3(0, 0, 0.04 * (r38 % 3 - 1)))
+					b.limb(Vector3(0.36, 0.95, 0.03), Vector3(0.36, 0.7, 0.05), 0.003, 0.003, MB.tag(Color("3a2a1a"), MB.CLOTH), 3)
+					b.cyl(Vector3(0.36, 0.62, 0.05), 0.012, 0.16, wd, Vector3.ZERO, 5)
 		"round":
 			# what was done before the next dry wind (the Five Hands release): a firebreak's end with its tub, a
 			# village tub with its bell, or a burnt stump with seedlings round it and the stone of the years

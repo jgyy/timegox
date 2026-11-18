@@ -266,6 +266,7 @@ func _process(d: float) -> void:
 	_talk_hint()
 	_done_scene()
 	_rite_scene()
+	_page_scene()
 	# the Thundering Pots release: what the finds (eggs.gd) need to know of the world, what was said
 	# when one was found, and the tune the hour and the place call for (music.gd)
 	var in_world: bool = top_name() == "world"
@@ -337,6 +338,21 @@ func _rite_scene() -> void:
 	if Game.rite_due.is_empty() or Game.prologue != "" or not Game.done_pending.is_empty() or top_name() != "world" or not world.using.is_empty() or world.traveling() or world.ambush_t >= 0.0:
 		return
 	play_rite(str(Game.rite_due.pop_front()))
+
+## The Higher Sky release (memoir.gd): a page one of them has written of what has just happened is read out, in
+## their own words, once he is standing in the world with nothing else going on.  With no window it is only
+## written (Esc > In Their Own Words), so the bot's journey is what it was.
+func _page_scene() -> void:
+	if Game.page_due.is_empty():
+		return
+	if DisplayServer.get_name() == "headless" or args.has("bot"):
+		Game.page_due.clear()
+		return
+	if Game.prologue != "" or not Game.done_pending.is_empty() or not Game.cross_pending.is_empty() or not Game.rite_due.is_empty() or top_name() != "world" or not world.using.is_empty() or world.traveling() or world.ambush_t >= 0.0:
+		return
+	var pid := str(Game.page_due.pop_front())
+	Game.toast("A page is written: %s (Esc > In Their Own Words)" % str(Memoir.PAGES[pid].n))
+	say(Memoir.lines(Game, pid))
 
 func play_rite(id: String, cb: Callable = Callable()) -> void:
 	if not Rites.RITES.has(id):
@@ -452,6 +468,9 @@ func dao_dialogue(key: String, npc: Dictionary = {}) -> Array:
 		# standing, marks.gd)
 		if Dooms.epilogue(Game) != "":
 			lines.append(["Narrator", Dooms.epilogue(Game)])
+		# (the Higher Sky release, betters.gd: and how it went with the three who stood above him)
+		if Betters.epilogue(Game) != "":
+			lines.append(["Narrator", Betters.epilogue(Game)])
 		for rl9 in Reckon.epilogue(Game):
 			lines.append(["Narrator", str(rl9)])
 		# (the Three Burrows release: the town that is his own, and whose name is over its hall, hold.gd)
@@ -2519,6 +2538,10 @@ func boss_interact(e: Dictionary) -> void:
 		# the reckoning (reckon.gd): one of the last lords, made of what was chosen
 		if s.is_empty() or s.kind != "reckon" or not Reckon.stands(Game, str(e.enemy)):
 			return
+	elif Betters.is_better(str(e.enemy)) and not (not s.is_empty() and s.kind == "kill" and s.boss == e.enemy):
+		# the Higher Sky release (betters.gd): somebody above him, who can be walked past, watched, or met
+		meet_better(e)
+		return
 	elif s.is_empty() or not (s.kind == "kill" or s.kind == "fall") or s.boss != e.enemy:
 		say([["Narrator", "%s looms before you, but this is not the time. Finish your current objective first." % d.n]])
 		return
@@ -2554,6 +2577,65 @@ func boss_interact(e: Dictionary) -> void:
 			foe["atk"] = float(Grudges.MIGHT[1])
 		battle.start([foe], {"entity": e, "boss": true, "enemy": e.enemy, "theme": battle_theme()})
 		push("battle")
+	)
+
+## The Higher Sky release (betters.gd): standing in front of somebody several realms above him.  "Walk on" is
+## the first answer; he can be watched (a realm of the gap closed each time, once a day); and he can be met.
+## The first bout is the story's (a step of kind "dare"); after a loss he may be asked for another.
+func meet_better(e: Dictionary) -> void:
+	var id := str(e.enemy)
+	var d: Dictionary = Data.ENEMIES[id]
+	var s := Game.cur_step()
+	var due: bool = not s.is_empty() and str(s.kind) == "dare" and str(s.boss) == id
+	if not due and not Betters.again(Game, id):
+		say([["Narrator", "%s does not look round. Whatever is between the two of them, it is not yet." % d.n]])
+		return
+	var lv := Betters.level(Game, id)
+	var gap := maxi(1, Data.realm_of(lv) - Game.realm())
+	var wb := Betters.watch_blocked(Game, id)
+	var opts: Array = [
+		{"id": "", "label": "Walk on", "desc": "Not today. He will be here.", "col": UI.C_DIM},
+		{"id": "watch", "label": "Watch him", "note": "%d of %d" % [int(Game.watched.get(id, 0)), Betters.WATCH_MAX], "desc": "Stand where he can see he is being looked at, and look: %d hours. Knowing where his guard opens is worth a realm.\n\n%s" % [int(Betters.WATCH_HOURS), wb], "col": UI.C_GOLD, "enabled": wb == ""},
+		{"id": "draw", "label": "Stand in front of him", "note": "%s (%d realm%s above)" % [Data.level_name(lv), gap, "" if gap == 1 else "s"], "desc": "It can be won. If it is lost nobody is carried home: %s.%s" % [str(Betters.COST[id].tag), " He has beaten you once already." if Betters.again(Game, id) else ""], "col": Color(d.col)},
+	]
+	choose("%s, %s" % [d.n, Data.level_name(lv)], opts, func(pid: String):
+		match pid:
+			"watch":
+				var seen := Betters.watch(Game, id)
+				if seen != "":
+					say([["Narrator", seen], ["Narrator", "(%s now: %s.)" % [d.n, Data.level_name(Betters.level(Game, id))]]])
+			"draw":
+				var pre: Array = boss_story(id)
+				pre.append_array(Echoes.told(Game, "dare:" + id, Data.DIALOGUE.get("dare:" + id, [])) if not Game.bested.has(id) else Data.DIALOGUE.get("again:" + id, []))
+				say(pre, func():
+					battle.start([Betters.foe(Game, id)], {"entity": e, "boss": true, "enemy": id, "better": id, "theme": battle_theme(), "path_kind": "Above you", "path_n": "%d realm%s" % [gap, "" if gap == 1 else "s"]})
+					push("battle")
+				)
+	)
+
+## The bout with a better is over (betters.gd): what it cost is taken and told, and the story takes the
+## branch it took.
+func _better_done(outcome: String, ctx: Dictionary) -> void:
+	var id := str(ctx.better)
+	var e: Dictionary = ctx.entity
+	var first: bool = not Game.bested.has(id)
+	var how := "won" if outcome == "win" else str(ctx.get("how", "lost"))
+	var told := Betters.over(Game, id, how, str(e.get("area", Game.area)))
+	var lines: Array = []
+	if how == "won":
+		world.battle_mark(e, true)
+		Game.boss_done[id] = true
+		Game.add_renown(Trials.RENOWN_BOSS * 2)
+		lines = dao_dialogue("won:" + id) if first else Data.DIALOGUE.get("back:" + id, []).duplicate()
+	else:
+		lines = Data.DIALOGUE.get("bested:" + id + ":" + how, []).duplicate() if first else [["Narrator", "It goes as it went before, and costs what it cost before."]]
+	if told != "":
+		lines.append(["Narrator", told])
+	say(lines, func():
+		var s := Game.cur_step()
+		if not s.is_empty() and str(s.kind) == "dare" and str(s.boss) == id:
+			Game.advance()
+		ask_picks()
 	)
 
 ## Who a boss was before it stood in the road (lore.gd), told by the narrator the first time Lin Feng
@@ -2623,7 +2705,7 @@ const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "reca
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
 	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
-	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31", "s_break38": "recall32", "s_break39": "recall33", "s_break40": "recall34", "s_break41": "recall35"}
+	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31", "s_break38": "recall32", "s_break39": "recall33", "s_break40": "recall34", "s_break41": "recall35", "s_break42": "recall36"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,
@@ -2659,6 +2741,10 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 	# (the Open Net release, crime.gd: he drew on the watch, or the bounty-takers found him)
 	if ctx.has("crime"):
 		_crime_done(outcome, ctx)
+		return
+	# (the Higher Sky release, betters.gd: a bout with somebody above him, however it went)
+	if str(ctx.get("better", "")) != "" and outcome in ["win", "bested"]:
+		_better_done(outcome, ctx)
 		return
 	match outcome:
 		"win":

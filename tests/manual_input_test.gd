@@ -289,11 +289,14 @@ func doom_step() -> void:
 	if main.top_name() == "battle" and str(b.state) == "menu":
 		if not doom.has("seen%d" % int(doom.stage)):
 			doom["seen%d" % int(doom.stage)] = true
-			expect(bool(b.doomed) and b.ids.has("yield") and b.labels[b.ids.find("yield")] == "Give way" and bool(b.enabled[b.ids.find("flee")]), "what cannot be beaten: the menu has a fifth line, Give way")
-		if int(doom.stage) == 1 and str(b.menu_kind) == "main" and not doom.has("up"):
-			doom["up"] = true
+			if int(doom.stage) < 2:
+				expect(bool(b.doomed) and b.ids.has("yield") and b.labels[b.ids.find("yield")] == "Give way" and bool(b.enabled[b.ids.find("flee")]), "what cannot be beaten: the menu has a fifth line, Give way")
+			else:
+				expect(not bool(b.doomed) and str(b.better) == "lian_po" and b.ids.has("yield") and int(b.foes[0].lv) == int(g.level) + 12 and float(b.foes[0].maxhp) > 100.0 * float(g.max_hp(0)), "somebody four realms above him: the menu has Give way, and he is not a thing to trade blows with")
+		if int(doom.stage) >= 1 and str(b.menu_kind) == "main" and not doom.has("up%d" % int(doom.stage)):
+			doom["up%d" % int(doom.stage)] = true
 			tap(KEY_UP)
-		elif int(doom.stage) == 1 and str(b.menu_kind) == "main":
+		elif int(doom.stage) >= 1 and str(b.menu_kind) == "main":
 			expect(str(b.ids[b.cursor]) == "yield", "Up from Attack is Give way")
 			tap(KEY_ENTER)
 		else:
@@ -316,7 +319,16 @@ func doom_step() -> void:
 			doom.stage = 1
 			_doom_battle()
 		else:
-			expect(str(doom.out1) == "fall" and str(doom.how1) == "gave" and int(doom.rounds1) == 1 and int(g.fallen) == 2 and int(g.yielded) == 1 and int(g.deaths) == int(doom.deaths), "met again, it is given way to at once, standing")
+			if int(doom.stage) == 1:
+				expect(str(doom.out1) == "fall" and str(doom.how1) == "gave" and int(doom.rounds1) == 1 and int(g.fallen) == 2 and int(g.yielded) == 1 and int(g.deaths) == int(doom.deaths), "met again, it is given way to at once, standing")
+				# (the Higher Sky release, betters.gd: an old general four realms above him, given way to with the keys)
+				doom.stage = 2
+				doom["stones2"] = int(g.stones)
+				main.battle.start([Betters.foe(g, "lian_po")], {"entity": {"kind": "boss", "id": "boss_lian_po", "enemy": "lian_po", "area": str(g.area), "pos": Vector2i.ZERO}, "boss": true, "enemy": "lian_po", "better": "lian_po", "theme": main.battle_theme()})
+				main.push("battle")
+				return
+			expect(str(doom.out2) == "bested" and str(doom.how2) == "gave" and int(g.deaths) == int(doom.deaths) and str(g.area) == str(doom.area) and main.world.ptile == doom.tile, "given way to: the bout is lost, and nobody is carried home")
+			expect(Betters.branch(g, "lian_po") == "up" and not Betters.wounded(g, "lian_po") and int(g.stones) == int(doom.stones2) - Betters.taken("lian_po", "gave", int(doom.stones2)) and int(g.bowed) == 1, "it cost a toll and nothing else, and the story takes the road of the thorn rods")
 			# and last of all, the keys of the Small Fish release: P, H, B
 			fish = {"stage": 0, "at": frame}
 			doom = {}
