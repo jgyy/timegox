@@ -2359,6 +2359,10 @@ func _run() -> void:
 		# the Iron Pestle release (--pestle, or --pestle=a,b): the people, foes and lords of Part XXXIII, what each
 		# answer of its crossroads leaves standing, the lords in battle, and the crossroads
 		await _pestle_shots(str(main.args.pestle))
+	if main.args.has("sky"):
+		# the Higher Sky release (--sky, or --sky=a,b): those above him where they stand, the choice in front of
+		# one, a bout and how it ends, the pages in their own words, and Part XXXVIII
+		await _sky_shots(str(main.args.sky))
 	if main.args.has("hands"):
 		# the Five Hands release (--hands, or --hands=a,b): hands on what they hold, before and after; the five
 		# phases turned on a wood, one after another; what hangs from a hand; and Part XXXVII
@@ -6738,6 +6742,141 @@ func _block_shots(which: String = "1") -> void:
 		main.set_stack(["world"])
 	get_tree().quit(0)
 
+
+## The Higher Sky release: the three who stand above him at the back of their caves (betters.gd), the choice in
+## front of one of them, a bout and the fourth end of a battle, a page read out and the book of pages
+## (memoir.gd), and the people, foes and marks of Part XXXVIII.
+func _sky_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_burrows_state()
+	Game.level = 126
+	Game.step = Data.step_index("s_p38_fuchai")
+	Game.companion = true
+	Game.day = 270
+	Game.stones = 96000
+	Game.dao = "sword"
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	var quiet := func():
+		Game.toasts.clear()
+		main.toast_list.clear()
+		Game.mail_told = 999
+		Game.fame_told = Fame.rank(Game)
+	# (the hero two tiles in front of a lord of a cave, looking at him)
+	var before := func(area: String, id: String) -> Dictionary:
+		var fid := Caves.fid(area, -1)
+		var cw: Dictionary = Atlas.world_of(fid)
+		for e in cw.get("ents", []):
+			if str(e.get("id", "")) != "boss_" + id:
+				continue
+			for d in [Vector2i(0, 1), Vector2i(-1, 0), Vector2i(1, 0), Vector2i(0, -1)]:
+				var t1: Vector2i = e.pos + d
+				var t2: Vector2i = e.pos + d * 2
+				if t2.x < 0 or t2.y < 0 or t2.x >= int(cw.w) or t2.y >= int(cw.h):
+					continue
+				if MapGen.is_walkable_tile(cw.grid[t1.y * int(cw.w) + t1.x]) and MapGen.is_walkable_tile(cw.grid[t2.y * int(cw.w) + t2.x]):
+					w.enter_layer(fid)
+					w.teleport(t2, fid)
+					w.facing = -d
+					w.cam_q = maxi(0, w.FWD.find(-d))
+					w._snap_cam()
+					w.banner_t = 0.0
+					return e
+		return {}
+	if want.call("stand"):
+		for bb in [["dragon", "fuchai"], ["maple", "pang_juan"], ["terraces", "lian_po"]]:
+			main.set_stack(["world"])
+			Game.step = Data.step_index("s_p38_home") + 1
+			var e0: Dictionary = before.call(str(bb[0]), str(bb[1]))
+			if e0.is_empty():
+				continue
+			quiet.call()
+			await _wait(1.0)
+			quiet.call()
+			await _shot("better_stands_" + str(bb[1]))
+	if want.call("choice"):
+		main.set_stack(["world"])
+		Game.step = Data.step_index("s_p38_fuchai")
+		Game.watched = {"fuchai": 1}
+		Game.watch_on = {}
+		var e1: Dictionary = before.call("dragon", "fuchai")
+		if not e1.is_empty():
+			quiet.call()
+			await _wait(0.6)
+			main.meet_better(e1)
+			main.choice.cursor = 1
+			await _wait(0.8)
+			await _shot("better_choice")
+			main.pop()
+		Game.watched = {}
+	if want.call("battles"):
+		for bt in [["fuchai", "dragon"], ["pang_juan", "maple"], ["lian_po", "terraces"]]:
+			main.set_stack(["world"])
+			var b = main.battle
+			b.start([Betters.foe(Game, str(bt[0]))], {"boss": true, "enemy": str(bt[0]), "better": str(bt[0]), "theme": str(Data.AREAS[str(bt[1])].theme), "area": str(bt[1]), "path_kind": "Above you", "path_n": "%d realms" % Betters.gap(Game, str(bt[0])),
+				"entity": {"kind": "boss", "id": "boss_" + str(bt[0]), "enemy": str(bt[0]), "area": str(bt[1]), "pos": Vector2i.ZERO}})
+			main.push("battle")
+			await _wait(3.2)
+			await _shot("battle_better_" + str(bt[0]))
+			if str(bt[0]) == "fuchai":
+				b._bested(false)
+				await _wait(1.6)
+				await _shot("battle_bested")
+			main.pop()
+	if want.call("pages"):
+		main.set_stack(["world"])
+		w.load_area("sect", Vector2i(20, 9))
+		w.banner_t = 0.0
+		Game.bested = {"fuchai": {"first": "lost", "last": "lost", "base": 138, "day": 268, "took": 48000, "wound": true, "bouts": 1}}
+		for pid in Memoir.ORDER:
+			if Memoir.open(Game, pid) and Data.step_index(str(Memoir.PAGES[pid].after)) <= Data.step_index("s_p38_fuchai"):
+				Game.pages[pid] = 3 + 7 * Game.pages.size()
+		quiet.call()
+		await _wait(0.6)
+		main.say(Memoir.lines(Game, "p38_fuchai_down_lin"))
+		await _wait(1.4)
+		await _shot("page_stables")
+		main.pop()
+		main.say(Memoir.lines(Game, "p38_fuchai_down_yue").slice(1))
+		await _wait(1.4)
+		await _shot("page_wall")
+		main.pop()
+		main.open_menu()
+		main.menu.mode = "words"
+		main.menu._build()
+		main.menu.cursor = main.menu.ids.find("page:p38_fuchai_down_lin")
+		await _wait(0.6)
+		await _shot("words_book")
+		main.menu.cursor = main.menu.ids.find("page:p15_woven")
+		await _wait(0.4)
+		await _shot("words_book_yue")
+		main.pop()
+	if want.call("people"):
+		await _gallery("part38_people", [Assets.person("goujian"), Assets.person("sun_bin"), Assets.person("lin_xiangru")], 0.5, 0.2)
+		await _gallery("part38_betters", [Assets.person("fuchai"), Assets.person("pang_juan"), Assets.person("lian_po")], 0.5, 0.2)
+	if want.call("foes"):
+		var fs: Array = []
+		for fid2 in ["stable_fork", "tribute_chest", "hung_gall", "counted_fire", "forced_march", "barked_tree", "barred_lane", "old_scar", "turned_cart"]:
+			fs.append(_foe(fid2))
+		await _gallery("part38_foes", fs, 1.0, 0.25)
+	if want.call("marks"):
+		var mk: Array = []
+		for oid in ["gall", "ditch", "road"]:
+			mk.append(Marks.model(Marks.MARKS.the_higher_sky[oid], 0))
+		await _gallery("part38_marks", mk, 1.6, 0.3)
+	if want.call("cross"):
+		main.set_stack(["world"])
+		Game.picks.erase("the_higher_sky")
+		Game.cross_pending = ["the_higher_sky"]
+		main.ask_crossroads()
+		main.choice.cursor = 1
+		await _wait(1.0)
+		await _shot("crossroads_higher_sky")
+		main.pop()
+		Game.cross_pending = []
+	get_tree().quit(0)
 
 ## The Five Hands release: the work of the hands as it was held and as it is held (grip.gd), the five phases
 ## turned on a forest's edge and met with one another (phases.gd), what hangs from a hand (heft.gd), and the

@@ -2596,7 +2596,7 @@ func meet_better(e: Dictionary) -> void:
 	var opts: Array = [
 		{"id": "", "label": "Walk on", "desc": "Not today. He will be here.", "col": UI.C_DIM},
 		{"id": "watch", "label": "Watch him", "note": "%d of %d" % [int(Game.watched.get(id, 0)), Betters.WATCH_MAX], "desc": "Stand where he can see he is being looked at, and look: %d hours. Knowing where his guard opens is worth a realm.\n\n%s" % [int(Betters.WATCH_HOURS), wb], "col": UI.C_GOLD, "enabled": wb == ""},
-		{"id": "draw", "label": "Stand in front of him", "note": "%s (%d realm%s above)" % [Data.level_name(lv), gap, "" if gap == 1 else "s"], "desc": "It can be won. If it is lost nobody is carried home: %s.%s" % [str(Betters.COST[id].tag), " He has beaten you once already." if Betters.again(Game, id) else ""], "col": Color(d.col)},
+		{"id": "draw", "label": "Stand in front of him", "note": "%d realm%s above" % [gap, "" if gap == 1 else "s"], "desc": "It can be won. If it is lost nobody is carried home: %s.%s" % [str(Betters.COST[id].tag), " He has beaten you once already." if Betters.again(Game, id) else ""], "col": Color(d.col)},
 	]
 	choose("%s, %s" % [d.n, Data.level_name(lv)], opts, func(pid: String):
 		match pid:

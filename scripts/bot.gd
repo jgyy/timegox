@@ -3333,6 +3333,13 @@ func _finish(reason: String) -> void:
 	for fid in Game.falls:
 		how_n[str(Game.falls[fid].how)] = int(how_n.get(str(Game.falls[fid].how), 0)) + 1
 	print("what was lost   : %d battles that could not be won (%d given way to), %d of 3 dooms of the story stood in front of %s" % [Game.fallen, Game.yielded, int(Feats.value(Game, ["dooms", 3])), str(how_n)])
+	# (the Higher Sky release, betters.gd, memoir.gd)
+	var how_b: Array = []
+	for bid in Betters.ORDER:
+		if Game.bested.has(bid):
+			how_b.append("%s %s, the story went %s" % [bid, str(Game.bested[bid].first), Betters.branch(Game, bid)])
+	print("those above     : %d of 3 met; %d bouts lost (%d given way to), %d won; %s; wounds still on him %s" % [Betters.met(Game), Game.overmatched, Game.bowed, Game.bettered, "; ".join(how_b) if not how_b.is_empty() else "none met", str(Betters.tags(Game))])
+	print("their own words : %d of %d pages written (Lin Feng %d, Yue Ling %d, Elder Qing Xuan %d)" % [Game.pages.size(), Memoir.ORDER.size(), Game.pages.keys().filter(func(k): return str(Memoir.PAGES[k].who) == "lin").size(), Game.pages.keys().filter(func(k): return str(Memoir.PAGES[k].who) == "yue").size(), Game.pages.keys().filter(func(k): return str(Memoir.PAGES[k].who) == "elder").size()])
 	var stood := 0
 	for lid9 in ["surface", "heaven", "under", "sea"]:
 		stood += Marks.standing(Game, Atlas.world_of(lid9).ents)
