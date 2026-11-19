@@ -7823,42 +7823,43 @@ func _lakes_shots(which: String = "1") -> void:
 			for k in Traffic.ORDER.slice(half * 5, half * 5 + 5):
 				var holder := Node3D.new()
 				var vm := Wagons.build(k, 3)
-				vm.scale = Vector3.ONE * 0.2
+				vm.scale = Vector3.ONE * 0.42
 				vm.rotation.y = 0.9
 				Wagons.animate(vm, 1.3, true)
 				holder.add_child(vm)
 				vs.append(holder)
-			await _gallery("traffic_vehicles_%d" % (half + 1), vs, 1.5, 0.0)
+			await _gallery("traffic_vehicles_%d" % (half + 1), vs, 2.6, 0.0)
 	if want.call("traffic"):
 		for lr in [["lakes", "traffic_rivers_and_lakes"], ["surface", "traffic_unbroken_land"]]:
 			var lid := str(lr[0])
 			Clock.set_hour(Game, 11.0)
 			Game.step = Data.step_index("s_p40_home")
-			# where two of them are nearest one another on the high road just now
-			var best: Array = []
-			var bd := 1e9
-			var fl: Array = Traffic.fleet(lid)
-			for i in fl.size():
-				for j in i:
-					var a: Dictionary = Traffic.where(fl[i], float(Game.day) * Clock.DAY + float(Game.clock), float(Game.playtime))
-					var b: Dictionary = Traffic.where(fl[j], float(Game.day) * Clock.DAY + float(Game.clock), float(Game.playtime))
-					var d: float = (a.pos as Vector2).distance_to(b.pos)
-					if d < bd and d > 5.0 and bool(a.moving) and bool(b.moving):
-						bd = d
-						best = [a, b]
-			if best.is_empty():
+			# somebody under way out in the country, well clear of every town: he stands beside the road ahead of it
+			var clk := float(Game.day) * Clock.DAY + float(Game.clock)
+			var feet: Array = (Roads.of(lid).at as Dictionary).values()
+			var pick: Dictionary = {}
+			var bd := -1.0
+			for v in Traffic.fleet(lid):
+				var wv: Dictionary = Traffic.where(v, clk, float(Game.playtime))
+				var far := 1e9
+				for f in feet:
+					far = minf(far, Vector2(f).distance_to(wv.pos))
+				if bool(wv.moving) and far > bd and not str(v.kind) in ["handcart", "barrow"]:
+					bd = far
+					pick = wv
+			if pick.is_empty():
 				continue
-			var mid: Vector2 = ((best[0].pos as Vector2) + (best[1].pos as Vector2)) * 0.5
-			w.teleport(_nearest_free(Vector2i(mid) + Vector2i(3, 3)), lid)
+			var ahead: Vector2 = (pick.pos as Vector2) + (pick.dir as Vector2) * 5.0
+			var side2 := Vector2(-(pick.dir as Vector2).y, (pick.dir as Vector2).x)
+			w.teleport(_nearest_free(Vector2i(ahead + side2 * 3.0)), lid)
 			w.banner_t = 0.0
 			quiet.call()
-			await _wait(2.0)
-			var mp := Vector3(mid.x * w.TS + w.off.x, 0, mid.y * w.TS + w.off.z)
-			mp.y = w.ground_y(mp)
-			var along: Vector2 = ((best[1].pos as Vector2) - (best[0].pos as Vector2)).normalized()
-			var side := Vector3(-along.y, 0, along.x)
-			var reach: float = maxf(16.0, bd * w.TS * 0.75)
-			w.cam_override = Transform3D(Basis.IDENTITY, mp + side * reach + Vector3(0, reach * 0.55, 0)).looking_at(mp + Vector3(0, 1.0, 0), Vector3.UP)
+			await _wait(2.5)
+			var vp := Vector3(pick.pos.x * w.TS + w.off.x, 0, pick.pos.y * w.TS + w.off.z)
+			vp.y = w.ground_y(vp)
+			var d3 := Vector3((pick.dir as Vector2).x, 0, (pick.dir as Vector2).y)
+			var s3 := Vector3(side2.x, 0, side2.y)
+			w.cam_override = Transform3D(Basis.IDENTITY, vp + d3 * 13.0 + s3 * 9.0 + Vector3(0, 6.0, 0)).looking_at(vp + d3 * 2.0 + Vector3(0, 1.4, 0), Vector3.UP)
 			await _wait(1.0)
 			await _shot(str(lr[1]))
 			w.cam_override = null
@@ -7878,7 +7879,20 @@ func _lakes_shots(which: String = "1") -> void:
 			await _wait(2.4)
 			var rp: Vector3 = w.wpos(rd.tile)
 			rp.y = w.ground_y(rp)
-			w.cam_override = Transform3D(Basis.IDENTITY, rp + Vector3(9.0, 6.5, 12.0)).looking_at(rp + Vector3(0, 1.0, 0), Vector3.UP)
+			# (from along the road, or over open ground: not through the wood)
+			var from := rp + Vector3(6.0, 4.5, 8.0)
+			var bestd := 1e9
+			for rt in (Roads.of("lakes").tiles as Dictionary):
+				var dd: float = Vector2(rt).distance_to(Vector2(rd.tile))
+				if dd >= 5.0 and dd <= 7.0 and absf(dd - 6.0) < bestd:
+					bestd = absf(dd - 6.0)
+					from = w.wpos(rt)
+					from.y = w.ground_y(from) + 4.0
+			if str(rk[0]) == "camp":
+				var cc: Vector3 = w.wpos(Atlas.world_of("lakes").camps[str(rk[1])])
+				from = rp + (rp - cc).normalized() * 9.0
+				from.y = w.ground_y(from) + 5.0
+			w.cam_override = Transform3D(Basis.IDENTITY, from).looking_at(rp + Vector3(0, 1.0, 0), Vector3.UP)
 			await _wait(0.8)
 			await _shot(str(rk[2]))
 			w.cam_override = null
