@@ -7217,11 +7217,11 @@ const DIALOGUE := {
 		["Narrator", "Yue Ling joins Lin Feng. Her Spring Rain mends the wounded."],
 	],
 	"pre:bamboo_spirit": [
-		["Bamboo Spirit", "Shhhhh... the roots remember the red moon... they command me to crush you..."],
+		["Ancient Bamboo Spirit", "Shhhhh... the roots remember the red moon... they command me to crush you..."],
 		["Yue Ling", "It is in pain, Lin Feng. Strike true, and end its torment."],
 	],
 	"post:bamboo_spirit": [
-		["Bamboo Spirit", "Thank you, child of the Nine Heavens root... the crimson marsh... beware the hag who feeds there."],
+		["Ancient Bamboo Spirit", "Thank you, child of the Nine Heavens root... the crimson marsh... beware the hag who feeds there."],
 		["Lin Feng", "My qi is overflowing. I feel the walls of Qi Condensation straining. A breakthrough is near."],
 	],
 	"pre:s_break1": [
@@ -7879,7 +7879,7 @@ const DIALOGUE := {
 	],
 	"post:the_nineteen": [
 		["Narrator", "One by one the pages tear. Yue Ling breaks the four Immortal Peaches and sets a piece in each pair of empty hands, and one by one the nineteen remember their own names."],
-		["Shui Ying, the Drowned Bearer", "We do not owe anything, do we. We never did."],
+		["Drowned Bearer Shui Ying", "We do not owe anything, do we. We never did."],
 		["Lin Feng", "No. You never did. Rest. I will close the book."],
 	],
 	"pre:jade_ledger": [
@@ -8145,7 +8145,7 @@ const DIALOGUE := {
 	"post:scarecrow_king": [["Narrator", "The Scarecrow King's stitches pull loose, and it slumps back into a plain scarecrow, arms spread wide over the paddies, keeping off nothing but birds."]],
 	"pre:well_spider": [
 		["Narrator", "The village well hums. Something with eight long legs has strung a web from rim to rim, and the bucket hangs wrapped in silk halfway down."],
-		["Well Spider", "Water and thread. Thread and water. Everyone comes to the well. Everyone stays."],
+		["Spider in the Village Well", "Water and thread. Thread and water. Everyone comes to the well. Everyone stays."],
 		["Yue Ling", "Not this morning, they don't."],
 	],
 	"post:well_spider": [["Narrator", "The web parts. The bucket drops with a splash, and somewhere in the village a woman laughs for the first time in a week, because she can draw water again."]],
@@ -12886,7 +12886,7 @@ const DIALOGUE := {
 		["Ah Shun", "I can hear myself walk. I had forgotten what I sound like when nobody is listening for a thief."],
 	],
 	"done:s_p44_lost": [
-		["Narrator", "Two things dropped in the roads of Reedhaven are carried to whose they were. One of the doors he knocks at is Old Gao's. The farmer takes back what he dropped and looks at the cultivator from the mountain for a long time."],
+		["Narrator", "Two things dropped in the roads of Reedhaven go back to whose they were. Old Gao is at his gate when the cultivator from the mountain passes it, and looks at him for a long time, the way he once looked at a boy."],
 		["Lin Feng", "He was looking for the thief in me. I watched him not find it. It took about as long as it takes to find an axe in a furrow."],
 	],
 	"done:s_p44_sit": [

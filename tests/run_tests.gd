@@ -12696,3 +12696,13 @@ func _turned_face_chapter() -> void:
 	for fid in ["changes_its_cry", "no_thief", "smelled"]:
 		check(Feats.FEATS.has(fid), "the feat %s is there to be earned" % fid)
 	check(Feats.need(Feats.FEATS.changes_its_cry.test) == Data.MAX_LEVEL, "and none asks for more than there is")
+
+	print("== what was mended (the Turned Face release) ==")
+	var speakers := {}
+	for dk in Data.DIALOGUE:
+		for ln in Data.DIALOGUE[dk]:
+			speakers[str(ln[0])] = true
+	check(not speakers.has("Bamboo Spirit") and not speakers.has("Well Spider") and not speakers.has("Shui Ying, the Drowned Bearer") and speakers.has("Ancient Bamboo Spirit") and speakers.has("Spider in the Village Well") and speakers.has("Drowned Bearer Shui Ying"), "three lords are called in what they say by the names they fight under")
+	check(FileAccess.get_file_as_string("res://scripts/world.gd").contains("n.set_meta(\"foot_y\", maxf(low, base_y - 0.45))"), "a lord on a slope stands on the ground under his feet, not over the downhill side of it")
+	check(not str(Data.DIALOGUE["done:s_p44_lost"][0][1]).contains("doors he knocks at is Old Gao"), "nothing told of a step assumes whose door a lost thing was carried to")
+	check(Assets.DRAWN_AS.size() == 13 and str(Assets.DRAWN_AS.moon_toad) == "toad" and str(Assets.DRAWN_AS.waking_centipede) == "centipede", "eleven toads and frogs are no longer jellies, a centipede no longer a snake, and two owls no longer hawks")
