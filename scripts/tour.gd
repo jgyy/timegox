@@ -7918,7 +7918,7 @@ func _deeps_shots(which: String = "1") -> void:
 		Clock.set_hour(Game, 11.0)
 		Game.step = Data.step_index("s_p42_shape")
 		var dw: Dictionary = Atlas.world_of("deeps")
-		var from: Vector2i = Atlas.to_world("beiming", Vector2i(46, 50))
+		var from: Vector2i = Atlas.to_world("shanhu", Vector2i(60, 54))
 		w.teleport(_nearest_free(from), "deeps")
 		quiet.call()
 		await _wait(1.2)
@@ -7928,7 +7928,7 @@ func _deeps_shots(which: String = "1") -> void:
 			for dy in range(-rr, rr + 1):
 				for dx in range(-rr, rr + 1):
 					var q: Vector2i = from + Vector2i(dx, dy)
-					if at.x < 0 and Terra.why(Game, dw, "deeps", q, "raise") == "" and Terra.why(Game, dw, "deeps", q + Vector2i(3, 0), "pool") == "" and Terra.why(Game, dw, "deeps", q + Vector2i(-3, 0), "lower") == "" and w.tile_free(q + Vector2i(0, 2)):
+					if at.x < 0 and Terra.why(Game, dw, "deeps", q, "raise") == "" and Terra.why(Game, dw, "deeps", q + Vector2i(3, 0), "pool") == "" and Terra.why(Game, dw, "deeps", q + Vector2i(-3, 0), "lower") == "" and int(dw.grid[(q.y + 2) * dw.w + q.x]) == MapGen.FLOOR and int(dw.grid[(q.y + 1) * dw.w + q.x + 1]) == MapGen.FLOOR and w.tile_free(q + Vector2i(0, 2)):
 						at = q
 		if at.x >= 0:
 			w.teleport(at + Vector2i(0, 2), "deeps")
@@ -8028,18 +8028,17 @@ func _deeps_shots(which: String = "1") -> void:
 			mk.append(Marks.model(Marks.MARKS.the_joy_of_fish[oid], 0))
 		await _gallery("part42_marks", mk, 1.6, 0.3)
 	if want.call("machines"):
-		for half in 2:
+		# (a sheet a works: its three stations, each with whoever works it)
+		for wid2 in Mills.ORDER:
 			var ms: Array = []
-			for wid2 in Mills.ORDER.slice(half * 3, half * 3 + 3):
-				for k2 in 3:
-					var holder := Node3D.new()
-					var mm := Mills.model(wid2, k2)
-					mm.scale = Vector3.ONE * 0.8
-					mm.rotation.y = 0.5
-					Mills.tick(mm, 2.3 + k2, true)
-					holder.add_child(mm)
-					ms.append(holder)
-			await _gallery("works_machines_%d" % (half + 1), ms, 1.9, 0.0)
+			for k2 in 3:
+				var holder := Node3D.new()
+				var mm := Mills.model(wid2, k2)
+				mm.rotation.y = 0.55
+				Mills.tick(mm, 2.3 + k2, true)
+				holder.add_child(mm)
+				ms.append(holder)
+			await _gallery("works_stations_" + wid2, ms, 1.5, 0.0)
 	if want.call("cross"):
 		main.set_stack(["world"])
 		w.teleport(_nearest_free(Atlas.to_world("jiaoshi", Vector2i(39, 31))), "deeps")

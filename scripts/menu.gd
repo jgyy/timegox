@@ -786,7 +786,7 @@ func _draw_deeps() -> void:
 		UI.text(self, Vector2(r.position.x + 40, y + 18), str(wp.n) if known else "A works not yet seen", 13, wp.col if known else UI.C_DIM)
 		if known:
 			UI.text(self, Vector2(r.position.x + 330, y + 18), "%s: %d of %d" % [str(wp.makes), int(wp.stock), int(wp.cap)], 12, UI.C_TEXT)
-			UI.text(self, Vector2(r.position.x + 40, y + 32), "of %s%s" % [str(wp.raw), ("; wants what " + " and ".join(wp.from) + " make" + ("s" if (wp.from as Array).size() == 1 else "")) if not (wp.from as Array).is_empty() else ""], 11, UI.C_DIM.lightened(0.2), HORIZONTAL_ALIGNMENT_LEFT, 740)
+			UI.text(self, Vector2(r.position.x + 40, y + 32), ("of %s" % str(wp.raw)) if (wp.from as Array).is_empty() else ("wants what %s make%s" % [" and ".join(wp.from), "s" if (wp.from as Array).size() == 1 else ""]), 11, UI.C_DIM.lightened(0.2), HORIZONTAL_ALIGNMENT_LEFT, 740)
 		y += 36.0
 	var hands := "No crate in his hands." if Game.mill_crates.is_empty() else "In his hands: " + ", ".join(Game.mill_crates.map(func(c): return "a crate for %s" % str(Mills.WORKS[str(c.to)].short))) + "."
 	UI.wrapped(self, Vector2(r.position.x + 24, y + 14), main.told("%s %d crates carried in all (%d spirit stones). %s" % [hands, Game.crates_done, Game.mill_paid, Terra.text(Game)]), 12, UI.C_TEXT, r.size.x - 48)
