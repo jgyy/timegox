@@ -96,7 +96,17 @@ const FEATS := {
 	"four_tables": {"n": "All Four Tables", "kind": "road", "pts": 10, "test": ["step", "s_p41_wolf"], "desc": "Sit down with all four sects of the Rivers and Lakes, two upright and two crooked."},
 	"forty_home": {"n": "Forty Out, Forty Home", "kind": "road", "pts": 10, "test": ["raids", 12], "desc": "Break twelve raids on the roads and the camps."},
 	# the Sea Floor release: the last realm, the works, the places of the sea floor and the shaped ground (Part XLII)
-	"joy_of_fish": {"n": "From the Bridge", "kind": "road", "pts": 20, "test": ["level", 141], "desc": "Reach Knows the Joy of Fish: the last realm there is."},
+	"joy_of_fish": {"n": "From the Bridge", "kind": "road", "pts": 20, "test": ["level", 141], "desc": "Reach Knows the Joy of Fish."},
+	# the Unblunted Knife release: the last realm, the chart, the crafts, the beasts and the places of peace (Part XLIII)
+	"masters_life": {"n": "Oh. Like That", "kind": "road", "pts": 20, "test": ["level", 144], "desc": "Reach Masters Life: the last realm there is."},
+	"six_lamps": {"n": "Six Lamps of Sixty", "kind": "road", "pts": 10, "test": ["step", "s_p43_gates"], "desc": "Open six ranks of the chart of the channels."},
+	"a_seal_open": {"n": "As Open as It Goes", "kind": "craft", "pts": 20, "test": ["seals_open", 1], "desc": "Open the seal at the end of one of the ten channels."},
+	"it_rattles": {"n": "It Rattles", "kind": "craft", "pts": 10, "test": ["crafted", 1], "desc": "Make something with his own hands."},
+	"six_benches": {"n": "A Thing of Each", "kind": "craft", "pts": 20, "test": ["crafts_worn", 6], "desc": "Wear something of his own making from every one of the six crafts."},
+	"no_art": {"n": "I Have No Art", "kind": "craft", "pts": 20, "test": ["masterworks", 1], "desc": "Make a masterwork."},
+	"held_out_a_fish": {"n": "Held Out a Fish", "kind": "odd", "pts": 10, "test": ["pets", 1], "desc": "Ask a beast of the land to stay, and be answered."},
+	"of_one_heart": {"n": "A Cock of Wood", "kind": "odd", "pts": 20, "test": ["pet_tier", 4], "desc": "Keep a beast until it is of one heart with him."},
+	"sat_and_forgot": {"n": "Who Was Sitting", "kind": "odd", "pts": 10, "test": ["retreats", 6], "desc": "Sit and forget in six different places of peace."},
 	"went_down": {"n": "Mind the Step", "kind": "road", "pts": 10, "test": ["step", "s_p42_dive"], "desc": "Go down with the water at the Returning Ruins, and stand on the floor of the sea."},
 	"asked_the_ground": {"n": "Asked, and It Moved", "kind": "road", "pts": 10, "test": ["step", "s_p42_shape"], "desc": "Learn the Dao of Leading Water, and shape the ground with it."},
 	"carried_level": {"n": "Carry It Level", "kind": "odd", "pts": 10, "test": ["crates", 6], "desc": "Carry six crates between the works of the sea floor."},
@@ -285,6 +295,27 @@ static func value(g, t: Array) -> float:
 			return float(g.sights.size())
 		"shaped":
 			return float(g.shaped_n)
+		"seals_open":
+			# (the Unblunted Knife release, channels.gd: the seals at the ends of the ten channels)
+			var so := 0
+			for b in Channels.ORDER:
+				so += 1 if Channels.rank(g, str(Channels.BRANCHES[b].nodes[Channels.SEAL].id)) > 0 else 0
+			return float(so)
+		"crafted":
+			return float(g.crafted_n)
+		"crafts_worn":
+			return float(g.kept.size())
+		"masterworks":
+			return float(g.masterworks.size())
+		"pets":
+			return float(g.pets_n)
+		"pet_tier":
+			var pt := 0
+			for p in g.pets:
+				pt = maxi(pt, Pets.tier(p))
+			return float(pt)
+		"retreats":
+			return float(g.retreats.size())
 		"masters":
 			return float(Yezi.beaten(g))
 		"roads":

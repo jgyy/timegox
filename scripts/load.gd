@@ -180,6 +180,8 @@ static func cap(g, riding: bool = false) -> float:
 		c += FRAME
 	if riding and str(g.ride) != "":
 		c += float(BY_RIDE.get(str(Fashion.RIDES.get(str(g.ride), {}).get("kind", "")), 0.0))
+	# (the Unblunted Knife release: what the beast at his heel carries, and the Carrier's Spine; 0 with neither)
+	c += Pets.carry(g) + Channels.add(g, "load")
 	return c
 
 static func ratio(g, riding: bool = false) -> float:

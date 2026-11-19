@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 141
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole", "Practised Hand", "Sleeves of Wind", "Uncarved Block", "Light Hand", "Five in One Hand", "Low as the Sea", "Hidden and Nameless", "Walking Two Roads", "Forgotten in the Lakes", "Knows the Joy of Fish"]
+const MAX_LEVEL := 144
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole", "Practised Hand", "Sleeves of Wind", "Uncarved Block", "Light Hand", "Five in One Hand", "Low as the Sea", "Hidden and Nameless", "Walking Two Roads", "Forgotten in the Lakes", "Knows the Joy of Fish", "Masters Life"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000, 900000, 940000, 980000, 940000, 980000, 1020000, 980000, 1020000, 1060000, 1020000, 1060000, 1100000, 1060000, 1100000, 1140000, 1100000, 1140000, 1180000, 1140000, 1180000, 1220000, 1180000, 1220000, 1260000, 1220000, 1260000, 1300000, 1260000, 1300000, 1340000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700, 52400, 53100, 53800, 54500, 55200, 55900, 56600, 57300, 58000, 58700, 59400, 60100, 60800, 61500, 62200, 62900, 63600, 64300, 65000, 65700, 66400, 67100, 67800, 68500, 69200, 69900, 70600, 71300, 72000, 72700]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000, 900000, 940000, 980000, 940000, 980000, 1020000, 980000, 1020000, 1060000, 1020000, 1060000, 1100000, 1060000, 1100000, 1140000, 1100000, 1140000, 1180000, 1140000, 1180000, 1220000, 1180000, 1220000, 1260000, 1220000, 1260000, 1300000, 1260000, 1300000, 1340000, 1300000, 1340000, 1380000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700, 52400, 53100, 53800, 54500, 55200, 55900, 56600, 57300, 58000, 58700, 59400, 60100, 60800, 61500, 62200, 62900, 63600, 64300, 65000, 65700, 66400, 67100, 67800, 68500, 69200, 69900, 70600, 71300, 72000, 72700, 73400, 74100, 74800]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -117,6 +117,8 @@ const REALM_INFO := [
 	{"life": 0, "title": "Who Is Forgotten in the Lakes", "note": "When the springs dry up the fish lie together on the mud, and wet one another with their breath, and moisten one another with spit. It is better to forget one another in the rivers and lakes. So the Zhuangzi. This is the realm of somebody who has been needed by every sect in the land at once, has put the water back, and has been allowed to go home without being thanked."},
 	# Part XLII (the Sea Floor release): the man on the bridge who was asked how he knew
 	{"life": 0, "title": "Who Knows the Joy of Fish", "note": "Two men stood on the bridge over the Hao. One said: the minnows swim out so easily, that is the joy of fish. The other said: you are not a fish, how do you know? The first said: you asked me how I knew, so you knew already that I knew. I knew it from up here, on the bridge. A cultivator of this realm has been down among the fish and come up again, and still says only: from here."},
+	# Part XLIII (the Unblunted Knife release): the woodworker who was asked what art he had
+	{"life": 0, "title": "Who Masters Life", "note": "A woodworker carved a bell-stand, and those who saw it thought it the work of spirits. Asked what art he had, he said: none. I fast until I have forgotten praise and blame, and then that I have four limbs and a body. Then I go into the forest and look, and if I see the bell-stand there I put my hand to it; if not, I let it go. A cultivator of this realm has skill, and is no longer the one using it."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -1137,6 +1139,17 @@ const ENEMIES := {
 	"silt_golem": {"n": "Silt of a Hundred Rivers", "elem": "earth", "weak": "water", "col": Color("8a7650"), "shape": "golem", "pal": {"sec": Color("4e4230"), "acc": Color("c8b888")}},
 	"drain_wraith": {"n": "Thing the Tail-Gate Sent Back", "elem": "dark", "weak": "fire", "col": Color("3a4a5a"), "shape": "wraith", "pal": {"sec": Color("1a242e"), "acc": Color("8ac8d8")}},
 	"proud_flood": {"n": "Flood That Thinks It Is the Sea", "elem": "water", "weak": "earth", "col": Color("7a6a4a"), "shape": "serpent", "pal": {"sec": Color("42382a"), "acc": Color("d8c890")}},
+	# ---- Part XLIII: Mastering Life (the Unblunted Knife release): what skill leaves lying about when it is
+	# gripped too hard, in three caves no chapter had used
+	"dropped_ball": {"n": "Ball Dropped from the Pole", "elem": "earth", "weak": "wood", "col": Color("b89a5a"), "shape": "blob", "pal": {"sec": Color("6a5630"), "acc": Color("e8d8a0")}},
+	"counted_wing": {"n": "Wing Counted Too Soon", "elem": "wood", "weak": "fire", "col": Color("9ab070"), "shape": "moth", "pal": {"sec": Color("4e6038"), "acc": Color("f0e8c0")}},
+	"trembling_pole": {"n": "Pole That Trembles", "elem": "thunder", "weak": "earth", "col": Color("8a7a4a"), "shape": "serpent", "pal": {"sec": Color("4a4026"), "acc": Color("c8c060")}},
+	"crossed_grain": {"n": "Billet Cut Across the Grain", "elem": "wood", "weak": "fire", "col": Color("a8825a"), "shape": "golem", "pal": {"sec": Color("5e4630"), "acc": Color("d8c090")}},
+	"hurried_chisel": {"n": "Chisel in a Hurry", "elem": "phys", "weak": "thunder", "col": Color("8a8e98"), "shape": "mantis", "pal": {"sec": Color("4a4e58"), "acc": Color("c8a050")}},
+	"gold_archer": {"n": "Archer Shooting for Gold", "elem": "fire", "weak": "water", "col": Color("c8a040"), "shape": "humanoid", "pal": {"sec": Color("6a5420"), "acc": Color("f8e8a0")}},
+	"crowing_cock": {"n": "Cock That Still Crows", "elem": "fire", "weak": "water", "col": Color("c85a3a"), "shape": "bird", "pal": {"sec": Color("6a2e20"), "acc": Color("f0c050")}, "bright": true},
+	"glaring_cock": {"n": "Cock That Glares at Shadows", "elem": "thunder", "weak": "earth", "col": Color("5a5a7a"), "shape": "bird", "pal": {"sec": Color("2e2e44"), "acc": Color("e8e0a0")}},
+	"hollow_swagger": {"n": "Swagger with Nothing Behind It", "elem": "water", "weak": "thunder", "col": Color("7a8aa8"), "shape": "wraith", "pal": {"sec": Color("3e485e"), "acc": Color("e8e8f0")}},
 	"list_meng": {"n": "Brother Meng Zhi", "elem": "fire", "weak": "water", "col": Color("a85a3a"), "shape": "person:folk_youth"},
 	"list_bai_lu": {"n": "Senior Sister Bai Lu", "elem": "water", "weak": "thunder", "col": Color("7a9ab8"), "shape": "person:folk_maiden"},
 	"list_han_yue": {"n": "Senior Brother Han Yue", "elem": "thunder", "weak": "earth", "col": Color("4a5a8a"), "shape": "person:folk_guard", "boss": true},
@@ -1771,6 +1784,8 @@ const AREAS := {
 			# Part XXVIII: the strong young man of Yixing who asks why nobody is glad, and who he is afterwards
 			{"id": "zhou_chu", "n": "Zhou Chu of Yixing", "pos": Vector2i.ZERO, "col": Color("7a3a2a"), "vis": ["s_p28_youth", "s_p28_feast"], "hide": ["s_p28_scales", "s_p28_jiao"], "late": true, "peak": 0, "stand": "foot"},
 			{"id": "zhou_chu_end", "n": "Zhou Chu of Yixing", "pos": Vector2i.ZERO, "col": Color("7a3a2a"), "asset": "zhou_chu", "vis": ["s_p28_third", ""], "late": true, "peak": 1, "stand": "foot"},
+			# Part XLIII (the Unblunted Knife release)
+			{"id": "ji_xingzi", "n": "Ji Xingzi", "pos": Vector2i.ZERO, "col": Color("b85a3a"), "asset": "folk_herder", "vis": ["s_p43_home", ""], "late": true, "after": true, "cave": -1, "stand": "near"},
 		],
 		"bosses": [
 			{"id": "shard_mimic", "pos": Vector2i(32, 14), "lv": 18, "req": 18},
@@ -1791,6 +1806,11 @@ const AREAS := {
 			# Part XXVIII: scales the jiao has shed against the piles of the long bridge
 			{"id": "p28_scale1", "item": "jiao_scale", "pos": Vector2i.ZERO, "vis": ["s_p28_bait", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p28_scale2", "item": "jiao_scale", "pos": Vector2i.ZERO, "vis": ["s_p28_bait", ""], "late": true, "peak": 1, "stand": "flank"},
 			{"id": "p28_scale3", "item": "jiao_scale", "pos": Vector2i.ZERO, "vis": ["s_p28_bait", ""], "late": true, "peak": 2, "stand": "foot"}, {"id": "p28_scale4", "item": "jiao_scale", "pos": Vector2i.ZERO, "vis": ["s_p28_bait", ""], "late": true, "peak": 2, "stand": "flank"},
+			# Part XLIII (the Unblunted Knife release)
+			{"id": "p43_spur1", "item": "cock_spur", "pos": Vector2i.ZERO, "vis": ["s_p43_cocks", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p43_spur2", "item": "cock_spur", "pos": Vector2i.ZERO, "vis": ["s_p43_cocks", ""], "late": true, "after": true, "cave": -1, "stand": "mid"},
+			{"id": "p43_spur3", "item": "cock_spur", "pos": Vector2i.ZERO, "vis": ["s_p43_cocks", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p43_spur4", "item": "cock_spur", "pos": Vector2i.ZERO, "vis": ["s_p43_cocks", ""], "late": true, "after": true, "cave": -1, "stand": "deep"},
 		],
 		"pickup_vis": "s_ml_collect",
 		# Part XXVIII: two of the three scourges of a river town, and the feast that was held too soon
@@ -2001,6 +2021,8 @@ const AREAS := {
 			{"id": "cheng_tang", "n": "Tang of Shang", "pos": Vector2i.ZERO, "col": Color("d8d0bc"), "vis": ["s_p30_pegs", ""], "late": true, "peak": 1, "stand": "foot"},
 			# Part XXXV (the Uncarved Block release)
 			{"id": "carpenter_shi", "n": "Carpenter Shi of Qi", "pos": Vector2i.ZERO, "col": Color("6a5a44"), "asset": "carpenter_shi", "vis": ["s_p35_home", ""], "late": true, "after": true, "peak": 2, "stand": "foot"},
+			# Part XLIII (the Unblunted Knife release)
+			{"id": "woodworker_qing", "n": "Woodworker Qing", "pos": Vector2i.ZERO, "col": Color("a8825a"), "asset": "folk_farmer", "vis": ["s_p43_home", ""], "late": true, "after": true, "cave": -1, "stand": "near"},
 		],
 		"bosses": [
 			{"id": "peach_tree", "pos": Vector2i(32, 40), "lv": 26, "req": 26},
@@ -2023,6 +2045,11 @@ const AREAS := {
 			{"id": "p35_tally2", "item": "reject_tally", "pos": Vector2i.ZERO, "vis": ["s_p35_lines", ""], "late": true, "after": true, "peak": 2, "stand": "flank"},
 			{"id": "p35_tally3", "item": "reject_tally", "pos": Vector2i.ZERO, "vis": ["s_p35_lines", ""], "late": true, "after": true, "peak": 2, "stand": "foot"},
 			{"id": "p35_tally4", "item": "reject_tally", "pos": Vector2i.ZERO, "vis": ["s_p35_lines", ""], "late": true, "after": true, "peak": 2, "stand": "flank"},
+			# Part XLIII (the Unblunted Knife release)
+			{"id": "p43_billet1", "item": "bell_billet", "pos": Vector2i.ZERO, "vis": ["s_p43_chips", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p43_billet2", "item": "bell_billet", "pos": Vector2i.ZERO, "vis": ["s_p43_chips", ""], "late": true, "after": true, "cave": -1, "stand": "mid"},
+			{"id": "p43_billet3", "item": "bell_billet", "pos": Vector2i.ZERO, "vis": ["s_p43_chips", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p43_billet4", "item": "bell_billet", "pos": Vector2i.ZERO, "vis": ["s_p43_chips", ""], "late": true, "after": true, "cave": -1, "stand": "deep"},
 		],
 		"pickup_vis": "s_gd_collect",
 		# Part XXX: what a net hung on four sides is made of
@@ -2924,6 +2951,8 @@ const AREAS := {
 			# Part XXVIII: the general of Jin who cannot win a field against one man, and the old man in the grass
 			{"id": "wei_ke", "n": "Wei Ke, General of Jin", "pos": Vector2i.ZERO, "col": Color("3a4a7a"), "vis": ["s_p28_home", "s_p28_calls"], "late": true, "peak": 0, "stand": "foot"},
 			{"id": "grass_elder", "n": "The Old Man in the Grass", "pos": Vector2i.ZERO, "col": Color("8a8a6a"), "vis": ["s_p28_duhui", ""], "late": true, "peak": 1, "stand": "foot"},
+			# Part XLIII (the Unblunted Knife release)
+			{"id": "old_goulou", "n": "Old Goulou", "pos": Vector2i.ZERO, "col": Color("8a7a52"), "asset": "folk_grandpa", "vis": ["s_p43_home", ""], "late": true, "after": true, "cave": -1, "stand": "near"},
 		],
 		"bosses": [
 			{"id": "boiled_crab", "pos": Vector2i(36, 16), "lv": 40, "req": 40},
@@ -2938,6 +2967,11 @@ const AREAS := {
 			{"id": "p28_knot1", "item": "grass_knot", "pos": Vector2i.ZERO, "vis": ["s_p28_dust", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p28_knot2", "item": "grass_knot", "pos": Vector2i.ZERO, "vis": ["s_p28_dust", ""], "late": true, "peak": 0, "stand": "foot"},
 			{"id": "p28_knot3", "item": "grass_knot", "pos": Vector2i.ZERO, "vis": ["s_p28_dust", ""], "late": true, "peak": 1, "stand": "flank"}, {"id": "p28_knot4", "item": "grass_knot", "pos": Vector2i.ZERO, "vis": ["s_p28_dust", ""], "late": true, "peak": 1, "stand": "top"},
 			{"id": "p28_knot5", "item": "grass_knot", "pos": Vector2i.ZERO, "vis": ["s_p28_dust", ""], "late": true, "peak": 1, "stand": "flank"},
+			# Part XLIII (the Unblunted Knife release)
+			{"id": "p43_ball1", "item": "pole_ball", "pos": Vector2i.ZERO, "vis": ["s_p43_grove", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p43_ball2", "item": "pole_ball", "pos": Vector2i.ZERO, "vis": ["s_p43_grove", ""], "late": true, "after": true, "cave": -1, "stand": "mid"},
+			{"id": "p43_ball3", "item": "pole_ball", "pos": Vector2i.ZERO, "vis": ["s_p43_grove", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p43_ball4", "item": "pole_ball", "pos": Vector2i.ZERO, "vis": ["s_p43_grove", ""], "late": true, "after": true, "cave": -1, "stand": "deep"},
 		],
 		"pickup_vis": "s_fs_collect",
 		"springs": [Vector2i(44, 30)],
@@ -6004,6 +6038,39 @@ const STEPS := [
 	{"id": "s_p42_stands", "kind": "marks", "n": 1, "new": true, "t": "Something has been stood on the sand at Jiaoshi for what was answered. Go and look at 1 thing that stands (Esc > Crossroads)", "stones": 114600},
 	{"id": "s_p42_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The tide goes up to the Returning Ruins at dusk. The river under the mountain is running clear. Go to Elder Qing Xuan", "stones": 114800},
 	{"id": "s_break47", "kind": "breakthrough", "to": 141, "t": "You are not a fish. From up here, on the bridge: Knows the Joy of Fish"},
+	# ---- Part XLIII: Mastering Life (the Unblunted Knife release).  A disciple asked the Elder how the first form
+	# is done, and he found he could not say.  Three people who have skill and are not the ones using it: a
+	# hunchback with a pole, a woodworker, a trainer of fighting cocks.  New step kinds: "retreat" (sittings in a
+	# place of peace: retreats.gd), "train" (points of the chart opened: channels.gd), "craft" (things made:
+	# crafts.gd), "tame" and "fetch" (a beast asked to stay, and sent out: pets.gd).  No lord: its foes are in
+	# three caves no chapter had used.
+	{"id": "s_p43_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "The Elder has taken his own name off the list of those who teach, and is sweeping the nine hundred and ninety-nine steps himself. Speak to Elder Qing Xuan", "stones": 115000},
+	{"id": "s_p43_sit", "kind": "retreat", "n": 1, "where": "summit", "t": "\"Go up, and sit down, and do not try to do it well.\" Sit and forget on the very top of any peak (M, standing on the summit)", "stones": 115200},
+	{"id": "s_p43_chart", "kind": "train", "n": 3, "t": "Something came loose while he sat. The Elder calls it insight. Open 3 ranks of the chart of the channels (Esc > The Channels)", "stones": 115400},
+	{"id": "s_p43_grove", "kind": "hunt", "area": "fusang", "cave": -1, "n": 52, "of": ["dropped_ball", "counted_wing", "trembling_pole"], "t": "What an old man dropped while he learned to catch cicadas is under the Valley of Sunrise. Clear 52 packs of it from the cave under Fusang", "stones": 115600},
+	{"id": "s_p43_balls", "kind": "collect", "item": "pole_ball", "n": 4, "area": "fusang", "cave": -1, "t": "Two balls on the end of the pole, then three, then five. Four of them rolled a long way. Find the 4 Balls from the Pole in the cave under Fusang", "stones": 115800},
+	{"id": "s_p43_hunch", "kind": "talk", "npc": "old_goulou", "area": "fusang", "cave": -1, "t": "He is standing just inside the cave mouth like the stump of a tree, with a pole. Speak to Old Goulou, who catches cicadas", "stones": 116000},
+	{"id": "s_p43_poles", "kind": "hunt", "area": "fusang", "cave": -1, "n": 26, "of": ["counted_wing", "trembling_pole"], "t": "\"The balls I can pick up. It is the trembling that has got into the rock.\" Clear 26 wings counted too soon and poles that tremble from the cave", "stones": 116100},
+	{"id": "s_p43_deep", "kind": "retreat", "n": 1, "where": "deep", "area": "fusang", "t": "\"Now go to the very back, where I went, and hold your arm out, and see what it does.\" Sit and forget at the back of the cave under Fusang (M)", "stones": 116200},
+	{"id": "s_p43_gates", "kind": "train", "n": 3, "t": "The arm held still for the length of a breath. It is a beginning. Open 3 more ranks of the chart of the channels (Esc > The Channels)", "stones": 116400},
+	{"id": "s_p43_guard", "kind": "craft", "thing": "plain_guard", "n": 1, "t": "\"You have never made the thing you carry.\" Gather a block of stone and a billet of timber, and forge a Plain Iron Guard with his own hands (N, in open country)", "stones": 116600},
+	{"id": "s_p43_ding", "kind": "talk", "npc": "pao_ding", "area": "tushan", "t": "One man in the land has not sharpened a knife in nineteen years. Show the guard to Cook Ding, at the foot of the peak at Tushan", "stones": 116800},
+	{"id": "s_p43_chips", "kind": "hunt", "area": "garden", "cave": -1, "n": 52, "of": ["crossed_grain", "hurried_chisel", "gold_archer"], "t": "A woodworker has thrown away more than most men make, and it has not lain still. Clear 52 packs of it from the cave under the Peach Garden", "stones": 117000},
+	{"id": "s_p43_billets", "kind": "collect", "item": "bell_billet", "n": 4, "area": "garden", "cave": -1, "t": "He went into the forest four times before the fifth, and came out each time with the wrong tree. Find the 4 Billets That Were Not the Bell-Stand", "stones": 117200},
+	{"id": "s_p43_qing", "kind": "talk", "npc": "woodworker_qing", "area": "garden", "cave": -1, "t": "He is sitting by the cave mouth with his hands in his lap and no tool in reach, and has been for seven days. Speak to Woodworker Qing", "stones": 117400},
+	{"id": "s_p43_gold", "kind": "hunt", "area": "garden", "cave": -1, "n": 26, "of": ["hurried_chisel", "gold_archer"], "t": "\"Who shoots for a tile shoots well. Who shoots for gold goes blind.\" Clear 26 chisels in a hurry and archers shooting for gold from the cave", "stones": 117500},
+	{"id": "s_p43_beads", "kind": "craft", "craft": "carve", "n": 2, "t": "\"Make a small thing twice. The second time, do less.\" Carve 2 things with his own hands: a billet of timber makes a string of Peach-Wood Beads (N)", "stones": 117700},
+	{"id": "s_p43_cocks", "kind": "hunt", "area": "mirror", "cave": -1, "n": 52, "of": ["crowing_cock", "glaring_cock", "hollow_swagger"], "t": "What a trainer took out of a king's fighting cock has to be somewhere. Clear 52 packs of it from the cave under Mirror Lake", "stones": 117900},
+	{"id": "s_p43_spurs", "kind": "collect", "item": "cock_spur", "n": 4, "area": "mirror", "cave": -1, "t": "A cock that is ready to fight is not ready. Find the 4 Spurs Taken Off Too Soon in the cave under Mirror Lake", "stones": 118100},
+	{"id": "s_p43_ji", "kind": "talk", "npc": "ji_xingzi", "area": "mirror", "cave": -1, "t": "A man is squatting by the cave mouth looking at a bird that does not look back. Speak to Ji Xingzi, who trains fighting cocks", "stones": 118300},
+	{"id": "s_p43_shadows", "kind": "hunt", "area": "mirror", "cave": -1, "n": 26, "of": ["glaring_cock", "hollow_swagger"], "t": "\"Not yet. It still answers to echoes and to shadows.\" Clear 26 cocks that glare at shadows and swaggers with nothing behind them from the cave", "stones": 118400},
+	{"id": "s_p43_beast", "kind": "tame", "n": 1, "area": "bamboo", "of": ["bamboo_wolf"], "t": "\"You have never kept anything alive but yourself.\" Catch a carp, go among the wolves of the Whispering Bamboo, and when one does not run, hold it out", "stones": 118600},
+	{"id": "s_p43_nose", "kind": "fetch", "n": 1, "t": "\"Send it away. If it comes back, it is yours. If it comes back with something, you are its.\" Send a beast out to gather (L), and be there when it returns", "stones": 118800},
+	{"id": "s_p43_tops", "kind": "retreat", "n": 2, "where": "summit", "t": "Forty days, Ji Xingzi took. Sit and forget twice more on a summit, with the beast, and see which of them fidgets (M)", "stones": 119000},
+	{"id": "s_p43_moot", "kind": "talk", "npc": "elder", "area": "sect", "t": "The outer court has heard that he came back with a wolf, a string of beads and a chart nobody can read, and wants to be taught all three. Go to Elder Qing Xuan", "stones": 119200},
+	{"id": "s_p43_stands", "kind": "marks", "n": 1, "new": true, "t": "Something has been stood on the mountain for what was answered. Go and look at 1 thing that stands (Esc > Crossroads)", "stones": 119400},
+	{"id": "s_p43_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The steps are swept, and the broom is leaning on the gate, and the Elder is not holding it. Go to Elder Qing Xuan", "stones": 119600},
+	{"id": "s_break48", "kind": "breakthrough", "to": 144, "t": "Forgot that he had four limbs and a body: Masters Life"},
 ]
 
 ## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
@@ -6259,6 +6326,10 @@ const ITEMS := {
 	"net_link": {"n": "Link of an Iron Net", "desc": "A link of the net that is sunk over young coral, bright where it was cut. The nets of Redbranch are raised in the third year. This one came up in the second, at night, with a tree in it that was still yellow, and the tree was sold"},
 	"well_rope": {"n": "Well-Rope Let Down into the Sea", "desc": "Forty fathoms of well-rope with a knot at every fathom and a stone on the end. Somebody let it down into the Northern Dark to find out how deep the sea was. It did not touch. There is a second rope tied to the end of it, and a third"},
 	"xirang_clod": {"n": "Clod of Swelling Soil", "desc": "Xirang, the earth that grows of itself, which Gun stole from the storehouse of heaven to wall the floods in. It is warm, and a little heavier each time it is picked up. This one came down the river with the silt. It would like to be a wall. It weighs nothing yet"},
+	# ---- Part XLIII (the Unblunted Knife release): what is found in the three caves
+	"pole_ball": {"n": "Ball from the Pole", "desc": "A clay ball the size of a plum, worn smooth on one side. An old man balanced two on the end of a cicada-pole for five months, then three, then five. This is one of the ones that fell. It does not look as if it had minded"},
+	"bell_billet": {"n": "Billet That Was Not the Bell-Stand", "desc": "A short billet of mountain timber with one cut in it, perfectly made, and nothing more. Whoever began it looked again, saw that the bell-stand was not in this tree, and put the chisel down. Most men would have gone on"},
+	"cock_spur": {"n": "Spur Taken Off Too Soon", "desc": "A steel spur of the kind tied to a fighting cock's leg, still bright. It was fitted on the tenth day, when the bird was all swagger, and taken off again by a man who said only: not yet"},
 	"mill_hemp": {"n": "Hank of Sea-Hemp", "desc": "Kelp retted in lime-water, beaten and combed to a pale fibre as long as an arm, twisted into a hank. Made at the Retting-Yard of Shuttlereef, in the open, by three people who would rather be asked than watched. It weighs nothing to speak of"},
 	"mill_gauze": {"n": "Bolt of Shark-Gauze", "desc": "The gauze of the Jiaoren, that goes into water and comes out dry: an ell of it will pass through a ring. Made at the Gauze-Looms of Shuttlereef. Worn against the skin it turns a blow of water (from the Items page: restores 60% of health)"},
 	"mill_lime": {"n": "Sack of Shell-Lime", "desc": "Dead coral and oyster shell burnt white in the kiln at Redbranch and slaked. It rets kelp, clears glass and sweetens a salt-pan, and the town burns nothing that was alive that morning. It weighs nothing to speak of"},
@@ -12302,7 +12373,7 @@ const DIALOGUE := {
 	],
 	"bout:list_bai_lu": [
 		["Narrator", "Senior Sister Bai Lu walks to her mark without hurrying, bows the exact depth the Roll requires, and waits. She has not been seen to hurry in nine years. She has not been seen to stop, either."],
-		["Senior Sister Bai Lu", "Junior Brother. I watched the first bout. You win quickly. I should like to see what you do when that is not offered."],
+		["Senior Sister Bai Lu", "Junior Brother Lin. I watched the first bout. You win quickly. I should like to see what you do when that is not offered."],
 	],
 	"bout:list_tong": [
 		["Narrator", "The lantern green has been raked. A broad man with a spear across his shoulders like a carrying-pole is arguing with the rakers about the corners, and losing, and enjoying it."],
@@ -12318,7 +12389,7 @@ const DIALOGUE := {
 	],
 	"bout:hui_shi": [
 		["Narrator", "A broad, comfortable man in plum is leaning on one of the great moulds, talking to it. He breaks off when Lin Feng's name is cut into the next column, and looks pleased."],
-		["Hui Shi, Minister of Wei", "Hui Shi. I am told you met an advocate who was on both sides. Excellent. I am only ever on one, and it is always the wrong one, and I defend it to the death. Shall we?"],
+		["Hui Shi, Minister of Wei", "Hui Shi. I am told there is an advocate at Yanggu who is on both sides. Excellent. I am only ever on one, and it is always the wrong one, and I defend it to the death. Shall we?"],
 	],
 	"s_p39_word": [
 		["Elder Qing Xuan", "They say an advocate of Zheng proves on the lantern green that whoever fights there has won, and then that he has lost, and that the lantern-makers cannot fault him either way. I have had three accounts. They agree on nothing else."],
@@ -12357,7 +12428,7 @@ const DIALOGUE := {
 	],
 	"bout:list_han_yue": [
 		["Narrator", "The whole kitchen is at the rail, and half the inner court on the library steps pretending not to be. Senior Brother Han Yue is already in the ring. He has been in it since dawn, standing still."],
-		["Senior Brother Han Yue", "I was first on the Roll when you were sweeping the ninth landing. I used to step over your broom. I have thought about that this week more than I should like."],
+		["Senior Brother Han Yue", "I was already on the Roll when you were sweeping the ninth landing. I used to step over your broom. I have thought about that this week more than I should like."],
 	],
 	"done:s_p39_scrolls": [
 		["Narrator", "The last form goes through the opening of the Azure Cloud sword exactly as it is drawn in the manual, to the angle of the wrist, and is cut down in the middle of it by somebody who has not done it that way for nine years."],
@@ -12425,13 +12496,13 @@ const DIALOGUE := {
 	],
 	"done:s_p39_schools": [
 		["Narrator", "The board at Tushan is a slab of slate as tall as a door, and the casters cut the names into it rather than chalk them, because bronze-men do not trust anything that wipes off."],
-		["Lin Feng", "He has written fourteen chapters to say my paper and I are not the same. For two exchanges, in that ring, I fought like the paper."],
+		["Lin Feng", "Gongsun Long has written fourteen chapters to say a paper and whoever holds it are not the same. For two exchanges, in that ring, I fought like the paper."],
 		["Yue Ling", "And then you stopped fighting like somebody Attested and started fighting like somebody I know. I saw it happen. So did the horse."],
 	],
 	"s_p39_roll": [
 		["Narrator", "The Roll of the Azure Cloud Sect is laid out on the Elder's own table, weighted at the corners with four tea-bowls. Two hundred and six names. Beside them a ruled column, empty, and the registrar's brush lying across it."],
 		["Narrator", "The registrar says he can fill it by supper. He has watched every one of them. What he cannot do is decide what it means when it is full. That is not his office, he says. He rectifies names. Somebody else must say what a name is for."],
-		["Elder Qing Xuan", "He means me. I mean you. You have been named three times this month in front of a crowd, and bought something with a hammer, and been told you are not a horse. You have had more of it than anybody on this mountain."],
+		["Elder Qing Xuan", "He means me. I mean you. You have been named three times this month in front of a crowd, and bought something with a hammer, and stood on a floor where a man says a horse is not a horse. You have had more of it than anybody on this mountain."],
 		["Lin Feng", "I held the paper and I was the same. I fought with it in my sleeve and I was a little worse. I do not know what that proves."],
 		["Elder Qing Xuan", "Nor do I. That is why it is a question. Sit down. Tell the registrar what his column is for.", "nod"],
 	],
@@ -12557,7 +12628,7 @@ const DIALOGUE := {
 		["Narrator", "Nobody on the landing speaks. Three hundred years of ignoring one another, a covenant drawn up in a month, and all of it because of a rock. They look at the scroll. Then, all four, they look at Lin Feng."],
 	],
 	"done:s_p41_stands": [
-		["Narrator", "It stands on a bank of the marsh where the boats pass, and the boats slow to look at it. An old piper is sitting beside it with her feet in the water. She says it has only been there a week and already nobody can remember the bank without it."],
+		["Narrator", "It stands on a bank of the marsh where the boats pass, and the boats slow to look at it. Somebody is sitting beside it with their feet in the water. She says it has only been there a week and already nobody can remember the bank without it."],
 		["Yue Ling", "The marsh is deeper than when we came. I can tell by where the reeds are wet. Whatever you answered, the water does not seem to have minded."],
 	],
 	"s_p41_end": [
@@ -12576,6 +12647,149 @@ const DIALOGUE := {
 		["Narrator", "The tribulation falls as rain falls on a lake, everywhere at once and on nothing in particular. When it is over nobody in the yard can say which bolt was the last. Lin Feng is standing in the spring to his ankles: Forgotten in the Lakes."],
 		["Yue Ling", "Forty-seven. I think. I lost count in the middle, and found I had stopped being afraid for you, and those two things happened at the same time."],
 		["Lin Feng", "Good. Forget the number. I should like to be somebody you do not have to count."],
+	],
+	# ---------------------------------------------------------------- Part XLIII: Mastering Life (the Unblunted Knife release)
+	"recall41": [
+		["Narrator", "The Lotus Seal sets Lin Feng down at the foot of the nine hundred and ninety-nine steps and not at the top of them. Somebody is sweeping, far up. The broom goes over each step twice, slowly, and it is not a disciple's broom."],
+		["Yue Ling", "He has been at it since before light. Hall Master Shen went up to take the broom from him and came down again without it, looking as he looks when a ledger will not add."],
+		["Elder Qing Xuan", "Child. Mind the wet ones. I have taken my name off the list of those who teach. It is pinned by the refectory door. You may read it on your way up, since everybody else has."],
+	],
+	"s_p43_home": [
+		["Elder Qing Xuan", "A girl of the outer court asked me yesterday how the first form is done. The first. I have done it every morning for seventy years. I opened my mouth to tell her, and there was nothing in it.", "shrug"],
+		["Lin Feng", "You taught it to me, Elder. I remember the morning. You said: like this."],
+		["Elder Qing Xuan", "I said: like this. And did it. That is not teaching, child, that is being looked at. If I cannot say what I do, then I do not know whether what I do is the form, or only an old man's habit of it. So I am sweeping. I can say how that is done."],
+		["Yue Ling", "He says there are people in the land who can do one thing as nobody else can, and that not one of them can say how. An old man with a pole, in the Valley of Sunrise. A woodworker under the Peach Garden. A trainer of birds at Mirror Lake."],
+		["Elder Qing Xuan", "Go and watch them. Do not ask them how: they will tell you, and it will be no use to you. But first go up something high and sit down on it. You have been busy for forty-seven realms. I should like to know what is there when you are not.", "think"],
+	],
+	"done:s_p43_sit": [
+		["Narrator", "The top of a mountain is a small place. Lin Feng sits on it for two hours, and for some of that time nobody in particular is sitting there. When he stands up his knees tell him how long it was."],
+		["Lin Feng", "I did not do anything. I am quite sure of that. And something is different, low down, as when a knot one had stopped noticing is gone."],
+		["Yue Ling", "The Elder says the old books draw it as a chart: the dantian in the middle, and channels leaving it like the spokes of a wheel. He says most people have three or four of them open by accident, and never know which."],
+	],
+	"done:s_p43_chart": [
+		["Narrator", "It is not like a breakthrough. Nothing comes down out of the sky. A place in the body that was shut is open, as a window is open, and the air that was always outside it is now also inside."],
+		["Lin Feng", "I chose those. Three of them. Nobody has ever let me choose before: the realms come in the order they come in."],
+		["Yue Ling", "And every one you opened is one you did not open somewhere else. I looked at the whole chart. Nobody is going to light all of it. I think that is the point of drawing it."],
+	],
+	"done:s_p43_grove": [
+		["Narrator", "The cave under the Valley of Sunrise is full of small round things that have rolled into every low place there is. They are clay. Each has a flat worn on it the width of a pole's end, and each one fell."],
+		["Lin Feng", "Thousands. He dropped thousands. I had thought he would be somebody who never did."],
+	],
+	"done:s_p43_balls": [
+		["Narrator", "Four balls, the same weight to a hair. With the one that is on the end of the old man's pole at this moment, not moving, they make five."],
+		["Yue Ling", "He has not looked round once. There is a cicada on the rock a hand from his face and he has not looked at that either. I do not think he is ignoring it. I think it is the only thing here."],
+	],
+	"s_p43_hunch": [
+		["Old Goulou", "Mm. You have my balls. Put them down, they are only balls. I catch cicadas. Somebody from Lu came by once and said: you are skilful, have you a Way? I have a Way. I will tell it you, and you may see how far it gets you.", "nod"],
+		["Old Goulou", "Five months I balanced two balls on the end of this pole. When they stopped falling, I missed few cicadas. Three balls: I missed one in ten. Five balls, and I took them as if I were picking them up off the ground."],
+		["Old Goulou", "I hold my body like a stump. I hold my arm like a dead branch. Heaven and earth are very large, and the ten thousand things very many, and I know of nothing but the wings of a cicada. I do not turn. I would not take the whole world for those wings. How should I miss?"],
+		["Lin Feng", "I have heard that told. I did not understand it until I saw the cave. I thought the stillness came first, and the catching after."],
+		["Old Goulou", "The dropping came first. Then the stillness. But some of the trembling I put down has not stayed down: it is in the rock, and my arm feels it. Go and take it out. Then go to the back, where it is quiet, and hold your own arm out, and look at it.", "point"],
+	],
+	"done:s_p43_poles": [
+		["Narrator", "The rock is still. At the cave mouth a pole comes round, slowly, in a hand that is like a root, and something that was singing on the wall is not singing. He did not seem to move."],
+		["Lin Feng", "He does not want the cicada. That is what I had wrong. He wants the wings, and nothing else in heaven or earth, for exactly as long as it takes."],
+	],
+	"done:s_p43_deep": [
+		["Narrator", "At the back of the cave there is no light to see an arm by. Lin Feng holds his out all the same. For a long time it does what arms do. Then, for the length of a breath, it is a dead branch, and belongs to nobody."],
+		["Yue Ling", "You were gone two hours. I counted drops. I got to four hundred and then I found I was not counting any more, and I am rather cross about it, because I think that was the thing, and I missed it."],
+	],
+	"done:s_p43_gates": [
+		["Narrator", "Six lamps lit on a chart of sixty points. Lin Feng can feel each of them, as one feels a tooth with the tongue. He can also feel, for the first time, the fifty-four that are shut."],
+		["Lin Feng", "The Elder said: you have never made the thing you carry. I have carried a sword since I was fourteen. I do not know how the guard is fixed to the tang."],
+	],
+	"done:s_p43_guard": [
+		["Narrator", "It is a guard. It is flat, nearly, and round, nearly, and it goes on the tang with a little persuasion. Lin Feng has not been so pleased with anything since his first breakthrough, and it is a great deal uglier."],
+		["Yue Ling", "It rattles. Only a little. I shall get used to it. ...Take it to somebody who knows knives, before you decide how proud to be."],
+	],
+	"s_p43_ding": [
+		["Narrator", "Cook Ding turns the sword over once. He does not look at the blade, which has cut down lords in forty-seven realms. He looks at the guard, with the attention he gives to an ox."],
+		["Cook Ding", "You beat it flat. Here, and here, and here, where it did not want to go. I can see every blow. A good smith makes a new guard every year, because he forces. An ordinary one every month, because he hacks.", "point"],
+		["Lin Feng", "And yours has lasted nineteen years. I know. I was hoping you would tell me that mine would last a month."],
+		["Cook Ding", "A week. But you made it, and now you know where it rattles, which nobody who bought one ever knew. When I come to a hard place I slow down. I look. I move the knife as little as may be. Then it is done, and I stand there with the knife in my hand and do not know what I did.", "laugh"],
+		["Cook Ding", "Go to the woodworker under the Peach Garden. He makes bell-stands that people take for the work of spirits. He will tell you he has no art. He is the only man I have met who is right about that."],
+	],
+	"done:s_p43_chips": [
+		["Narrator", "The cave under the Garden of Immortal Peaches smells of cut timber. It is heaped with it: billets, blanks, legs, a hundred beginnings, each put down at the first stroke. None of it is bad. That is the strange part."],
+		["Lin Feng", "Every one of these is better than my guard. He threw away all of it."],
+	],
+	"done:s_p43_billets": [
+		["Narrator", "Four billets, a single cut in each. The cuts are so clean that the grain seems to have opened of its own accord. Then he stopped, four times, and went home."],
+		["Yue Ling", "He is still sitting where he was. Seven days, the peach-pickers say. He has not touched a chisel. He does not look like somebody who is stuck. He looks like somebody waiting for the kettle."],
+	],
+	"s_p43_qing": [
+		["Woodworker Qing", "I am a workman. What art should I have? But there is one thing. When I am going to make a bell-stand I do not let it wear out my breath. I fast, to still the heart.", "shrug"],
+		["Woodworker Qing", "Three days, and I no longer think of praise, or pay, or rank. Five, and I no longer think of blame or honour, skill or clumsiness. Seven, and I have forgotten that I have four limbs and a body. By then there is no court. My hands are single, and nothing outside troubles them."],
+		["Woodworker Qing", "Then I go into the forest and look at what heaven made the trees to be. If one of them is the bell-stand already, I put my hand to it. If not, I let it go. I only join what is heaven's in me to what is heaven's in the tree.", "nod"],
+		["Lin Feng", "And the four billets in the cave?"],
+		["Woodworker Qing", "Were not it. I knew at the first cut. A man who shoots for a tile shoots well; for a belt-buckle, he is nervous; for gold, he is blind. What I cut for the lord's praise is down there still, walking about. Clear it out. Then make a small thing, twice. The second time, do less."],
+	],
+	"done:s_p43_gold": [
+		["Narrator", "The last archer lowers a bow that was never strung. There was no gold. There never is: there is only the thinking of it, which weighs exactly as much, and pulls the arm exactly as far to one side."],
+		["Lin Feng", "His skill is the same as it was. That is what the book says of the archer. Only he has begun to care, and what is outside has become heavy."],
+	],
+	"done:s_p43_beads": [
+		["Narrator", "The first string of beads is eighteen lumps. The second is eighteen beads. Lin Feng did not try harder the second time. He looked longer at the wood, and took off rather less of it."],
+		["Yue Ling", "Give me the first one. No, the first. I want the one where I can see you deciding. ...The second is better. I know it is better. I did not ask for the better one."],
+	],
+	"done:s_p43_cocks": [
+		["Narrator", "The cave under Mirror Lake rings like a market at dawn, and then, pack by pack, stops. What is left is the drip of the lake coming through the roof, and somewhere a single bird that has not made a sound the whole time."],
+		["Lin Feng", "They flew at their own reflections in the wet rock. Every one. They were magnificent, and there was nobody there."],
+	],
+	"done:s_p43_spurs": [
+		["Narrator", "Four steel spurs. Each was tied on when the king sent to ask, and each was untied again by a man who looked at the bird for a long moment and said two words."],
+		["Yue Ling", "\"Not yet.\" He said it at ten days, and twenty, and thirty. I asked the boy who carries the grain. He says the king stopped being angry at about twenty-five and began to be interested."],
+	],
+	"s_p43_ji": [
+		["Ji Xingzi", "Ji. I train fighting cocks. The king sent after ten days: is it ready? I said: not yet. It is vain, and trusts in its own spirit. That was the first lot you cleared out of my cave. Thank you. They were loud.", "nod"],
+		["Ji Xingzi", "After ten more: not yet. It still answers to echoes and to shadows. Ten more: not yet. It still glares, and is full of itself. Those are down there now. I took them out of the bird and had nowhere to put them."],
+		["Lin Feng", "And at forty days?"],
+		["Ji Xingzi", "Look at it. Another cock may crow, and nothing in it changes. From here you would take it for a cock of wood. Its virtue is whole. No bird will face it: they turn and run. I did not teach it a thing. I waited until it had stopped doing everything that was not itself.", "point"],
+		["Ji Xingzi", "You have a sword, and a chart, and a string of beads. You have never kept anything alive but yourself. Clear the shadows out, and then go and feed something that could bite you. It will show you what you are doing with your hands. They always know."],
+	],
+	"done:s_p43_shadows": [
+		["Narrator", "The wet rock shows nothing but rock. By the cave mouth the bird has not moved, and Ji Xingzi has not moved, and it would be hard to say which of them is being trained."],
+		["Lin Feng", "He did not make it brave. He took away the part that needed to be. I have been adding things to myself for forty-seven realms."],
+	],
+	"done:s_p43_beast": [
+		["Narrator", "The wolf takes the carp from his hand without touching the hand. Then it sits down a little way off, as if it had always meant to, and watches him as Cook Ding watches an ox."],
+		["Yue Ling", "It is thin. And it has decided about you, I can see that, though I cannot see what. Do not look so pleased. You did nothing. You stood still and held out a fish."],
+		["Lin Feng", "I stood still and held out a fish. I begin to think that is the whole of what the three of them were telling me."],
+	],
+	"done:s_p43_nose": [
+		["Narrator", "It comes back at a trot with its head high, and sets something down at his feet with enormous care. It is a wild yam. It is not a good one. The wolf looks from the yam to him and back."],
+		["Yue Ling", "Say thank you. Go on. It went four hours for that. ...Ji Xingzi said that if it came back with something, you were its. I think you had better get used to yams."],
+	],
+	"done:s_p43_tops": [
+		["Narrator", "Twice. The first time the wolf fidgets and Lin Feng does not. The second time neither does. Somewhere in the middle of the second there is a while in which a wolf and a mountain and somebody sitting are not three things."],
+		["Lin Feng", "It lay down before I did. I had thought I was the one teaching it to be still."],
+	],
+	"s_p43_moot": [
+		["Narrator", "The whole outer court is on the steps, which have been swept. They have heard about the wolf. They have heard about the chart with sixty points and the beads he carved himself, and every one of them has a question, and all the questions are: how."],
+		["Elder Qing Xuan", "They want to be taught it, child. The points. The crafts. The beasts. Hall Master Shen has drawn up a course of study, in forty parts, with examinations. Hall Master Du wishes to shut the hall for forty days and have everybody fast. They are both quite serious.", "think"],
+		["Yue Ling", "And you took your name off the list because you could not say how the first form is done. I do not see how forty parts will say it. I do not see how nobody saying anything will say it either."],
+		["Lin Feng", "An old man dropped a thousand balls. A woodworker threw away a cave of good timber. A man looked at a bird for forty days. Not one of them could tell me how. All of them could show me what they had dropped."],
+		["Elder Qing Xuan", "Then tell me what Azure Cloud does with a girl who asks how the first form is done. I have had seventy years to answer her and I swept a staircase instead. It is your answer I want. Mine is leaning against the gate."],
+	],
+	"done:s_p43_stands": [
+		["Narrator", "It stands where the outer court will pass it every morning on the way to the first form. Lin Feng looks at it for some time. It is not very well made. It was made by people who had not made one before."],
+		["Lin Feng", "Whoever did that hurried the left side. I can see where. A season ago I could not have seen it."],
+	],
+	"s_p43_end": [
+		["Narrator", "The broom is leaning against the gate. The Elder is sitting on the top step with his hands in his lap and no tool in reach, as a woodworker sat by a cave mouth, and a wolf has gone to sleep across his feet without asking anybody."],
+		["Elder Qing Xuan", "The girl came back this morning. She did the first form in front of me, badly, and then she looked at me. And I did it. And she said: oh. Like that. I had not said a word, child. I put my name back on the list at noon.", "laugh"],
+		["Lin Feng", "I thought I was sent to learn how they did it. I have a guard that rattles, and beads Yue Ling keeps the worse string of, and a wolf that brings me yams. I could not tell you how I made any of them."],
+		["Yue Ling", "You could show somebody. I watched you carve the second string. You would be dreadful at explaining it and rather good to sit next to. I think that is what a teacher is, and he has known it all along and wanted to hear somebody else find it."],
+		["Elder Qing Xuan", "I wanted my steps swept properly for once. ...Sit down, both of you. All three. It is not teaching, it is only being looked at. It turns out there has never been anything else.", "nod"],
+	],
+	"pre:s_break48": [
+		["Narrator", "The cloud comes, and Lin Feng does not get up to meet it. He is sitting on the top step. He has a string of beads at his wrist that he carved, and a wolf at his heel that chose him, and for a moment he has forgotten that he has four limbs and a body."],
+		["Lin Feng", "I am not ready. Good. Ji Xingzi would say that is the first true thing I have told a tribulation."],
+	],
+	"post:s_break48": [
+		["Narrator", "The bolts fall where they fall. Afterwards nobody in the yard can say what he did. He did not seem to do anything. The disciples who were watching for a technique are disappointed, and one girl of the outer court says, quite quietly: oh. Like that."],
+		["Yue Ling", "Forty-nine. The wolf slept through it. I should like that written down somewhere: that the heavens opened over Azure Cloud and one of us did not think it worth an ear."],
+		["Lin Feng", "It has the right of it. I was there the whole time, and I could not tell you how it was done."],
 	],
 	# ---------------------------------------------------------------- Part XLII: The Joy of Fish
 	"recall40": [
@@ -12625,7 +12839,7 @@ const DIALOGUE := {
 		["Narrator", "Redbranch stands in a forest that is red at the root, yellow above and, this autumn, white at every tip. A broad man is standing at the edge of the kiln yard with a dead branch in each hand, weighing one against the other as if it mattered which he burnt first."],
 		["Kiln-Master Hong of Redbranch", "Hong. I burn what dies. In a good year that is a basket a day and I am idle by noon. I have not been idle since your river came. Do you know how long that branch took? I do. I lowered the net over it the year my daughter was born."],
 		["Lin Feng", "I can clear the silt off it."],
-		["Kiln-Master Hong of Redbranch", "It is coral. It is alive. You clear silt off it the way you would brush dust off an eye. Nothing here can be hurried, and you have the look of somebody who has never had to wait for anything in his life. Clear the reef of what has got loose. That, you can hurry.", "shrug"],
+		["Kiln-Master Hong of Redbranch", "It is coral. It is alive. You clear silt off it the way you would brush dust off an eye. Nothing here can be hurried, and you have the look of somebody who has never had to wait for anything in a whole life. Clear the reef of what has got loose. That, you can hurry.", "shrug"],
 	],
 	"done:s_p42_reef": [
 		["Narrator", "Thirty-six packs. The rays went through the iron nets where the silt had rotted the cords. The polyps that went white have come off their rock and walk about, slowly, looking for it. The eels live in the dead branches and do not come out so much as arrive."],
@@ -12640,7 +12854,7 @@ const DIALOGUE := {
 		["Lin Feng", "Every town down here needs what the next one makes. I spent a month among four sects who had ignored one another for three hundred years. Nobody here has ever had that to spare."],
 	],
 	"done:s_p42_sights2": [
-		["Narrator", "Three more places of the sea floor. In one of them a bell is lying on its side, and a current goes through it, and it has been saying one note too low to hear for longer than there has been a sect on Azure Cloud Mountain."],
+		["Narrator", "Three more places of the sea floor. Somewhere in this forest, they say, a bell is lying on its side, and a current goes through it, and it has been saying one note too low to hear for longer than there has been a sect on Azure Cloud Mountain."],
 		["Kiln-Master Hong of Redbranch", "You walked in it. Good. Now you know what a thing looks like that took nine hundred years, and you will be a little afraid of your own hands. Go north. There is an old fool in the dark who has been waiting for somebody to tell about the sea.", "nod"],
 	],
 	"s_p42_turtle": [
@@ -12648,7 +12862,7 @@ const DIALOGUE := {
 		["Old Ao, the Turtle of the Eastern Sea", "Ah. A frog. No: forgive me. A habit. A frog of a caved-in well once told me how fine it was to have a whole well to oneself. I put one foot in, and my knee stuck. So I stepped back, and told him about the sea."],
 		["Old Ao, the Turtle of the Eastern Sea", "A thousand li does not measure its breadth, I said, nor a thousand fathoms its depth. In Yu's time there were nine floods in ten years, and it did not rise. In Tang's, seven droughts in eight, and it did not fall. He was very quiet afterwards. Then he came down here to check.", "think"],
 		["Lin Feng", "And my river has done what nine floods did not."],
-		["Old Ao, the Turtle of the Eastern Sea", "Your river! Listen to him. It has put a little dust on a very large floor, child. It matters to the people under the dust, and not otherwise. Hold both of those. Now go and clear my dark of everything that has come down to be sure it has seen it all."],
+		["Old Ao, the Turtle of the Eastern Sea", "Your river! Listen to that. It has put a little dust on a very large floor, child. It matters to the people under the dust, and not otherwise. Hold both of those. Now go and clear my dark of everything that has come down to be sure it has seen it all."],
 	],
 	"done:s_p42_dark": [
 		["Narrator", "Thirty-six packs. The frogs have measured the sea and are furious at the answer. The summer insects have been told of ice. The scholars each hold one corner of something and are certain it is the whole, and cannot be argued with, having only the one corner to stand on."],
@@ -12674,7 +12888,7 @@ const DIALOGUE := {
 		["Lin Feng", "I asked her whether she liked it. She said nobody had asked her that in forty years and she would need a day to think. I am going to come back tomorrow and find out."],
 	],
 	"done:s_p42_sights3": [
-		["Narrator", "Three places of the Northern Dark. At one of them a rib stands out of the sand, taller than the pagoda at home, and he walks its whole length before he understands that it is one rib and the rest is further on."],
+		["Narrator", "Three places of the Northern Dark. The rakers say a rib stands out of the sand out there, taller than the pagoda at home, and that whoever walks its length learns it is one rib and the rest is further on."],
 		["Old Ao, the Turtle of the Eastern Sea", "East of here the floor tilts, and you will hear it before you see it. That is the Tail-Gate. Your dust is lying across it. And the frog is there. He has been sitting at the edge for a month. Be kind to him. He was right to check.", "point"],
 	],
 	"s_p42_frog": [
@@ -12705,7 +12919,7 @@ const DIALOGUE := {
 		["Narrator", "They are all in the street at Shuttlereef: the weavers, Hong with lime to the elbow, Old Ao carried on a litter and complaining of it, the frog with a new coil of rope. Four shuttles lie on the table still. Beside them the Loom-Mother has set a bowl of clean sand."],
 		["Loom-Mother Jiao Zhu", "The mud is going. You led it away and did not wall it, and I thank you. Now. You have a Dao that makes the ground do as it is asked, and a clod in your sleeve that grows. Old Ao says you could give us any floor you chose."],
 		["Kiln-Master Hong of Redbranch", "Terraces for my coral, out of the current. A deep cold bed for her kelp. Warm flats for the pans. I have drawn it. It is a better floor than the one we have. I am not too proud to say so."],
-		["Loom-Mother Jiao Zhu", "And I say: he is not a fish. He has been among us one autumn. How does he know what we enjoy? But I am an old woman who has not picked up her shuttle. I will not pretend that I know either. So. I ask him.", "think"],
+		["Loom-Mother Jiao Zhu", "And I say: you are not a fish. You have been among us one autumn. How do you know what we enjoy? But I am an old woman who has not picked up her shuttle. I will not pretend that I know either. So. I ask you.", "think"],
 		["Lin Feng", "I do not know what you enjoy. I know what I saw. I shall tell you what I think, and you may do as you like with it. I find I should prefer it that way."],
 	],
 	"done:s_p42_stands": [
@@ -12717,7 +12931,7 @@ const DIALOGUE := {
 		["Elder Qing Xuan", "She writes that the floor is as it is, and that it is theirs. She writes that you were asked a thing you could not know, and that you said so first and answered second. She has underlined first. Twice. I have never had a letter underlined to me before."],
 		["Lin Feng", "There was a man on a bridge once who said the fish were happy. His friend said: you are not a fish. I always took the friend's side. I have been down there now, and I still do not know what they enjoy. But I do not think the first man was wrong."],
 		["Yue Ling", "He knew it standing on the bridge. That was what he said. Not from inside the fish. From where he was, looking, with his friend beside him arguing. I think that is the only place anybody knows anything from."],
-		["Elder Qing Xuan", "Then I shall tell you what I know, from this step. The water is clear. Two people came up nine hundred and ninety-nine stairs this evening and did not notice them. And somebody has shaped the ground by my spring so that it drains. Thank you, child. Sit down.", "nod"],
+		["Elder Qing Xuan", "Then I shall tell you what I know, from this step. The water is clear. Two people came up nine hundred and ninety-nine stairs this evening and did not notice them. And the spring under my pine has not been so clear since I was a boy. Thank you, child. Sit down.", "nod"],
 	],
 	"pre:s_break47": [
 		["Narrator", "The cloud that comes has a floor. Everybody in the yard sees it: flat and pale underneath, with ripples on it, as the sea is seen from below. It does not come down. For the first time in forty-seven tribulations, the thing overhead seems to be waiting to be asked."],
@@ -12725,7 +12939,7 @@ const DIALOGUE := {
 	],
 	"post:s_break47": [
 		["Narrator", "The bolts come down like water finding a channel that was already there. Each goes into the ground where the ground was lowest, and the yard, when it is over, is not even scorched. Lin Feng is standing with one palm flat on the flagstones, as if he had asked them something."],
-		["Yue Ling", "Forty-eight. I did count, this time. I wanted to know. You led all of it away. There is a little pool by the gate that was not there this morning, and it is perfectly round."],
+		["Yue Ling", "Forty-eight. I did count, this time. I wanted to know. You led all of it away. There is a little pool outside the gate, on the open slope, that was not there this morning, and it is perfectly round."],
 		["Lin Feng", "I did not make that. I only lowered the ground, and it came. I think that may be all I have ever done that was any good."],
 	],
 	"pre:s_break44": [
@@ -12804,7 +13018,7 @@ const DIALOGUE := {
 		["Elder Qing Xuan", "Mian has asked to walk a second road. The one who missed the pines. Flame Palm, and now he wants the Heart as well, so that he can mend what he burns. He asked very politely. Shen brought it to me as if it were a dead rat.", "nod"],
 		["Elder Qing Xuan", "The rule is one road. A heart in two places is wholly in neither: I have said so every spring for seventy years. And then I watched you, child, with five phases in one hand, and a sword, and whatever that thing is you do with a pot."],
 		["Lin Feng", "I have walked one road at a time, Elder. I set one down to pick up the next. I never tried to carry two."],
-		["Elder Qing Xuan", "Then carry two, and tell me what it weighs. Go to a stele. Do not set the first down. I shall not rule on what a boy may do until somebody I trust has done it, and come back, and told me the truth about his shoulders."],
+		["Elder Qing Xuan", "Then carry two, and tell me what it weighs. Go to a stele. Do not set the first down. I shall not rule on what a boy may do until somebody I trust has done it, and come back, and told me the truth about what it did to the shoulders."],
 	],
 	"done:s_p40_two": [
 		["Narrator", "The stele is cold under his palm, as it always is. The second road opens beside the first and does not push it aside. For a moment he stands at the place where they part, and then he finds that he is not standing: he is on both."],

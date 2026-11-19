@@ -201,6 +201,15 @@ func _unhandled_input(ev: InputEvent) -> void:
 		KEY_Y:
 			# ask something of the ground in front of him (the Sea Floor release: terra.gd)
 			press("shape")
+		KEY_N:
+			# the work of the hands (the Unblunted Knife release: crafts.gd)
+			press("make")
+		KEY_M:
+			# sit, or sleep, in a place of peace (retreats.gd)
+			press("peace")
+		KEY_L:
+			# the beasts he keeps (pets.gd)
+			press("beasts")
 		KEY_UP, KEY_W:
 			press("up")
 		KEY_DOWN, KEY_S:
@@ -250,6 +259,12 @@ func press(act: String) -> void:
 			world.toggle_view()
 		elif act == "shape":
 			offer_shape()
+		elif act == "make":
+			offer_make()
+		elif act == "peace":
+			offer_peace()
+		elif act == "beasts":
+			offer_beasts()
 		elif act == "talk":
 			talk_yue()
 		elif act == "cancel":
@@ -284,6 +299,10 @@ func _process(d: float) -> void:
 		if in_world and not Game.passengers.is_empty():
 			for fl in Offices.arrive(Game):
 				Game.toast(str(fl))
+		# (the Unblunted Knife release, pets.gd: a beast sent out to gather is back, with what it found)
+		if in_world and not Game.pets.is_empty():
+			for pl in Pets.collect(Game):
+				Game.toast(str(pl))
 		# (fame.gd: his standing is said when it rises with his cultivation)
 		if in_world and Game.prologue == "" and Fame.rank(Game) != Game.fame_told:
 			if Fame.rank(Game) > Game.fame_told:
@@ -2691,6 +2710,112 @@ func offer_shape() -> void:
 		world.shape(id)
 	)
 
+## The Unblunted Knife release (crafts.gd): N: what the hands make, here.  "Not now" is first.  (The bot says
+## which it means, world.make, and is not asked.)
+func offer_make() -> void:
+	if Game.prologue != "":
+		return
+	var why: String = world.make_why()
+	if why != "":
+		Game.toast(why)
+		return
+	var ph: Dictionary = world.peace_here()
+	var pc := int(ph.get("p", 0))
+	var where := "Out in the open, with nothing to quiet the hands." if ph.is_empty() else "At %s: %s. What is made here comes out the better for it." % [str(ph.r.n), str(Retreats.LEVELS[pc]).to_lower()]
+	var opts: Array = [{"id": "later", "label": "Not now", "desc": "%s\n\nSix crafts, one for each road: whoever walks a road works its craft better. The best thing made in each is worn (Esc > Hands & Beasts)." % where, "col": UI.C_DIM}]
+	for o in Crafts.offers(Game, pc):
+		var th: Dictionary = Crafts.THINGS[str(o.thing)]
+		var cr: Dictionary = Crafts.CRAFTS[str(o.craft)]
+		opts.append({"id": str(o.thing), "label": str(o.n), "note": "%s: %s" % [str(cr.n), str(Crafts.QUALITIES[int(o.q)])],
+			"desc": "%s\n\n%s (%s). Wants: %s. About %.1f hours. Worn %s: %s.%s" % [str(th.desc), str(cr.n), str(Data.DAOS[str(cr.dao)].n), Crafts.needs_text(Game, str(o.thing)), Crafts.hours(Game, str(o.thing)),
+				str(cr.worn), Crafts.effect_text(str(o.craft), str(o.thing), int(o.q)), "" if str(o.why) == "" else "\n\n" + str(o.why)],
+			"col": cr.col if str(o.why) == "" else UI.C_DIM, "enabled": str(o.why) == ""})
+	choose(Crafts.ASK, opts, func(id: String):
+		if id != "" and id != "later" and Crafts.THINGS.has(id):
+			world.make(id))
+
+## retreats.gd: M: a place of peace: what is done in it.  "Not now" is first.
+func offer_peace() -> void:
+	if Game.prologue != "":
+		return
+	var ph: Dictionary = world.peace_here()
+	if ph.is_empty():
+		Game.toast(Retreats.NOWHERE)
+		return
+	var pc := int(ph.p)
+	var kd: Dictionary = Retreats.KINDS[str(ph.r.kind)]
+	var opts: Array = [{"id": "later", "label": "Not now", "desc": "%s\n\n%s: %s. %s" % [str(kd.word), str(ph.r.n).substr(0, 1).to_upper() + str(ph.r.n).substr(1), str(Retreats.LEVELS[pc]).to_lower(), Retreats.text(Game)], "col": UI.C_DIM}]
+	var trouble := "" if pc > 0 else "\n\nSomething is hunting within earshot. Nothing can be done here until it has gone."
+	opts.append({"id": "sit", "label": "Sit and forget", "note": "2 hours", "desc": "He sits, and lets go of what he was holding. He is mended, he cultivates as a long meditation would have him, and the first sitting of a day in each place is an insight for the chart of the channels.%s" % trouble,
+		"col": UI.C_JADE, "enabled": pc > 0})
+	opts.append({"id": "sleep", "label": "Sleep until dawn", "note": "to the sixth hour", "desc": "He lies down where he is. Nothing comes. He wakes mended, at first light.%s" % trouble, "col": UI.C_JADE, "enabled": pc > 0})
+	opts.append({"id": "make", "label": "Set up a bench here", "note": "N", "desc": "The work of the hands, where it is quiet: what is made here comes out a grade better for every step of peace.", "col": UI.C_GOLD, "enabled": pc > 0 and world.make_why() == ""})
+	choose("%s: %s" % [Retreats.ASK, str(ph.r.n)], opts, func(id: String):
+		if id == "sit" or id == "sleep":
+			world.sit(id)
+		elif id == "make":
+			offer_make())
+
+## pets.gd: L: the beasts he keeps: which is at his heel, which is fed, which is sent out.  "Leave them be" is first.
+func offer_beasts() -> void:
+	if Game.prologue != "":
+		return
+	if Game.pets.is_empty():
+		Game.toast("He keeps no beast. One of a beaten pack of the land may stay, if he has on him what its kind eats (a fish, a bundle of herbs, mushrooms).")
+		return
+	var opts: Array = [{"id": "later", "label": "Leave them be", "desc": "He keeps %d of %d. The one at his heel strikes beside him, carries a little, and may keep watch; one sent out is back in four hours with what it has a nose for." % [Game.pets.size(), Pets.room(Game)], "col": UI.C_DIM}]
+	for i in Game.pets.size():
+		var p: Dictionary = Game.pets[i]
+		var txt := Pets.text(Game, p)
+		if i != Game.pet and not Pets.away(Game, p):
+			opts.append({"id": "heel:%d" % i, "label": "Call %s to heel" % str(p.n), "note": str(Pets.TIERS[Pets.tier(p)]), "desc": txt, "col": UI.C_JADE})
+		var fw := Pets.feed_why(Game, i)
+		opts.append({"id": "feed:%d" % i, "label": "Feed %s" % str(p.n), "note": str(Data.ITEMS[str(Pets.traits(p).diet)].n), "desc": txt + ("" if fw == "" else "\n\n" + fw), "col": UI.C_JADE if fw == "" else UI.C_DIM, "enabled": fw == ""})
+		var sw := Pets.send_why(Game, i)
+		opts.append({"id": "send:%d" % i, "label": "Send %s out to gather" % str(p.n), "note": "4 hours", "desc": txt + ("" if sw == "" else "\n\n" + sw), "col": UI.C_GOLD if sw == "" else UI.C_DIM, "enabled": sw == ""})
+		opts.append({"id": "free:%d" % i, "label": "Let %s go" % str(p.n), "desc": "%s walks back into the country it came out of, and does not look round more than once." % str(p.n), "col": UI.C_DIM})
+	choose(Pets.ASK, opts, func(id: String):
+		if id == "" or id == "later":
+			return
+		var k := int(id.get_slice(":", 1))
+		var what := id.get_slice(":", 0)
+		if what == "heel":
+			if Pets.bring(Game, k):
+				Game.toast("%s is at his heel." % str(Game.pets[k].n))
+		elif what == "feed":
+			if Pets.feed(Game, k):
+				Game.toast("%s eats from his hand. (%s)" % [str(Game.pets[k].n), str(Pets.TIERS[Pets.tier(Game.pets[k])])])
+		elif what == "send":
+			if Pets.send(Game, k, Game.area):
+				Game.toast("%s goes off with its nose down. Back in four hours." % str(Game.pets[k].n))
+		elif what == "free":
+			var nm := str(Game.pets[k].n)
+			if Pets.let_go(Game, k):
+				Game.toast("%s is gone, back to its own country." % nm))
+
+## pets.gd: one of a beaten pack has not run, and he has on him what it eats: it is asked.  "Let it go" is
+## first.  (The bot holds out its hand only inside a step that asks for a beast, world.tame_want.)
+func offer_tame(e: Dictionary, group: Array) -> void:
+	var of: Dictionary = Pets.offer(Game, e, group)
+	if of.is_empty() or top_name() != "world":
+		return
+	if bot != null:
+		if world.tame_want:
+			var bp: Dictionary = Pets.tame(Game, str(of.foe))
+			if not bp.is_empty():
+				print("[bot] a beast stays: %s" % Pets.title(bp))
+		return
+	var k: Dictionary = Pets.kind_of(str(of.foe))
+	var opts: Array = [{"id": "go", "label": "Let it go", "desc": "It is a wild thing in its own country. He turns his back, and when he looks again it is not there.", "col": UI.C_DIM},
+		{"id": "stay", "label": "Hold out the %s" % str(Data.ITEMS[str(of.food)].n).to_lower(), "note": str(k.kind), "desc": "%s It would strike beside him, carry a little, and go out for %s. He keeps %d of %d." % [str(k.word), str(Data.ITEMS[str(k.nose)].n).to_lower(), Game.pets.size(), Pets.room(Game)], "col": UI.C_JADE}]
+	say([["Narrator", Pets.seen_line(str(of.foe))]], func():
+		choose("One of them has not run", opts, func(id: String):
+			if id != "stay":
+				return
+			var pet: Dictionary = Pets.tame(Game, str(of.foe))
+			if not pet.is_empty():
+				say([["Narrator", "It takes the %s from his hand without touching the hand. Then it sits down, a little way off, as if it had always meant to. He calls it %s." % [str(Data.ITEMS[str(of.food)].n).to_lower(), str(pet.n)]]])))
+
 ## The Sea Floor release (mills.gd): the foreman of a works: what is made here and how ("Not today" first), a
 ## thing of its make from the store, a crate for a works that wants it, and the crates brought for this one.
 func offer_mill(e: Dictionary, wid: String) -> void:
@@ -3017,6 +3142,8 @@ func scatter_pack(e: Dictionary) -> void:
 	# a pack that runs has been driven off all the same: it counts for a hunt (an over-cultivated player
 	# could otherwise never finish one)
 	Game.record_kills(str(e.get("area", Game.area)), e.group.size(), e.group.map(func(g): return g.id))
+	# (the Unblunted Knife release, pets.gd: one of them may not have run with the rest)
+	offer_tame(e, e.group)
 
 ## One of the Founder's sealed caves (Part XII): a door that opens only to a cultivator of the realm
 ## carved on it.  Inside, the Founder's words, a gift of spirit stones and an awakening of the root.
@@ -3255,7 +3382,7 @@ const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "reca
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
 	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
-	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31", "s_break38": "recall32", "s_break39": "recall33", "s_break40": "recall34", "s_break41": "recall35", "s_break42": "recall36", "s_break43": "recall37", "s_break44": "recall38", "s_break45": "recall39", "s_break46": "recall40"}
+	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31", "s_break38": "recall32", "s_break39": "recall33", "s_break40": "recall34", "s_break41": "recall35", "s_break42": "recall36", "s_break43": "recall37", "s_break44": "recall38", "s_break45": "recall39", "s_break46": "recall40", "s_break47": "recall41"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,
@@ -3375,6 +3502,9 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 					Wilds.culled(Game, str(e2.get("area", Game.area)))
 				var fought: Array = ctx.get("group", e2.group)
 				Game.record_kills(e2.get("area", Game.area), fought.size(), fought.map(func(g): return g.id))
+				# (the Unblunted Knife release, pets.gd: one of them may not have run)
+				if not ctx.has("raid"):
+					offer_tame(e2, fought)
 				# (the Rivers and Lakes release, raids.gd: they were raiders, and whoever they had come for is still there)
 				if ctx.has("raid"):
 					Game.defeated.erase(e2.id)

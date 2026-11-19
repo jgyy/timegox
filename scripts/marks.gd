@@ -299,11 +299,20 @@ const MARKS := {
 	# Part XLII (the Sea Floor release): what was done with a Dao that moves the ground and a clod that grows
 	"the_joy_of_fish": {
 		"shape": {"area": "jiaoshi", "m": ["joy", "shape"], "k": 3, "n": "The Measured Terraces", "desc": "A step of the sea floor a hand high and dead level, edged with shell, with a young red branch netted in the middle of it and a plumb-line left hanging from a post. Everything on it is growing. It is the only level ground in the country.",
-			"who": ["Hong's Daughter, Who Tends the Steps", "folk_maiden", Color("c86a5a"), "I net the terraces. They are very good terraces. Father drew them and the man from the mountain raised them in eleven days, and the coral has taken on every one.", "My grandmother walks here in the evening and says: it used to slope. That is all she says. I do not know what I am meant to do about it having sloped.", "I asked the Loom-Mother who made the sea. She said nobody. I said then who made this. She went and sat at her loom."]},
+			"who": ["Hong's Daughter, Who Tends the Steps", "folk_maiden", Color("c86a5a"), "I net the terraces. They are very good terraces. Father drew them and you raised them in eleven days, and the coral has taken on every one.", "My grandmother walks here in the evening and says: it used to slope. That is all she says. I do not know what I am meant to do about it having sloped.", "I asked the Loom-Mother who made the sea. She said nobody. I said then who made this. She went and sat at her loom."]},
 		"teach": {"area": "jiaoshi", "m": ["joy", "teach"], "k": 3, "n": "The Children's Mounds", "desc": "A mound of sand about the size of a sleeping dog, lopsided, with a shell pressed into the top and a name scratched on the shell. Whoever raised it was aiming at something else. There are forty of them now, and the children know every one by sight.",
-			"who": ["Xiao Bei, Who Raised the Crooked One", "folk_boy", Color("7ac0c8"), "That one is mine. It was meant to be a wall for the kelp. It is not a wall. The Loom-Mother says it is a very good not-a-wall and I am to leave it.", "You put your hand flat and you ask. You do not push. I pushed, the first time, and got a hole. The hole is over there. It is also mine.", "The man from the mountain could do a hundred in a morning. He did one, to show, and then he sat on his hands. I watched him sit on them."]},
+			"who": ["Xiao Bei, Who Raised the Crooked One", "folk_boy", Color("7ac0c8"), "That one is mine. It was meant to be a wall for the kelp. It is not a wall. The Loom-Mother says it is a very good not-a-wall and I am to leave it.", "You put your hand flat and you ask. You do not push. I pushed, the first time, and got a hole. The hole is over there. It is also mine.", "You could do a hundred in a morning. You did one, to show, and then you sat on your hands. I watched you sit on them."]},
 		"leave": {"area": "jiaoshi", "m": ["joy", "leave"], "k": 3, "n": "The Thread Round Nothing", "desc": "Four pegs of black coral and a length of sea-hemp tied round them, a pace square, enclosing a piece of sand that is exactly like the sand outside it. A slip of gauze is knotted to one peg. It says: as it lay.",
-			"who": ["Old Bei's Apprentice, Who Tied the Thread", "folk_youth", Color("8a9aa8"), "The Loom-Mother had us peg it the day he let the clod go. Nothing is inside it. That is what it is for. People stop and look in and then look at the rest of the floor.", "The Kiln-Master would not come by here for a month. Then a red tip came on the old arch, and he came, and stood, and went away again.", "I do not know whether he was right. I know that if he had been wrong we could not have undone it, and that this way we can still be wrong ourselves."]},
+			"who": ["Old Bei's Apprentice, Who Tied the Thread", "folk_youth", Color("8a9aa8"), "The Loom-Mother had us peg it the day you let the clod go. Nothing is inside it. That is what it is for. People stop and look in and then look at the rest of the floor.", "The Kiln-Master would not come by here for a month. Then a red tip came on the old arch, and he came, and stood, and went away again.", "I do not know whether you were right. I know that if you had been wrong we could not have undone it, and that this way we can still be wrong ourselves."]},
+	},
+	# Part XLIII (the Unblunted Knife release): what Azure Cloud does with somebody who asks how
+	"the_first_form": {
+		"course": {"area": "mountain", "m": ["form", "course"], "k": 3, "n": "The Boards of the Forty Parts", "desc": "A board on two posts beside the path, hung with rows of wooden slips, a part of the course to each. Every slip is numbered and every one has been turned to the wall by somebody who has passed it. There are three boards, so that nobody need wait.",
+			"who": ["Tang Xi, Who Came Top", "folk_maiden", Color("c8b070"), "I came top in the Conception Vessel and the Governing Vessel and I am on part nineteen. I can tell you where every point is. I have them on slips.", "I asked how the first form was done and they gave me a book. It is a good book. The first form is not in it. I have looked twice.", "Hall Master Shen says doing comes after knowing. The old man with the broom did not say anything. He did the form, once, when he thought I had gone."]},
+		"fast": {"area": "mountain", "m": ["form", "fast"], "k": 3, "n": "The Bowls Turned Down", "desc": "A flat stone by the path with a rice bowl set on it upside down, and a peg driven in beside it with forty notches. One was set out for everybody who went into the hall. The bowls of those who came down the mountain early have been turned up again, and are full of rain.",
+			"who": ["Tang Xi, Who Stayed the Forty", "folk_maiden", Color("9ab0c8"), "That one is mine. I turned it down myself. I thought about the bowl for nine days and then one morning I had not thought about it and it was noon.", "Eleven went home. I do not think less of them. I nearly went on the eighth. I stayed because I could not decide, and by the time I could it did not matter.", "Nobody told me how the first form is done. I did it in the dark on the thirtieth night. I do not know how either. I am not being modest."]},
+		"show": {"area": "mountain", "m": ["form", "show"], "k": 3, "n": "The Benches Under the Open Sky", "desc": "A workbench carried out of doors and left where the path passes: a billet in the vice with a few cuts in it, a chisel, shavings underfoot. Somebody was here an hour ago and somebody will be here in an hour. Whoever passes slows down to see how far it has got.",
+			"who": ["Tang Xi, Who Watches the Second Bench", "folk_maiden", Color("d8a070"), "I do not work at it yet. I watch. Hall Master Du is carving a duck. Yesterday I said: less. I do not know why I said it. He took less off, and it was a duck.", "Nobody teaches here. I asked the one at the next bench how she set the chisel and she said: I do not know, look. So I looked.", "I asked how the first form was done, and you came out and did a bead instead, badly, where I could see. I understood the form the week after. I cannot explain that."]},
 	},
 	# Part XXXVIII (the Higher Sky release): what the sect teaches about those above it
 	"the_higher_sky": {
@@ -470,7 +479,7 @@ static func who_stands(g, e: Dictionary) -> bool:
 ## The crossroads of a later release whose marks are stood after the late bands of an older one
 ## (`"warband5"`, `"warband6"`), in a second pass (`after_bands`): a mark stood before them would take
 ## ground a band of an older map stood on, and the band would move.
-const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round", "the_higher_sky", "the_red_seal", "the_two_roads"]
+const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round", "the_higher_sky", "the_red_seal", "the_two_roads", "the_first_form"]
 
 static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, ids: Array, ents: Array, layer: String, reach: Dictionary, peaks: Array, camps: Dictionary, after_bands: bool = false) -> void:
 	var near := {}
@@ -669,6 +678,38 @@ static func model(sp: Dictionary, i: int = 0) -> Node3D:
 	var st := MB.tag(STONE, MB.STONE)
 	var h := Terrain3D.hash2(i, 13 + a.size(), 3.0)
 	match str(a[0]):
+		"form":
+			# Part XLIII: a board of slips on two posts; a stone, an upturned bowl and a notched peg; a workbench
+			# with a billet in the vice
+			match str(a[1]):
+				"course":
+					for px in [-0.42, 0.42]:
+						b.box(Vector3(px, 0.8, 0), Vector3(0.08, 1.6, 0.08), wd)
+					b.box(Vector3(0, 1.15, 0), Vector3(0.92, 0.8, 0.05), w)
+					b.box(Vector3(0, 1.6, 0), Vector3(1.0, 0.07, 0.14), wd)
+					for r3 in 5:
+						for c3 in 8:
+							var turned := Terrain3D.hash2(r3 * 8 + c3, i + 5, 7.0) < 0.3 + 0.2 * h
+							b.box(Vector3(-0.385 + c3 * 0.11, 1.45 - r3 * 0.15, 0.035), Vector3(0.07, 0.11, 0.015), wp if turned else MB.tag(Color("e8dcc0"), MB.WOOD))
+				"fast":
+					b.box(Vector3(0, 0.1, 0), Vector3(0.7, 0.2, 0.55), st)
+					b.hemi(Vector3(0, 0.2, 0), Vector3(0.17, 0.13, 0.17), MB.tag(Color("d8d4c8") if h < 0.7 else Color("9ab0c8"), MB.STONE))
+					b.cyl(Vector3(0, 0.215, 0), 0.07, 0.03, MB.tag(Color("d8d4c8"), MB.STONE), Vector3.ZERO, 10)
+					b.box(Vector3(0.42, 0.35, 0.1), Vector3(0.05, 0.7, 0.05), w)
+					for r4 in 8:
+						b.box(Vector3(0.42, 0.15 + r4 * 0.07, 0.128), Vector3(0.05, 0.012, 0.012), wd)
+				_:
+					b.box(Vector3(0, 0.62, 0), Vector3(1.0, 0.07, 0.44), w)
+					for px2 in [-0.42, 0.42]:
+						for pz2 in [-0.16, 0.16]:
+							b.box(Vector3(px2, 0.3, pz2), Vector3(0.07, 0.6, 0.07), wd)
+					b.box(Vector3(0, 0.2, 0), Vector3(0.84, 0.05, 0.05), wd)
+					b.box(Vector3(-0.2, 0.72, 0), Vector3(0.1, 0.14, 0.2), wd)
+					b.box(Vector3(-0.05, 0.72, 0), Vector3(0.1, 0.14, 0.2), wd)
+					b.cyl(Vector3(-0.125, 0.86 + 0.06 * h, 0), 0.055, 0.34 + 0.12 * h, wp, Vector3.ZERO, 8)
+					b.box(Vector3(0.28, 0.67, 0.05), Vector3(0.22, 0.02, 0.03), MB.tag(Color("8a8e98"), MB.METAL), Vector3(0, 0.5, 0))
+					for sh3 in 6:
+						b.box(Vector3(-0.3 + sh3 * 0.13, 0.015, 0.34 + 0.05 * (sh3 % 2)), Vector3(0.07, 0.01, 0.03), wp, Vector3(0, sh3 * 0.9, 0))
 		"stele":
 			# a slab on a plinth; broken across, or with smaller writing newly cut under the old
 			var sc := MB.tag(a[1], MB.STONE)

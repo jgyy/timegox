@@ -36,7 +36,7 @@ jobs:
 
   test-and-playthrough:
     runs-on: ubuntu-latest
-    timeout-minutes: 120  # the bot plays about fifty and three quarter hours of game time: half an hour or so since the Iron Pestle release taught it not to read the whole realm every frame (seventy to ninety-five minutes before)
+    timeout-minutes: 120  # the bot plays about fifty-two hours of game time: half an hour or so since the Iron Pestle release taught it not to read the whole realm every frame (seventy to ninety-five minutes before)
     steps:
       - uses: actions/checkout@v4
 

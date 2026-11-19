@@ -45,6 +45,8 @@ const SIGNATURE := {
 	"Ju Gong": "stroke_beard",
 	# Forgetting One Another in the Rivers and Lakes (Part XLI)
 	"Fleet-Mother Lu Ting": "hand_heart", "Shide, Who Sweeps the Kitchen": "stoop", "Ledger-Mistress Mo Chou": "sleeve_smile", "Banner-Lord Tuoba Lie": "arms_cross",
+	# Mastering Life (Part XLIII)
+	"Old Goulou": "stoop", "Woodworker Qing": "measure", "Ji Xingzi": "shade_eyes",
 	# The Joy of Fish (Part XLII)
 	"Loom-Mother Jiao Zhu": "sleeve_smile", "Kiln-Master Hong of Redbranch": "arms_cross", "Old Ao, the Turtle of the Eastern Sea": "stroke_beard", "Wa, the Frog of the Caved-In Well": "shade_eyes",
 	# A Sky Above the Sky (Part XXXVIII)

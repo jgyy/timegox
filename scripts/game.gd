@@ -428,6 +428,30 @@ var shaped := {}
 var shaped_n := 0
 var shaped_kinds := {}
 var step_terra := 0
+## the Unblunted Knife release (channels.gd, crafts.gd, pets.gd, retreats.gd): the points of the chart he has
+## opened (point -> ranks), how often, and the insight that came of sitting and making; what each craft has
+## learned, the best thing kept of each (craft -> {id, q}), the best each thing has come out, the first
+## masterworks, and how many things were made; the beasts he keeps (each {k, foe, shape, n, bond, day, fed,
+## wins, loads, out}), which is at his heel, how many he has ever kept and what they have brought back; the
+## places of peace he has sat in (place -> sittings), the day he last sat in each, sittings and nights slept
+## out; and what the step of the day has seen done (kind -> n: "train", "craft", "tame", "fetch", "retreat")
+var channels := {}
+var channels_n := 0
+var insight := 0
+var craft_xp := {}
+var kept := {}
+var crafted := {}
+var crafted_n := 0
+var masterworks := {}
+var pets: Array = []
+var pet := -1
+var pets_n := 0
+var fetched := 0
+var retreats := {}
+var sat_day := {}
+var sittings := 0
+var slept := 0
+var step_did := {}
 var sect_q := {}
 var sect_base := {}
 var raids_broken := 0
@@ -751,6 +775,23 @@ func reset() -> void:
 	shaped_n = 0
 	shaped_kinds = {}
 	step_terra = 0
+	channels = {}
+	channels_n = 0
+	insight = 0
+	craft_xp = {}
+	kept = {}
+	crafted = {}
+	crafted_n = 0
+	masterworks = {}
+	pets = []
+	pet = -1
+	pets_n = 0
+	fetched = 0
+	retreats = {}
+	sat_day = {}
+	sittings = 0
+	slept = 0
+	step_did = {}
 	sect_q = {}
 	sect_base = {}
 	raids_broken = 0
@@ -809,12 +850,12 @@ func max_hp(i: int) -> int:
 	# (his origin and outfit build his body only, not Yue Ling's: Fashion.gear)
 	# (and her dress hers: Fashion.yue_gear)
 	# (and what being promised, or wed, gives her: romance.gd)
-	return int(Data.max_hp(level) * (1.0 if i == 0 else 0.85) * boon("hp", 1.0) * ((1.0 + talent_mod("hp")) * (1.0 + Fashion.gear(self, "hp")) if i == 0 else (1.0 + Fashion.yue_gear(self, "hp")) * Romance.mod(self)) * Works.mod(self, "hp"))
+	return int(Data.max_hp(level) * (1.0 if i == 0 else 0.85) * boon("hp", 1.0) * ((1.0 + talent_mod("hp")) * (1.0 + Fashion.gear(self, "hp")) * Channels.mod(self, "hp") * Crafts.mod(self, "hp") if i == 0 else (1.0 + Fashion.yue_gear(self, "hp")) * Romance.mod(self)) * Works.mod(self, "hp"))
 
 func max_qi(i: int) -> int:
 	# (his origin and his outfit may widen or narrow his dantian: Fashion.gear)
 	# (a body that is parched or filthy holds less: needs.gd; nothing with survival off)
-	return int(Data.max_qi(level) * (1.0 if i == 0 else 1.1) * ((1.0 + talent_mod("qi")) * (1.0 + Fashion.gear(self, "qi")) if i == 0 else 1.0 + Fashion.yue_gear(self, "qi")) * Needs.mod(self, "qi"))
+	return int(Data.max_qi(level) * (1.0 if i == 0 else 1.1) * ((1.0 + talent_mod("qi")) * (1.0 + Fashion.gear(self, "qi")) * Channels.mod(self, "qi") * Crafts.mod(self, "qi") if i == 0 else 1.0 + Fashion.yue_gear(self, "qi")) * Needs.mod(self, "qi"))
 
 func fighter(i: int) -> Dictionary:
 	var a := float(Data.atk(level)) * (1.0 + 0.12 * temper) * boon("atk", 1.0)
@@ -826,17 +867,20 @@ func fighter(i: int) -> Dictionary:
 	# (the Red Seal release: the wound is his: Yue Ling used to limp with him)
 	if i == 0:
 		a *= Betters.mod(self, "atk")
+		# (the Unblunted Knife release: the points of the chart he has opened, and what he forged and wears; 1 with neither)
+		a *= Channels.mod(self, "atk") * Crafts.mod(self, "atk")
 	# the Wandering Dao and the friendship of the Feathered Folk make Lin Feng quicker
 	var spd: int = Data.speed(level) + (2 + int(Fashion.yue_gear(self, "spd")) if i == 1 else 0)
 	if i == 0:
 		spd += int(dao_mod("spd", 0.0) + boon("spd", 0.0) + talent_mod("spd") + Arms.mod(self, "spd", 0.0))
+		spd += int(Channels.add(self, "spd") + Crafts.add(self, "spd"))
 	spd += int(Needs.mod(self, "spd"))
 	if i == 0:
 		spd = int(round(float(spd) * Betters.mod(self, "spd")))
 	return {
 		"id": "pc%d" % i, "name": member_name(i), "side": "party", "idx": i, "lv": level, "boss": false,
 		"hp": hp[i], "maxhp": float(max_hp(i)), "qi": qi[i], "maxqi": float(max_qi(i)),
-		"atk": a, "def": float(Data.defense(level)) * (1.0 if i == 0 else 0.9), "spd": spd,
+		"atk": a, "def": float(Data.defense(level)) * (Channels.mod(self, "def") * Crafts.mod(self, "def") if i == 0 else 0.9), "spd": spd,
 		"elem": "phys", "weak": "none", "col": Color("7ec8ff") if i == 0 else Color("ff9ac0"),
 		"shape": "hero" if i == 0 else "healer", "skills": Data.known_skills(i, level, step) + dao_skills(i) + (Arms.skills(self) + Creed.skills(self) if i == 0 else []),
 		"turns": 0, "flash": 0.0, "shake": 0.0, "dead": false, "fade": 1.0,
@@ -1155,7 +1199,7 @@ func do_breakthrough() -> void:
 
 func med_rate(near_spring: bool) -> float:
 	# an Enlightened Mind goes deeper into every meditation
-	return (3.0 + 1.2 * level) * (3.0 if near_spring else 1.0) * (1.0 + talent_mod("med")) * Works.mod(self, "med")
+	return (3.0 + 1.2 * level) * (3.0 if near_spring else 1.0) * (1.0 + talent_mod("med")) * Works.mod(self, "med") * Channels.mod(self, "med")
 
 # ---------------------------------------------------------------- quests
 func cur_step() -> Dictionary:
@@ -1223,6 +1267,7 @@ func advance() -> void:
 	step_raids = 0
 	step_supply = 0
 	step_terra = 0
+	step_did = {}
 	step_fit = 0
 	step_toil = 0
 	step_restore = 0
@@ -1398,6 +1443,11 @@ func poll_steps() -> void:
 			"terra":
 				# Part XLII (terra.gd): so many askings the ground answered since the step began
 				ok = step_terra >= int(s.n)
+			"train", "craft", "tame", "fetch", "retreat":
+				# Part XLIII (channels.gd, crafts.gd, pets.gd, retreats.gd): so many points of the chart opened,
+				# things made, beasts asked to stay, loads a beast brought back, sittings in a place of peace,
+				# since the step began
+				ok = int(step_did.get(str(s.kind), 0)) >= int(s.n)
 			"weal":
 				# Part XXVIII: so many towns of the land left the better for his coming since the step
 				# began (weal.gd)
@@ -1537,6 +1587,8 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(Deeps.found_in(self, str(s.get("area", ""))), int(s.n)), int(s.n)]
 	elif s.kind == "terra":
 		t += "  (%d/%d)" % [mini(step_terra, int(s.n)), int(s.n)]
+	elif s.kind in ["train", "craft", "tame", "fetch", "retreat"]:
+		t += "  (%d/%d)" % [mini(int(step_did.get(str(s.kind), 0)), int(s.n)), int(s.n)]
 	elif s.kind == "sect":
 		t += "  (%d/%d)" % [mini(Sects.done_count(self, str(s.sect)), int(s.n)), int(s.n)]
 	elif s.kind == "meet" and Lists.entered(self, str(s.meet)):
@@ -1845,6 +1897,15 @@ func use_item_field(id: String) -> String:
 	# of qi, or of both, for whoever of the party is lowest)
 	if Mills.USES.has(id):
 		var u: Dictionary = Mills.USES[id]
+		# (the Unblunted Knife release: a thing that only steadies the breath is for whoever is lowest in qi; it
+		# used to ask the one lowest in health, and say nobody needed it while the other was drained)
+		if u.has("qi") and not u.has("hp"):
+			var lowq := 2.0
+			for k in party_size():
+				var rq: float = qi[k] / float(max_qi(k))
+				if rq < lowq:
+					lowq = rq
+					i = k
 		var need_hp: bool = u.has("hp") and hp[i] < max_hp(i) - 0.5
 		var need_qi: bool = u.has("qi") and qi[i] < max_qi(i) - 0.5
 		if not need_hp and not need_qi:
