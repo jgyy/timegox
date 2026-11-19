@@ -252,7 +252,8 @@ static func deliver(g, to: String) -> int:
 	g.crates_done = int(g.crates_done) + n
 	g.step_supply = int(g.step_supply) + n
 	g.mill_paid = int(g.mill_paid) + paid
-	Weal.act(g, str(WORKS[to].town), "supplied")
+	# (the Unblunted Knife release: two crates set down together used to be told to the town as one)
+	Weal.act(g, str(WORKS[to].town), "supplied", n)
 	g.note("Brought %d crate%s to %s" % [n, "" if n == 1 else "s", str(WORKS[to].short)])
 	return paid
 

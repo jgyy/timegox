@@ -41,7 +41,7 @@ const EXAMINER := "Registrar Yin Wen"
 const ASKS := {
 	"sword": "The Sword Road. Everybody who comes to this desk says they walk it. Show me the part of it that is not the sword.",
 	"wander": "Free Wandering. I am to certify that you go where you like. Stand still, then. I want to see whether you can do that too.",
-	"heart": "The Mirror Heart. I shall say something untrue about you, and watch what your face does. I have already said it. Good.",
+	"heart": "The Compassionate Heart. I shall say something unkind about you, and watch what your face does. I have already said it. Good.",
 	"formation": "Formations. Set one out on my desk with what is on my desk. No. The ink-stone stays where it is. That is the examination.",
 	"alchemy": "The Cauldron. I do not want a pill. I want you to tell me, before the fire is lit, what this one will fail of.",
 	"illusion": "Illusion. Show me something that is not there, and then tell me which of us it fooled. I shall know if you guess.",

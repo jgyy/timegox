@@ -284,6 +284,19 @@ const PAGES := {
 		"Zhuangzi stood on a bridge and said the fish were happy. Hui Shi said: you are not a fish. I have argued Hui Shi's side all my life without knowing it had a name. Do not presume. Sweep your own step.",
 		"I went down among them. I ate at their tables and carried their crates and learned the one art they had to teach. I still do not know what a fish enjoys. But I know what I saw, and I said it, and I said where I was standing when I saw it.",
 		"I think that is all the man on the bridge ever claimed. Not that he was a fish. Only that he was there, and looking, and that it would have been a kind of lie to say he had seen nothing."]},
+	# Part XLIII (the Unblunted Knife release)
+	"p43_guard": {"n": "It Rattles", "who": "lin", "after": "s_p43_guard", "lines": [
+		"I have carried a sword since I was fourteen and I did not know how the guard is fixed to the tang. I know now. It is fixed with a wedge, and mine is not quite the right wedge.",
+		"I beat it flat where it did not want to go. I can see every blow in it. When I draw, it rattles: a small sound, like a tooth. Forty-seven realms, and the first thing of mine that anybody could hear coming.",
+		"I would not change it for a better one. I have tried to work out why, and I think it is only that I know where it is wrong. I have never known that about anything I was given."]},
+	"p43_wolf": {"n": "You Held Out a Fish", "who": "yue", "after": "s_p43_beast", "lines": [
+		"You stood in the bamboo with a carp in your hand and your arm out, and you did not say anything, and you did not do that thing with your shoulders that you do before a fight. I had not known you could leave it off.",
+		"It looked at you for a long time. I thought: it will see the lord-killer, it will run. It did not see that. I do not know what it saw. I have been trying to see it too, ever since, when you are not looking.",
+		"You are going to tell me you did nothing. I know. I was there. I should like you to do nothing more often. It is the most anybody has ever seen of you."]},
+	"p43_last": {"n": "Like That", "who": "elder", "after": "s_break48", "lines": [
+		"The child came home with a wolf, a string of beads, and a chart with six lamps lit on it out of sixty. Seventy years I have been adding to disciples. This one went away for a season and came back with less, and it suits.",
+		"A girl asked me how the first form is done and I swept a staircase. The child went and looked at an old man with a pole, and a carpenter, and a man with a bird, and none of them could say either. I find that a very great comfort.",
+		"The tribulation came while the child was sitting on my top step, not ready. I have seen forty-eight of them met. This one was not met. It was only there, and so was the child, and then it had gone. The wolf did not wake. I have put my name back on the list."]},
 	"p38_last": {"n": "In My Own Hand", "who": "lin", "after": "s_break43", "lines": [
 		"These pages were her idea. She said a story told only from over somebody's shoulder is a story about a back. So here is the front of it.",
 		"I am Lin Feng. I swept steps. I was handed a root I did not earn and a companion I did not deserve, and I climbed until there was nobody above me, and then three people walked down a mountain and there was.",
@@ -293,7 +306,7 @@ const ORDER := ["p01_post", "p01_broom", "p01_gate", "p02_emperor", "p03_hollow"
 	"p13_gates", "p14_karma", "p15_woven", "p16_year", "p17_spring", "p18_fire", "p19_works", "p20_hollow", "p21_arms", "p22_roads", "p23_host", "p24_horse", "p25_town", "p26_springs", "p27_sack",
 	"p28_grass", "p29_chimney", "p30_net", "p31_shoe", "p32_mirror", "p33_pestle", "p34_road", "p35_block", "p36_fish", "p37_round",
 	"p38_word", "p38_fuchai_down_lin", "p38_fuchai_down_yue", "p38_fuchai_up_lin", "p38_pang_down_lin", "p38_pang_down_yue", "p38_pang_up_lin",
-	"p38_lian_down_lin", "p38_lian_down_yue", "p38_lian_up_lin", "p38_lian_won_lin", "p38_low", "p38_last", "p39_ring", "p39_paper", "p39_last", "p40_leaves", "p40_two", "p40_last", "p41_bowl", "p41_crooked", "p41_last", "p42_floor", "p42_hands", "p42_last"]
+	"p38_lian_down_lin", "p38_lian_down_yue", "p38_lian_up_lin", "p38_lian_won_lin", "p38_low", "p38_last", "p39_ring", "p39_paper", "p39_last", "p40_leaves", "p40_two", "p40_last", "p41_bowl", "p41_crooked", "p41_last", "p42_floor", "p42_hands", "p42_last", "p43_guard", "p43_wolf", "p43_last"]
 
 static var _by_step := {}
 

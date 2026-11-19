@@ -59,7 +59,7 @@ const ORDER := ["outer", "arms", "schools"]
 const RIVALS := {
 	"list_meng": {"temper": "hot", "jeers": ["Three years sweeping and they let you in the bowl? I drew you. I asked to draw you.", "Is that the form? I had heard it was better. I had heard a great deal.", "Stand still and I shall explain where you went wrong!"],
 		"won": "I talked through the whole of it, did I not. Hall Master Du says I would be further on if I talked less. He says it often.", "lost": "There! Write that on the Roll. Write it large. No. Write it the usual size. I find I do not want it large."},
-	"list_bai_lu": {"temper": "cold", "jeers": ["Good morning, Junior Brother.", "You are leaning on your front foot.", "Still leaning."],
+	"list_bai_lu": {"temper": "cold", "jeers": ["Good morning, Junior Brother Lin.", "You are leaning on your front foot.", "Still leaning."],
 		"won": "You stopped leaning in the fourth exchange. I wondered whether you would. Thank you for the bout.", "lost": "You hurried. I do not hurry. That is all that happened here; do not make a story of it."},
 	"list_han_yue": {"temper": "proud", "jeers": ["Six years first on the Roll. I have bowed to nobody I had not measured. I have measured you.", "The Elder is watching. He has never watched one of mine before. I notice that.", "I am not going to be the step you stood on."],
 		"won": "Then it is measured. First on the Roll for six years, and second from today. I shall bow now. I find I know how.", "lost": "Measured, and found a little short. You will be told it was close. It was not. Come back in a month."},
@@ -74,7 +74,7 @@ const RIVALS := {
 	"hui_shi": {"temper": "merry", "jeers": ["I have five carts of books and a friend who laughs at all of them. Shall we see which of us the sun sets on at noon?", "An egg has feathers. You will see what I mean when it hatches. Mind your left.", "Take half of a stick each day and ten thousand generations will not see the end of it. This bout, now, I am less sure of."],
 		"won": "Oh, well struck. Zhuang Zhou will be unbearable. He says I lean on a tree and mutter. I shall go and lean on one, and tell it.", "lost": "There: the south has no limit and has a limit. You found the limit. Come and argue it over wine. I only ever fight to get to the wine."},
 	"gongsun_long": {"temper": "cold", "jeers": ["A white horse is not a horse. A certified swordsman is not a swordsman. I shall show you the second; the first took me a book.", "Hard, and white. Two things. You strike at the stone, and there is no stone there.", "What your paper names and what stands here are not one thing. I am waiting to meet either."],
-		"won": "Then the name and the thing were one, this once. I had said it could not be. I shall have to write another chapter. Do not look pleased; I dislike writing.", "lost": "You brought the paper into the ring. The man who earned it stayed outside. Next time, send him in, and leave the horse."},
+		"won": "Then the name and the thing were one, this once. I had said it could not be. I shall have to write another chapter. Do not look pleased; I dislike writing.", "lost": "You brought the paper into the ring. Whoever earned it stayed outside. Next time, send that one in, and leave the horse."},
 }
 
 ## What can be said across a ring: the name on the menu, and what it is.

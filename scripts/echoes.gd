@@ -1939,19 +1939,19 @@ const CROSSROADS := {
 		"after": {
 			"bind": [["Narrator", "Lin Feng signs in the gap. Mo Chou blots it. Tuoba Lie makes his mark with a thumb. Shide is handed the brush, looks at it, and draws a short line, the stroke of a broom. Lu Ting says: then somebody had better feed the clerk. And there is, at once, a clerk."]],
 			"dig": [["Narrator", "It takes four days. Mo Chou digs in silk gloves and ruins them. Tuoba Lie moves the rock that three hermits could not. Lu Ting sings the stroke. Shide sweeps the spoil. On the fifth morning the cleft speaks, and four beds darken, one after another, downhill."]],
-			"toll": [["Narrator", "Tuoba Lie looks at the scroll, and at Lin Feng, for a long breath. Then he nods, once, to the boy with the slate. By evening there is a rope across the road at Reedhaven, at the height of a man's chest. Lu Ting puts a bowl into the hands of the rider who holds it. He does not know what to do with it."]],
+			"toll": [["Narrator", "Tuoba Lie looks at the scroll, and at Lin Feng, for a long breath. Then he nods, once, to the child with the slate. By evening there is a rope across the road at Reedhaven, at the height of a man's chest. Lu Ting puts a bowl into the hands of the rider who holds it. He does not know what to do with it."]],
 		},
 		"echo": {
 			# (the Sea Floor release: what four sects did with the water is remembered when the water comes back brown)
 			"s_p42_home": {
 				"bind": [["Elder Qing Xuan", "The league has sent a rider about the silt, child, with a form. Four seals. It asks which gate is answerable for a river. I have written back that the river is. I do not expect that to be the end of it."]],
 				"dig": [["Elder Qing Xuan", "Four sects dug that cleft with you and went home. I thought of writing to them about the silt. Then I thought: they would only say that it is not on their floor. And they would be right, and it is on somebody's."]],
-				"toll": [["Elder Qing Xuan", "The Banner has put a rope across the river at the last gorge, I hear, and is pricing the flood. A boy with a slate. He has priced it at nothing, since nobody would pay. It is the one honest thing anybody has said about it."]],
+				"toll": [["Elder Qing Xuan", "The Banner has put a rope across the river at the last gorge, I hear, and is pricing the flood. A child with a slate, who has priced it at nothing, since nobody would pay. It is the one honest thing anybody has said about it."]],
 			},
 			"s_p41_end": {
 				"bind": [["Elder Qing Xuan", "They have sent me a copy of the Covenant, child, in a clerk's hand, with a request that Azure Cloud consider being the fifth gate. I am considering it. I have been considering it since breakfast. I may consider it for some years."]],
 				"dig": [["Elder Qing Xuan", "Four letters, and I shall tell you what is in them without opening one: nothing. A line each, to say the water is back and they will not be writing again. It is the most courteous thing four sects have ever done for me."]],
-				"toll": [["Elder Qing Xuan", "There is a rope across the landing at Reedhaven, I am told, at the height of a man's chest, and a boy with a slate. He priced Bao's carter at four coppers. The carter has not spoken since. I do not say you were wrong, child. I say I shall go round by the fields."]],
+				"toll": [["Elder Qing Xuan", "There is a rope across the landing at Reedhaven, I am told, at the height of a man's chest, and a child with a slate, who priced Bao's carter at four coppers. The carter has not spoken since. I do not say you were wrong, child. I say I shall go round by the fields."]],
 			},
 		},
 		"end": {
@@ -1979,6 +1979,11 @@ const CROSSROADS := {
 			"leave": [["Narrator", "He carries it to the lip himself. It is heavier than it was. The frog comes with him, and holds the rope. When he opens his hand the clod does not fall: it goes, the way the silt went, to wherever the sea keeps things. Hong does not speak to him for two days. On the third he sends a float, without a note."]],
 		},
 		"echo": {
+			"s_p43_home": {
+				"shape": [["Elder Qing Xuan", "You raised nine terraces on the sea floor in eleven days, child, and could you tell the Kiln-Master how your hand did it? No. You showed him a floor. I have been wondering ever since whether that is the same thing as not knowing."]],
+				"teach": [["Elder Qing Xuan", "You set the Loom-Mother's palm on the sand and said: ask. I am told that was all you said. She got a crooked mound and was furious. I have been thinking about that mound, child. I believe it was the best lesson anybody on this mountain has given."]],
+				"leave": [["Elder Qing Xuan", "You had the sea floor in your hand and opened it. Nobody could have taught you that. I have asked myself whether I could have, and I think I should only have stood beside you and looked worried. Perhaps that is what I have been doing for seventy years."]],
+			},
 			"s_p42_end": {
 				"shape": [["Elder Qing Xuan", "And under the underlining, child, a smaller hand: the terraces are very fine and the coral is taking, and my granddaughter asked today who made the sea. I did not know what to tell her. I had never needed to know before."]],
 				"teach": [["Elder Qing Xuan", "And under the underlining, a drawing. It is a mound. It is, I am fairly sure, the worst mound ever raised by anybody. She has signed it. I am going to have it framed and hung where the outer court can see what a first attempt looks like."]],
@@ -1989,6 +1994,37 @@ const CROSSROADS := {
 			"shape": "The floor of the Eastern Sea under Shuttlereef is terraced, bedded and drained, to a drawing, and three towns live better on it than they ever did. The children born since think the sea was made by a man from a mountain. Their grandmothers do not correct them, and do not quite forgive him.",
 			"teach": "On the floor of the Eastern Sea the Jiaoren ask the ground for what they want, with a clod that grows, and get it wrong about one time in three. The floor is the most lopsided in the world. They would not change a mound of it. It is said that Yu would have wept, and then asked to be shown how.",
 			"leave": "The floor of the Eastern Sea lies as it lay. The silt went down the Tail-Gate, and the coral came back red at the tips in its own time, or did not. Nobody there has a Dao for moving ground, and nobody misses one. They remember that a stranger had the sea in his hand once, and opened it.",
+		}},
+	# ---- Part XLIII (the Unblunted Knife release): a girl asked how the first form is done, and the Elder swept a staircase
+	"the_first_form": {"step": "s_p43_moot", "part": "XLIII", "n": "Like This",
+		"ask": "A girl of the outer court asked how the first form is done, and seventy years could not say. Now the whole court wants the chart, the crafts and the beasts taught. Hall Master Shen has a course in forty parts. Hall Master Du would shut the hall forty days and fast. The Elder asks what Azure Cloud does.",
+		"options": [
+			{"id": "course", "label": "Write it down: Shen's forty parts", "tilt": {"craft": 3, "heart": -1}, "creed": {"rule": 6}, "gain": {"renown": 6},
+				"desc": "Set it out. Sixty points, six crafts, the feeding of a beast, in forty parts with an examination to each. It will be wrong in places, as every book is. But a girl who asks how will be handed something, and the next Elder will not have to sweep a staircase to find out what he knows (renown: +6).",
+				"log": "Had the chart, the crafts and the keeping of beasts written out for the outer court in forty parts, with examinations."},
+			{"id": "fast", "label": "Shut the hall forty days, and fast", "tilt": {"craft": -3, "reach": -2}, "creed": {"virtue": 5}, "gain": {"stones": 10200},
+				"desc": "Bar the door. No forms, no lessons, no visitors, for as long as Ji Xingzi took over one bird. Let every disciple find out what is there when nothing is being added. Some will find nothing and go home. Those who stay will not need to be told how (spirit stones: +10200).",
+				"log": "Had the hall of Azure Cloud shut for forty days, and the whole outer court fast to still the heart."},
+			{"id": "show", "label": "Neither: put the benches in the yard", "tilt": {"heart": 3, "reach": 2}, "creed": {"rule": -6}, "gain": {"stones": 12300},
+				"desc": "No course and no fast. Carry the benches out where everybody passes. Whoever can do a thing does it there, badly or well, and whoever wants to know how may stand and look. It is not teaching. It is only being looked at. He has seen three people do nothing else (spirit stones: +12300).",
+				"log": "Had the workbenches of Azure Cloud carried out into the yard, for anybody to work at and anybody to watch."},
+		],
+		"after": {
+			"course": [["Narrator", "Hall Master Shen has it written in nine days. He is a happy man. The first examination is on the Conception Vessel, and the girl who asked about the first form comes top in it. She can name every point from the lip to the root. She still cannot do the first form, and has stopped asking, since it is not in the forty parts."]],
+			"fast": [["Narrator", "The bar goes across the door at dusk. For three days the outer court thinks about food. For five it thinks about its own cleverness in not thinking about food. On the ninth, eleven of them go down the mountain. On the fortieth the door opens, and the ones who come out blink, and are very gentle with the door."]],
+			"show": [["Narrator", "The benches go out under the pine. On the first morning nobody sits at one. On the second Lin Feng does, with a billet of timber, and carves a bead rather badly while forty disciples pretend to be crossing the yard. By the end of the week there is a queue for the second bench, and nobody has been told anything."]],
+		},
+		"echo": {
+			"s_p43_end": {
+				"course": [["Elder Qing Xuan", "Shen has your girl at the head of his first class, child. She can recite the Governing Vessel backwards. I asked her to show me where it was, on herself, and she looked it up. It is a very good book. I am keeping one by the broom."]],
+				"fast": [["Elder Qing Xuan", "Twenty-nine came out of the forty, child. They do not say much. Du is insufferable. But I watched the girl do the first form in the dark on the thirtieth night, when she thought the hall was asleep, and nobody had told her anything at all."]],
+				"show": [["Elder Qing Xuan", "There is a bench under my pine, child, and a queue for it. Du carves ducks. They are terrible ducks. Three of the outer court stand and watch him every evening, and yesterday one of them said: Hall Master, less. And he took less off. I nearly wept."]],
+			},
+		},
+		"end": {
+			"course": "Azure Cloud teaches the Chart of the Channels in forty parts, and its graduates can name sixty points in their sleep. The Forty Parts are copied in nine sects. It is said that the Elder who commissioned them kept one by his broom, and was seen now and then to look something up, and then to put it down and sweep.",
+			"fast": "Once in a disciple's life the hall of Azure Cloud is barred for forty days, and whoever is inside it fasts. A third go home. The rest are known all over the land by a way they have of not hurrying. Nobody on the mountain can say what is taught in there. It is the one question the sect has stopped being asked.",
+			"show": "There are benches under the pine on Azure Cloud Mountain, and whoever can do a thing does it there. Nothing is taught. Disciples come out of that yard able to forge, carve and sit still, and when they are asked who their teacher was they name whoever was at the next bench, who generally denies it.",
 		}},
 }
 const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawings", "nineteen", "ancestor", "widow", "crows", "axe", "cauldron_map", "furnace",
@@ -2002,7 +2038,7 @@ const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawin
 	"the_sack",
 	"the_knot",
 	"the_mat",
-	"the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round", "the_higher_sky", "the_red_seal", "the_two_roads", "the_covenant", "the_joy_of_fish"]
+	"the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round", "the_higher_sky", "the_red_seal", "the_two_roads", "the_covenant", "the_joy_of_fish", "the_first_form"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:

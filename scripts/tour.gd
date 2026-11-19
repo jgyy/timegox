@@ -2364,6 +2364,11 @@ func _run() -> void:
 		# the ten vehicles, traffic on the high road, a raid on a cart and on a camp, the hall of tasks, the page of
 		# the sects, the river-boat's landing, the map of the sixth realm, and Part XLI
 		await _lakes_shots(str(main.args.lakes))
+	if main.args.has("knife"):
+		# the Unblunted Knife release (--knife, or --knife=a,b): the chart of the channels, the bench of each craft,
+		# a place of peace on a summit, at the back of a cave and in a pavilion, a beast asked to stay and at his
+		# heel, the pages, and Part XLIII
+		await _knife_shots(str(main.args.knife))
 	if main.args.has("deeps"):
 		# the Sea Floor release (--deeps, or --deeps=a,b): the three towns under the sea, the six works at their
 		# stations, the places of the sea floor, the ground shaped by the Dao of Leading Water, the way down at
@@ -8271,5 +8276,257 @@ func _lakes_shots(which: String = "1") -> void:
 		main.ask_crossroads()
 		await _wait(0.6)
 		await _shot("crossroads_covenant")
+		main.set_stack(["world"])
+		Game.cross_pending = []
+
+## The Unblunted Knife (--knife, or --knife=a,b): "chart" (Esc > The Channels, closed and with points open),
+## "hands" (Esc > Hands & Beasts), "make" (the choice, and each craft at its bench), "peace" (the choice on a
+## summit, sitting there, at the back of a cave and in a pavilion), "beast" (one that has not run, the choice,
+## the beast at his heel, the beasts he keeps), "foes", "marks", "people" and "cross" (Part XLIII).
+func _knife_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_burrows_state()
+	Game.level = 143
+	Game.step = Data.step_index("s_p43_tops")
+	Game.companion = true
+	Game.day = 371
+	Game.stones = 118000
+	Game.dao = "sword"
+	Game.dao_xp["sword"] = 999999
+	for rid in [Atlas.HUB] + Data.AREA_CHAIN:
+		Game.seen[rid] = true
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	var quiet := func():
+		Game.toasts.clear()
+		main.toast_list.clear()
+		Game.mail_told = 999
+		Game.fame_told = Fame.rank(Game)
+		Game.page_due = []
+		Game.rite_due = []
+		Game.done_pending = []
+	var surf: Dictionary = Atlas.world_of("surface")
+	var top: Vector2i = Peaks.of_area(surf, "mountain")[0].c
+	if want.call("chart"):
+		w.teleport(_nearest_free(Atlas.to_world("sect", Vector2i(20, 10))), "surface")
+		quiet.call()
+		await _wait(0.8)
+		Game.channels = {}
+		main.push("menu")
+		main.menu.mode = "channels"
+		main.menu.cursor = 0
+		main.menu._build()
+		await _wait(0.3)
+		await _shot("page_channels_closed")
+		for id in ["ren", "ren", "ren", "du", "du", "chong", "dai", "circuit", "sw_arm", "sw_arm", "sw_forge", "sw_edge", "sw_gap", "sw_seal", "he_gate", "he_carve", "st_sit", "st_breath", "st_ear", "ha_grip", "ha_eye", "be_hand", "be_fang", "wa_leg", "al_burn", "fo_back", "il_eye"]:
+			Channels.open(Game, id)
+		main.menu.msg = ""
+		main.menu._build()
+		main.menu.cursor = main.menu.ids.find("point:sw_gap")
+		await _wait(0.3)
+		await _shot("page_channels_open")
+		main.menu.cursor = main.menu.ids.find("point:qiao")
+		await _wait(0.3)
+		await _shot("page_channels_fork")
+		main.pop()
+	if want.call("make"):
+		Clock.set_hour(Game, 10.0)
+		Game.inv["timber"] = 9
+		Game.inv["stone_block"] = 4
+		Game.inv["herb_bundle"] = 12
+		Game.inv["ore_lump"] = 5
+		Game.craft_xp = {"forge": 9, "carve": 4}
+		var mt := _nearest_free(Atlas.to_world("bamboo", Vector2i(30, 22)))
+		w.teleport(mt, "surface")
+		for d in [Vector2i(0, 1), Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, -1)]:
+			if w.tile_free(mt + d) and w.ent_at(mt + d) == null:
+				w.facing = d
+				break
+		quiet.call()
+		await _wait(1.2)
+		main.offer_make()
+		await _wait(0.4)
+		if main.top_name() == "choice":
+			main.choice.cursor = 1
+			main.choice._show()
+			await _wait(0.3)
+			await _shot("make_ask")
+		main.set_stack(["world"])
+		for th in ["plain_guard", "peach_beads", "ward_slip", "herb_paste", "river_stone", "straw_sandals"]:
+			quiet.call()
+			if w.make(th):
+				await _wait(3.0)
+				await _shot("make_" + Crafts.craft_of(th))
+				w._use_finish()
+				w._use_clear()
+				await _wait(0.3)
+			quiet.call()
+	if want.call("peace"):
+		Clock.set_hour(Game, 7.0)
+		w.teleport(top, "surface")
+		w.facing = Vector2i(0, 1)
+		quiet.call()
+		await _wait(1.5)
+		main.offer_peace()
+		await _wait(0.4)
+		if main.top_name() == "choice":
+			main.choice.cursor = 1
+			main.choice._show()
+			await _wait(0.3)
+			await _shot("peace_ask_summit")
+		main.set_stack(["world"])
+		quiet.call()
+		if w.sit("sit"):
+			await _wait(3.0)
+			await _shot("peace_sit_summit")
+			w._use_finish()
+			w._use_clear()
+			await _wait(0.3)
+		quiet.call()
+		var fid := Caves.fid("fusang", -1)
+		var cw: Dictionary = surf.floors[fid]
+		for e in cw.ents:
+			if str(e.id).begins_with("cave_cache:"):
+				Game.taken[str(e.id)] = true
+				Game.defeated = {}
+				for e2 in cw.ents:
+					if str(e2.kind) == "enemy":
+						Game.defeated[e2.id] = Game.playtime
+				w.teleport(e.pos + Vector2i(0, 1) if cw.grid[(e.pos.y + 1) * int(cw.w) + e.pos.x] == MapGen.FLOOR else e.pos, fid)
+		quiet.call()
+		await _wait(1.5)
+		if w.sit("sit"):
+			await _wait(3.0)
+			await _shot("peace_sit_cave")
+			w._use_finish()
+			w._use_clear()
+			await _wait(0.3)
+		Game.defeated = {}
+		quiet.call()
+		for e3 in surf.ents:
+			if str(e3.kind) == "prop" and str(e3.get("prop", "")) == "pavilion" and not e3.has("furn"):
+				var spot := _prop_spot(surf, e3)
+				if spot != Vector2i(-1, -1):
+					Clock.set_hour(Game, 17.0)
+					w.teleport(spot, "surface")
+					w.facing = e3.pos - spot
+					quiet.call()
+					await _wait(1.5)
+					main.offer_peace()
+					await _wait(0.4)
+					if main.top_name() == "choice":
+						await _shot("peace_ask_pavilion")
+					main.set_stack(["world"])
+					break
+	if want.call("beast"):
+		Clock.set_hour(Game, 15.0)
+		Game.pets = []
+		Game.pet = -1
+		Game.pets_n = 0
+		Game.inv["carp"] = 4
+		w.teleport(_nearest_free(Atlas.to_world("bamboo", Vector2i(34, 24))), "surface")
+		quiet.call()
+		await _wait(1.2)
+		var pack := {"id": "tour_pack", "kind": "enemy", "group": [{"id": "bamboo_wolf", "lv": 1}, {"id": "bamboo_wolf", "lv": 1}], "pos": w.ptile + Vector2i(1, 0), "area": "bamboo", "vis": ["", ""]}
+		main.offer_tame(pack, pack.group)
+		await _wait(0.5)
+		await _shot("beast_has_not_run")
+		if main.top_name() == "dialogue":
+			main.dialogue.press("confirm")
+			await _wait(0.2)
+			main.dialogue.press("confirm")
+			await _wait(0.5)
+		if main.top_name() == "choice":
+			main.choice.cursor = 1
+			main.choice._show()
+			await _wait(0.3)
+			await _shot("beast_ask")
+		main.set_stack(["world"])
+		Pets.tame(Game, "bamboo_wolf")
+		Game.inv["mushrooms"] = 2
+		Pets.tame(Game, "white_gibbon")
+		Game.pets[0]["bond"] = 62.0
+		quiet.call()
+		w.move_dir = Vector2i(0, 1)
+		await _wait(1.0)
+		w.move_dir = Vector2i.ZERO
+		await _wait(1.0)
+		quiet.call()
+		await _shot("beast_at_heel")
+		main.offer_beasts()
+		await _wait(0.4)
+		if main.top_name() == "choice":
+			main.choice.cursor = 2
+			main.choice._show()
+			await _wait(0.3)
+			await _shot("beasts_kept")
+		main.set_stack(["world"])
+	if want.call("heel"):
+		# on the flagstones of the sect, where the grass does not hide it
+		Clock.set_hour(Game, 9.0)
+		Game.pets = []
+		Game.pet = -1
+		Game.pets_n = 0
+		Game.inv["carp"] = 2
+		Pets.tame(Game, "bamboo_wolf")
+		Game.pets[0]["bond"] = 62.0
+		main.set_stack(["world"])
+		w.teleport(_nearest_free(Atlas.to_world("sect", Vector2i(20, 12))), "surface")
+		quiet.call()
+		await _wait(0.8)
+		w.move_dir = Vector2i(-1, 0)
+		await _wait(0.8)
+		w.move_dir = Vector2i.ZERO
+		await _wait(1.8)
+		quiet.call()
+		w.banner_t = 0.0
+		await _shot("beast_at_heel")
+	if want.call("hands"):
+		Game.kept = {"forge": {"id": "folded_collar", "q": 2}, "carve": {"id": "peach_beads", "q": 1}, "refine": {"id": "herb_paste", "q": 1}}
+		Game.craft_xp = {"forge": 17, "carve": 4, "refine": 2}
+		Game.crafted_n = 11
+		Game.retreats = {str(Peaks.of_area(surf, "mountain")[0].id): 3, "deep:fusang:-1": 1, "pav:x": 2}
+		Game.sittings = 6
+		Game.slept = 1
+		if Game.pets.is_empty():
+			Game.inv["carp"] = 2
+			Pets.tame(Game, "bamboo_wolf")
+			Game.pets[0]["bond"] = 62.0
+		main.push("menu")
+		main.menu.mode = "hands"
+		main.menu.cursor = 0
+		main.menu._build()
+		await _wait(0.3)
+		await _shot("page_hands_and_beasts")
+		main.pop()
+	if want.call("foes"):
+		var fs: Array = []
+		for fid2 in ["dropped_ball", "counted_wing", "trembling_pole", "crossed_grain", "hurried_chisel", "gold_archer", "crowing_cock", "glaring_cock", "hollow_swagger"]:
+			fs.append(_foe(fid2))
+		await _gallery("part43_foes", fs, 1.0, 0.25)
+	if want.call("marks"):
+		var mk: Array = []
+		for oid in ["course", "fast", "show"]:
+			mk.append(Marks.model(Marks.MARKS.the_first_form[oid], 0))
+		await _gallery("part43_marks", mk, 1.6, 0.3)
+	if want.call("benches"):
+		var bs: Array = []
+		for c in Crafts.ORDER:
+			bs.append(Crafts.bench(c))
+		bs.append(Retreats.mat())
+		await _gallery("part43_benches", bs, 1.3, 0.2)
+	if want.call("cross"):
+		main.set_stack(["world"])
+		w.teleport(_nearest_free(Atlas.to_world("sect", Vector2i(20, 10))), "surface")
+		Clock.set_hour(Game, 18.0)
+		quiet.call()
+		await _wait(1.0)
+		Game.picks.erase("the_first_form")
+		Game.cross_pending = ["the_first_form"]
+		main.ask_crossroads()
+		await _wait(0.6)
+		await _shot("crossroads_first_form")
 		main.set_stack(["world"])
 		Game.cross_pending = []

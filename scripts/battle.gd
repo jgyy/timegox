@@ -62,6 +62,8 @@ var boon := {}
 var enraged := false
 ## what the foes remember of this battle (tactics.gd): who mends, who the pack is on, who has guarded
 var wits := Tactics.memory()
+## pets.gd: whether the beast at his heel has taken the blow it takes for him this battle
+var pet_guarded := false
 ## Fates and Faces (lore.gd): the story of a species met for the first time, on a card over the
 ## battle's opening ({"n", "text"}, or empty)
 var lore_card := {}
@@ -385,6 +387,7 @@ func start(foe_list: Array, c: Dictionary) -> void:
 		timer = maxf(timer, LORE_INTRO)
 	order.clear()
 	round_no = 0
+	pet_guarded = false
 	outcome = ""
 	fx.clear()
 	log_lines.clear()
@@ -577,13 +580,16 @@ func _next_turn() -> void:
 			# allies a trial's path brought strike at the start of every round
 			if _assist():
 				continue
+			# (the Unblunted Knife release, pets.gd: and so does the beast at his heel)
+			if _pet_strike():
+				continue
 		cur = order.pop_front()
 		if not cur.dead:
 			break
 	cur.turns += 1
 	if cur.side == "party":
 		# a Sea of Qi gathers more every turn
-		cur.qi = minf(cur.maxqi, cur.qi + cur.maxqi * (0.04 + (Game.talent_mod("regen") if cur.idx == 0 else 0.0)))
+		cur.qi = minf(cur.maxqi, cur.qi + cur.maxqi * (0.04 + (Game.talent_mod("regen") + Channels.add(Game, "regen") if cur.idx == 0 else 0.0)))
 		# the crown of the Sea of Qi: once a battle, when it runs low, the tide comes back in
 		if cur.idx == 0 and not tide_used and cur.qi < cur.maxqi * 0.2 and Game.talent_crown("qi_sea"):
 			tide_used = true
@@ -664,7 +670,14 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 	# or the foe may strike a reflection (the Mirror, and the celestial foxes' friendship)
 	if tgt.side == "party" and a.side == "foe":
 		# (and the Dao of the Folding Wind, with the fan in the hand: arms.gd)
-		var slip := Game.dao_mod("evade", 0.0) + (Game.talent_mod("evade") if tgt.idx == 0 else 0.0) + Arms.mod(Game, "evade", 0.0)
+		var slip := Game.dao_mod("evade", 0.0) + (Game.talent_mod("evade") + Channels.add(Game, "evade") if tgt.idx == 0 else 0.0) + Arms.mod(Game, "evade", 0.0)
+		# (the Unblunted Knife release: the seal of the Channel of the Beasts: the first blow of a battle that
+		# would have been his is the beast's, and it is quicker than the blow)
+		if tgt.idx == 0 and not pet_guarded and Channels.add(Game, "pet_guard") > 0.0 and not Pets.heel(Game).is_empty() and meet == "":
+			pet_guarded = true
+			fx.append({"text": "the beast", "p": head3(tgt), "t": 1.0, "col": Color("b8e08a"), "slash": ""})
+			say("%s is in the way of it, and then is not." % str(Pets.heel(Game).n))
+			return 0
 		var miss := Game.dao_mod("miss", 0.0) + Game.boon("miss", 0.0) + (0.04 if Game.talent_crown("spirit_sense") else 0.0)
 		if slip > 0.0 and randf() < slip:
 			fx.append({"text": "slips it", "p": head3(tgt), "t": 1.0, "col": Color("b8f0d0"), "slash": ""})
@@ -704,7 +717,7 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 		raw *= Creed.mod(Game, "taken") * Taboo.mod(Game, "taken") * Roots.mod(Game, "taken")
 	if tgt.side == "party":
 		# Formations and the Heart (and the shades' friendship) soften every blow; so does a Vajra Body
-		raw *= Game.dao_mod("taken", 1.0) * Game.boon("taken", 1.0) * (1.0 - (Game.talent_mod("taken") if tgt.idx == 0 else 0.0)) * Works.mod(Game, "taken") * Needs.mod(Game, "taken")
+		raw *= Game.dao_mod("taken", 1.0) * Game.boon("taken", 1.0) * (1.0 - (Game.talent_mod("taken") + Channels.add(Game, "taken") if tgt.idx == 0 else 0.0)) * (Crafts.mod(Game, "taken") if tgt.idx == 0 else 1.0) * Works.mod(Game, "taken") * Needs.mod(Game, "taken")
 		# and a formation or allies a trial's path brought
 		raw *= float(boon.get("taken", 1.0))
 	var crit := randf() < 0.08 + ((Game.talent_mod("crit") + Arms.mod(Game, "crit", 0.0)) if lf else 0.0)
@@ -780,6 +793,9 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 func _heal(tgt: Dictionary, amount: float) -> void:
 	# the Compassionate Heart and the Pearl-Weepers' friendship strengthen every heal
 	amount *= Game.dao_mod("heal", 1.0) * Game.boon("heal", 1.0)
+	# (the Unblunted Knife release, channels.gd: Utmost Spring; 1 with a closed chart)
+	if tgt.side == "party" and int(tgt.idx) == 0:
+		amount *= Channels.mod(Game, "heal")
 	tgt.hp = minf(tgt.maxhp, tgt.hp + amount)
 	fx.append({"text": "+%d" % int(amount), "p": head3(tgt), "t": 1.0, "col": UI.C_JADE, "slash": ""})
 	if not headless() and tgt.has("node"):
@@ -830,7 +846,7 @@ func _perform(actor: Dictionary, skill_id: String, tgts: Array) -> void:
 				dm = Game.dao_mod("one", 1.0) * Arms.mod(Game, "one", 1.0)
 				blow = {"pierce": maxf(Arms.mod(Game, "pierce", 0.0), float(s.get("pierce", 0.0))), "true": s.get("true", false)}
 			# (the Uncarved Block release, roots.gd: a technique of a phase in his root lands harder, of one it lacks softer)
-			dm *= Game.talent_power(skill_id) * Roots.power(Game, str(s.get("elem", "")))
+			dm *= Game.talent_power(skill_id) * Roots.power(Game, str(s.get("elem", ""))) * Channels.power(Game, skill_id)
 		for tg in tgts:
 			var done := _hit(actor, tg, s.mult * dm, s.elem, false)
 			if not lf or done <= 0:
@@ -886,7 +902,7 @@ func _use_item(actor: Dictionary, item: String, tgt: Dictionary) -> void:
 	Game.inv[item] -= 1
 	acts.mends = int(acts.mends) + 1
 	# the Cauldron's Dao: pills do far more good
-	var pk := Game.dao_mod("pill", 1.0) * Works.mod(Game, "pill")
+	var pk := Game.dao_mod("pill", 1.0) * Works.mod(Game, "pill") * Channels.mod(Game, "pill")
 	if item == "hp_pill":
 		wits.mended[int(actor.idx)] = round_no
 		say("%s feeds %s a healing pill." % [actor.name, tgt.name])
@@ -903,6 +919,38 @@ func _end_action() -> void:
 	timer = 0.95
 	labels.clear()
 
+## The Unblunted Knife release (pets.gd): the beast at his heel strikes the foe nearest to falling at the
+## start of every round, in every battle that is not fought alone (a bout of a meet, a tribulation).  Nothing
+## is thrown for: what it strikes with is a share of his own attack by its kind and its trust.  Returns
+## whether the battle is over because of it.
+func _pet_strike() -> bool:
+	var raw := Pets.blow(Game)
+	if raw <= 0.0 or meet != "" or ctx.get("tribulation", false):
+		return false
+	var live := alive(foes)
+	if live.is_empty():
+		return false
+	var tgt: Dictionary = live[0]
+	for f in live:
+		if float(f.hp) < float(tgt.hp):
+			tgt = f
+	var pet := Pets.heel(Game)
+	var dmg := maxi(1, int(round((raw - float(tgt.def) * 0.5) * Data.suppression(Game.level, int(tgt.lv)))))
+	# (a doom is not worn down by anybody's hound, and nobody realms above him by much)
+	if tgt.get("doom", false):
+		dmg = 1
+	tgt.hp = maxf(0.0, float(tgt.hp) - dmg)
+	tgt.flash = 0.35
+	fx.append({"text": str(dmg), "p": head3(tgt), "t": 1.0, "col": Color("b8e08a"), "slash": ""})
+	say("%s goes in at %s for %d." % [str(pet.n), tgt.name, dmg])
+	if tgt.hp <= 0.0:
+		tgt.dead = true
+		Game.kills += 1
+		if tgt.has("model"):
+			Models.act(tgt.model, "die", t)
+		say("%s is defeated." % tgt.name)
+	return alive(foes).is_empty()
+
 func _win() -> void:
 	outcome = "win"
 	state = "result"
@@ -916,12 +964,14 @@ func _win() -> void:
 	# the Cauldron's Dao pays better, and so does Heaven's Favour; every victory deepens the Dao Lin
 	# Feng walks (twice over with the crown of an Enlightened Mind), and an Enlightened Mind learns more
 	stones = int(stones * Game.dao_mod("stones", 1.0) * (1.0 + Game.talent_mod("stones")) * Game.boon("stones", 1.0))
-	xp = int(xp * (1.0 + Game.talent_mod("exp")) * Game.boon("exp", 1.0) * Habits.mod(habit, "exp") * Works.mod(Game, "exp") * Creed.mod(Game, "exp") * Taboo.mod(Game, "exp") * Roots.mod(Game, "exp"))
+	xp = int(xp * (1.0 + Game.talent_mod("exp")) * Channels.mod(Game, "exp") * Game.boon("exp", 1.0) * Habits.mod(habit, "exp") * Works.mod(Game, "exp") * Creed.mod(Game, "exp") * Taboo.mod(Game, "exp") * Roots.mod(Game, "exp"))
 	# (and the scales, echoes.gd: a beaten pack gives up what it guarded to somebody known to spare)
 	stones = int(stones * Works.mod(Game, "stones") * (Echoes.lean_mod(Game, "stones") if not boss else 1.0) * (Creed.mod(Game, "stones") if not boss else 1.0))
 	if not ctx.get("tribulation", false):
 		# (and the Dao of the weapon it was won with: arms.gd)
 		Game.arm_battle_won(boss)
+		# (pets.gd: and the beast that stood in it with him trusts him a little more)
+		Pets.won(Game)
 		Game.dao_battle_won(boss)
 		if Game.talent_crown("insight"):
 			Game.dao_battle_won(boss)

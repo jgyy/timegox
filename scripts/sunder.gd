@@ -168,7 +168,8 @@ static func blow(g, layer: String, wd: Dictionary, from: Vector2i, f: Vector2i) 
 		if r == 0 and int(out.n) == 1:
 			g.sunder_light += 1
 		var s: Dictionary = g.cur_step()
-		if not s.is_empty() and str(s.kind) == "sunder":
+		# (the Unblunted Knife release: a step that names a country counts what is broken in that country)
+		if not s.is_empty() and str(s.kind) == "sunder" and (not s.has("area") or Atlas.owner_id(wd, from) == str(s.area)):
 			if s.has("max"):
 				if int(out.n) <= int(s.max):
 					g.step_sunder += 1

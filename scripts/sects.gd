@@ -113,7 +113,7 @@ const TASKS := {
 		"ask": "Somebody is raiding on our roads without having bought the right to. Break two raids, anywhere in the Rivers and Lakes. Whose carts they were raiding I do not ask. Clean work.",
 		"thanks": "Two. The carters do not know who to thank, and the Gate prefers it so. Count it. I shall not be offended; I should think less of you if you did not."},
 	"black_jar": {"sect": "black", "n": "Something for the Black Jar", "need": ["have", {"ess_dark": 3}], "stones": 8000, "renown": 1,
-		"ask": "Apothecary She wants three Dark Essences and does not say for what, and I have not asked, which is how I am able to tell you that it is clean work as far as I know.",
+		"ask": "Apothecary She wants three Yin Essences and does not say for what, and I have not asked, which is how I am able to tell you that it is clean work as far as I know.",
 		"thanks": "Three. She says to tell you it is for rats. She says it of everything. Here is the sum; it is fair, and it is double."},
 	"black_call": {"sect": "black", "n": "A Debt Called In", "foul": true, "need": ["more", "deeds_bad", 1], "stones": 12000, "renown": 0,
 		"ask": "This one is foul; I tell you before the brush is wet. Somebody in some street owes, or will be made to think so. Do one wrong thing to one person, anywhere, and come and tell me. You may leave it on the wall. Most do.",

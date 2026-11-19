@@ -1661,6 +1661,13 @@ func _use_finish() -> void:
 		# (the Small Fish release, cooking.gd: the last of the twelve is the meal)
 		if int(using.e.stage) == Cooking.STAGES.size() - 1:
 			lines = Cooking.done(Game, str(using.e.cook), int(cooking.get("pokes", 0)))
+	elif using.e.has("sit"):
+		# (the Unblunted Knife release, retreats.gd: he has sat, or slept, in a place of peace)
+		lines = Retreats.sit(Game, using.e.place, int(using.e.peace)) if str(using.e.sit) == "sit" else Retreats.sleep(Game, using.e.place, int(using.e.peace))
+	elif using.e.has("make"):
+		# (crafts.gd: the thing is made)
+		var mres: Dictionary = Crafts.make(Game, str(using.e.make), int(using.e.peace))
+		lines = mres.get("lines", [str(mres.get("why", ""))])
 	elif using.e.has("work"):
 		# (the Heavy Road release, toil.gd: the work of the hands is done; the tree goes over, on screen)
 		lines = Toil.done(Game, str(using.e.work), layer, using.e.pos, is_cave())
@@ -2346,6 +2353,7 @@ func _process(d: float) -> void:
 		_arks_tick(d)
 		_traffic_tick(d)
 		_weal_doors(d)
+		_pet_tick(d)
 		# (the Tall People release, visage.gd: the face his Way has given him, looked at again now and then)
 		_visage_t -= d
 		if _visage_t <= 0.0:
@@ -4735,7 +4743,7 @@ func _draw_hud() -> void:
 		UI.wrapped(self, Vector2(VIEW.x - 506, 35 - (15 - osz)), obj, osz, UI.C_TEXT, 486)
 	# (the line grew a key with every release and was still drawn 580 px wide: since G was added its
 	# end was cut off, "Esc men")
-	UI.text(self, Vector2(VIEW.x - 1084, VIEW.y - 14), "Arrows/WASD move   Q/E camera   P eyes   R ride   T talk   F strike   H hand   K phase   G sword qi   V glide   C work   B cook   Y shape   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 1000.0)
+	UI.text(self, Vector2(VIEW.x - 1204, VIEW.y - 14), "WASD move  Q/E camera  P eyes  R ride  T talk  F strike  H hand  K phase  G sword qi  V glide  C work  B cook  Y shape  N make  M sit  L beasts  Enter act  Esc menu", 12, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 1120.0)
 	_draw_minimap()
 	_draw_clock()
 	if banner_t > 0.0:
@@ -5298,3 +5306,135 @@ func shape(shape_id: String) -> bool:
 	Feats.poll(Game)
 	Game.poll_steps()
 	return true
+
+# ---------------------------------------------------------------- the Unblunted Knife release: places of peace, the bench, the beast at his heel
+## retreats.gd: the place of peace he stands in ({} if none), and how quiet it is now (0 troubled .. 3).
+func peace_here() -> Dictionary:
+	if wd.is_empty() or Game.prologue != "":
+		return {}
+	var fe = ent_at(ptile + facing)
+	var r := Retreats.at(wd, ptile, fe if fe != null else {})
+	if r.is_empty():
+		return {}
+	return {"r": r, "p": Retreats.peace(Game, pack_dist())}
+
+## Tiles to the nearest pack that is up and about (a big number if there is none).
+func pack_dist() -> int:
+	var best := 9999
+	for e in ents:
+		if str(e.kind) != "enemy":
+			continue
+		var p: Vector2i = e.pos
+		var dd := maxi(absi(p.x - ptile.x), absi(p.y - ptile.y))
+		if dd < best and ent_visible(e):
+			best = dd
+	return best
+
+func _free_now() -> bool:
+	return using.is_empty() and trip.is_empty() and ambush_t < 0.0 and move_t < 0.0 and glide.is_empty() and Game.prologue == "" and not wd.is_empty()
+
+## M: he sits and forgets (`mode` "sit"), or sleeps until dawn ("sleep"), in the place of peace he stands in.
+## Returns whether it was begun (why not is said).
+func sit(mode: String) -> bool:
+	if not _free_now():
+		return false
+	var ph := peace_here()
+	if ph.is_empty():
+		Game.toast(Retreats.NOWHERE)
+		return false
+	if int(ph.p) <= 0:
+		Game.toast("Something is hunting within earshot. There is no peace here until it has gone, or been seen off.")
+		return false
+	var from := _player_pos()
+	var dir := Vector3(facing.x, 0.0, facing.y)
+	var e := {"id": "sit:" + str(ph.r.id), "kind": "retreat", "sit": mode, "place": ph.r, "peace": int(ph.p), "pos": ptile, "n": str(ph.r.n)}
+	var clip := "meditate" if mode == "sit" else "doze"
+	var k := {"clip": clip, "dur": 6.0 if mode == "sit" else 4.5, "at": "face", "hold": "", "fx": "", "comp": clip, "n": str(ph.r.n)}
+	using = {"e": e, "k": k, "t0": t, "dur": float(k.dur), "from": from, "to": from, "yaw": atan2(dir.x, dir.z), "yaw0": player.rotation.y if player != null else 0.0,
+		"c": from + dir, "dir": dir, "side": Vector3(dir.z, 0.0, -dir.x), "started": false, "ended": false, "fx_n": 0, "held": null, "stool": null, "comp_sit": false,
+		"comp_from": comp_pos, "comp_held": null, "base_y": from.y}
+	if not headless():
+		var mat := Retreats.mat()
+		scene3d.add_child(mat)
+		mat.position = from
+		mat.rotation.y = atan2(dir.x, dir.z)
+		using.stool = mat
+	move_dir = Vector2i.ZERO
+	return true
+
+## crafts.gd: why nothing can be made where he stands ("" if it can).
+func make_why() -> String:
+	if not _free_now():
+		return "Not now."
+	if is_floor() and not is_cave():
+		return "Not under somebody's roof: a bench is set up in the open."
+	var tl := ptile + facing
+	if not tile_free(tl) or ent_at(tl) != null or walk_props.has(tl):
+		return "There is no room for a bench in front of him."
+	return ""
+
+## N: thing `id` of crafts.gd is made, here.  Returns whether it was begun (what he lacks is said if not).
+func make(id: String) -> bool:
+	var why := make_why()
+	if why == "":
+		why = Crafts.blocked(Game, id)
+	if why != "":
+		Game.toast(why)
+		return false
+	var cr: Dictionary = Crafts.CRAFTS[Crafts.craft_of(id)]
+	var ph := peace_here()
+	var from := _player_pos()
+	var dir := Vector3(facing.x, 0.0, facing.y)
+	var e := {"id": "make:" + id, "kind": "make", "make": id, "peace": int(ph.get("p", 0)), "pos": ptile + facing, "n": str(Crafts.THINGS[id].n)}
+	var k := {"clip": str(cr.clip), "dur": 5.5, "at": "face", "hold": str(cr.hold), "fx": "", "comp": "watch", "n": str(Crafts.THINGS[id].n)}
+	using = {"e": e, "k": k, "t0": t, "dur": float(k.dur), "from": from, "to": from + dir * 0.2, "yaw": atan2(dir.x, dir.z), "yaw0": player.rotation.y if player != null else 0.0,
+		"c": from + dir * 0.9, "dir": dir, "side": Vector3(dir.z, 0.0, -dir.x), "started": false, "ended": false, "fx_n": 0, "held": null, "stool": null, "comp_sit": false,
+		"comp_from": comp_pos, "comp_held": null, "base_y": from.y}
+	if not headless():
+		var bn := Crafts.bench(Crafts.craft_of(id))
+		scene3d.add_child(bn)
+		bn.position = from + dir * 0.9
+		bn.rotation.y = atan2(dir.x, dir.z)
+		using.stool = bn
+	move_dir = Vector2i.ZERO
+	return true
+
+## pets.gd: the beast at his heel, drawn a pace ahead of him on the side Yue Ling is not (drawn only: with
+## no window there is none).
+## what the bot means when one of a pack stays (a player is asked)
+var tame_want := false
+var pet_node: Node3D = null
+var pet_key := -1
+var pet_pos := Vector3.ZERO
+
+func _pet_tick(d: float) -> void:
+	if headless() or player == null:
+		return
+	var p := Pets.heel(Game)
+	var key := int(p.get("k", -1))
+	if key != pet_key or (pet_node != null and not is_instance_valid(pet_node)):
+		if pet_node != null and is_instance_valid(pet_node):
+			pet_node.queue_free()
+		pet_node = null
+		pet_key = key
+		if key >= 0:
+			pet_node = Pets.model(p)
+			scene3d.add_child(pet_node)
+			pet_pos = player.position
+	if pet_node == null:
+		return
+	pet_node.visible = trip.is_empty() and glide.is_empty() and player.visible
+	var fw := Vector3(facing.x, 0.0, facing.y)
+	# (a pace ahead of him, on the side Yue Ling is not: behind him she would hide it)
+	var want := player.position + fw * 0.9 - Vector3(-fw.z, 0.0, fw.x) * 1.2
+	var gap := Vector3(want.x - pet_pos.x, 0.0, want.z - pet_pos.z)
+	if gap.length() > 12.0:
+		pet_pos = want
+	elif gap.length() > 0.15:
+		pet_pos += gap * (1.0 - exp(-d * 4.0))
+		pet_node.rotation.y = lerp_angle(pet_node.rotation.y, atan2(gap.x, gap.z), 1.0 - exp(-d * 8.0))
+	pet_pos.y = _stand_y(bundles[layer], pet_pos) if bundles.has(layer) else player.position.y
+	pet_node.position = pet_pos
+	var m = pet_node.get_meta("m", null)
+	if m != null and is_instance_valid(m):
+		Models.anim_monster(m, t, 0.0, "walk" if gap.length() > 0.4 and Assets.has_clip(m, "walk") else "idle")

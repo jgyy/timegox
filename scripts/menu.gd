@@ -28,10 +28,10 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Root & Rites", "In Their Own Words", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "The Land", "The Way", "The Law", "The Wild", "The Almanac", "Bestiary", "World Map", "Annals", "Seals & Lists", "Leaves", "The Sects", "The Sea Floor", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "rites", "words", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "land", "way", "law", "wild", "almanac", "bestiary", "map", "annals", "seals", "leaves", "sects", "deeps", "resume"]
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Root & Rites", "In Their Own Words", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "The Land", "The Way", "The Law", "The Wild", "The Almanac", "Bestiary", "World Map", "Annals", "Seals & Lists", "Leaves", "The Sects", "The Sea Floor", "The Channels", "Hands & Beasts", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "rites", "words", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "land", "way", "law", "wild", "almanac", "bestiary", "map", "annals", "seals", "leaves", "sects", "deeps", "channels", "hands", "resume"]
 		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, true, true, Game.companion or Game.bond > 0,
-			Game.dao != "" or not Game.met.is_empty(), Game.prologue == "", not Game.pages.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, Game.done(Seals.OPEN), Game.prologue == "", Game.prologue == "", Game.prologue == "", true]
+			Game.dao != "" or not Game.met.is_empty(), Game.prologue == "", not Game.pages.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, Game.done(Seals.OPEN), Game.prologue == "", Game.prologue == "", Game.prologue == "", Game.prologue == "", Game.prologue == "", true]
 	elif mode == "bestiary":
 		labels = []
 		ids = []
@@ -69,6 +69,24 @@ func _build() -> void:
 		enabled.append(true)
 	elif mode == "way" or mode == "almanac" or mode == "wild" or mode == "seals" or mode == "sects" or mode == "deeps":
 		# creed.gd, almanac.gd, wilds.gd: a page to read
+		labels = ["Back"]
+		ids = ["back"]
+		enabled = [true]
+	elif mode == "channels":
+		# channels.gd: every point of the chart, channel by channel; Enter opens the next rank of one
+		labels = []
+		ids = []
+		enabled = []
+		for b in Channels.ORDER:
+			for nd in Channels.BRANCHES[b].nodes:
+				labels.append("%s\t%d/%d" % [str(nd.n), Channels.rank(Game, str(nd.id)), Channels.max_rank(str(nd.id))])
+				ids.append("point:" + str(nd.id))
+				enabled.append(true)
+		labels.append("Back")
+		ids.append("back")
+		enabled.append(true)
+	elif mode == "hands":
+		# crafts.gd, pets.gd, retreats.gd: a page to read
 		labels = ["Back"]
 		ids = ["back"]
 		enabled = [true]
@@ -273,7 +291,7 @@ func press(act: String) -> void:
 				var k := ls.find(map_layer)
 				map_layer = ls[(k + (1 if act == "right" else -1) + ls.size()) % ls.size()]
 		"cancel":
-			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words", "seals", "leaves", "sects", "deeps"]:
+			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words", "seals", "leaves", "sects", "deeps", "channels", "hands"]:
 				mode = "root"
 				cursor = 0
 				_build()
@@ -292,6 +310,18 @@ func press(act: String) -> void:
 				# (yezi.gd: the painted leaf he brings to a table of leaves, or none)
 				Game.leaf = id.trim_prefix("leaf:")
 				msg = "He brings %s." % str(Data.ITEMS["leaf_" + Game.leaf].n) if Game.leaf != "" else "He brings no painted leaf."
+				return
+			if id.begins_with("point:"):
+				# (channels.gd: the next rank of a point of the chart, for the insight it wants)
+				var pid := id.trim_prefix("point:")
+				var pw := Channels.why(Game, pid)
+				if pw != "":
+					msg = pw
+				elif Channels.open(Game, pid):
+					msg = "%s opens." % str(Channels.nodes()[pid].n)
+					var keep := cursor
+					_build()
+					cursor = keep
 				return
 			if id.begins_with("rite:"):
 				# (rites.gd: the rite of a Dao that is his, performed where he stands)
@@ -367,7 +397,7 @@ func press(act: String) -> void:
 				"forbidden":
 					main.pop()
 					main.open_forbidden()
-				"works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words", "seals", "leaves", "sects", "deeps":
+				"works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words", "seals", "leaves", "sects", "deeps", "channels", "hands":
 					mode = id
 					cursor = 0
 					msg = ""
@@ -790,6 +820,94 @@ func _draw_deeps() -> void:
 		y += 36.0
 	var hands := "No crate in his hands." if Game.mill_crates.is_empty() else "In his hands: " + ", ".join(Game.mill_crates.map(func(c): return "a crate for %s" % str(Mills.WORKS[str(c.to)].short))) + "."
 	UI.wrapped(self, Vector2(r.position.x + 24, y + 14), main.told("%s %d crates carried in all (%d spirit stones). %s" % [hands, Game.crates_done, Game.mill_paid, Terra.text(Game)]), 12, UI.C_TEXT, r.size.x - 48)
+
+## The Channels (the Unblunted Knife release, channels.gd): the chart, drawn: the dantian in the middle, ten
+## channels leaving it like spokes, each three points, a fork and a seal; what is open is lit.  The point under
+## the cursor is ringed, and said below.
+func _draw_channels() -> void:
+	UI.text(self, Vector2(60, 70), "The Channels", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 15)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	var c := Vector2(r.position.x + r.size.x * 0.5, r.position.y + 258.0)
+	var k := 0.88
+	var sel := str(ids[cursor]).trim_prefix("point:") if str(ids[cursor]).begins_with("point:") else ""
+	var all: Dictionary = Channels.nodes()
+	for ln in Channels.links():
+		var a := c + Channels.pos(str(ln[0])) * k
+		var b := c + Channels.pos(str(ln[1])) * k
+		var lit: bool = (str(ln[0]) == Channels.ROOT or Channels.rank(Game, str(ln[0])) > 0) and Channels.rank(Game, str(ln[1])) > 0
+		var bc: Color = Channels.BRANCHES[str(all[str(ln[1])].b)].col
+		draw_line(a, b, bc if lit else Color(bc.r, bc.g, bc.b, 0.22), 3.0 if lit else 1.5, true)
+	draw_circle(c, 15.0, UI.C_GOLD)
+	draw_circle(c, 9.0, Color("2a2018"))
+	for b2 in Channels.ORDER:
+		var br: Dictionary = Channels.BRANCHES[b2]
+		var tip: Vector2 = c + Channels.pos(str(br.nodes[Channels.SEAL].id)) * k * 1.1
+		# (clear of the seal: further out along the spoke, and further still to the side on the level ones)
+		var out_dir: Vector2 = (tip - c).normalized()
+		tip += Vector2(out_dir.x * 46.0, out_dir.y * 6.0)
+		UI.text(self, Vector2(tip.x - 90.0, tip.y + 4.0), str(br.n).trim_prefix("The Channel of ").trim_prefix("the "), 11, br.col, HORIZONTAL_ALIGNMENT_CENTER, 180.0)
+		for nd in br.nodes:
+			var id := str(nd.id)
+			var p := c + Channels.pos(id) * k
+			var rk := Channels.rank(Game, id)
+			var mx := Channels.max_rank(id)
+			var rad := 11.0 if int(all[id].k) == Channels.SEAL else 8.0
+			var can := Channels.why(Game, id) == ""
+			draw_circle(p, rad + 2.0, Color(0, 0, 0, 0.7))
+			draw_circle(p, rad, (br.col as Color) if rk > 0 else ((br.col as Color).darkened(0.55) if can else Color(0.2, 0.2, 0.22)))
+			for pip in mx:
+				draw_circle(p + Vector2((float(pip) - float(mx - 1) * 0.5) * 5.0, rad + 5.0), 1.8, UI.C_GOLD if pip < rk else Color(0.35, 0.35, 0.38))
+			if id == sel:
+				draw_arc(p, rad + 5.0, 0.0, TAU, 24, Color.WHITE, 2.0, true)
+	UI.text(self, Vector2(r.position.x + 20, r.position.y + 28), "Insight: %d to spend" % Channels.spare(Game), 15, UI.C_GOLD)
+	UI.text(self, Vector2(r.position.x + 20, r.position.y + 46), "%d had, %d spent" % [Channels.earned(Game), Channels.spent(Game)], 11, UI.C_DIM.lightened(0.3))
+	UI.text(self, Vector2(r.position.x + 20, r.position.y + 61), "%d points open, %d ranks" % [Channels.opened(Game), Channels.ranks(Game)], 11, UI.C_DIM.lightened(0.3))
+	UI.text(self, Vector2(r.position.x + 20, r.position.y + 76), "the whole chart: %d" % Channels.total_cost(), 11, UI.C_DIM.lightened(0.3))
+	var y := r.position.y + 508.0
+	if sel != "":
+		var sd: Dictionary = all[sel]
+		var sb: Dictionary = Channels.BRANCHES[str(sd.b)]
+		UI.text(self, Vector2(r.position.x + 24, y), "%s  (%s)" % [str(sd.n), str(sb.n)], 16, sb.col)
+		UI.wrapped(self, Vector2(r.position.x + 24, y + 20), main.told(str(sd.desc)), 12, UI.C_TEXT, r.size.x - 48)
+		var wy := Channels.why(Game, sel)
+		UI.wrapped(self, Vector2(r.position.x + 24, y + 56), main.told(Channels.fx_text(Game, sel) + ("  Enter opens it." if wy == "" else "  " + wy)), 12, UI.C_JADE if wy == "" else UI.C_DIM.lightened(0.2), r.size.x - 48)
+	else:
+		UI.wrapped(self, Vector2(r.position.x + 24, y + 20), main.told("Ten channels leave the dantian. Each is three points, a fork where one way bars the other, and a seal. The seals of the six Daos open only to whoever walks that road."), 12, UI.C_TEXT, r.size.x - 48)
+	if msg != "":
+		UI.text(self, Vector2(r.position.x + r.size.x - 444, r.position.y + 28), msg, 13, UI.C_GOLD, HORIZONTAL_ALIGNMENT_RIGHT, 420.0)
+
+## Hands & Beasts (crafts.gd, pets.gd, retreats.gd): the six crafts, where he stands in each and what he wears
+## of his own making; the beasts he keeps; the places of peace he has sat in.
+func _draw_hands() -> void:
+	UI.text(self, Vector2(60, 70), "Hands & Beasts", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 16)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	UI.text(self, r.position + Vector2(24, 36), "The crafts of the six roads (N, in open country or a place of peace): %d things made" % Game.crafted_n, 17, UI.C_GOLD)
+	var y := r.position.y + 50.0
+	for cp in Crafts.page(Game):
+		draw_rect(Rect2(r.position.x + 24, y + 4, 6, 30), cp.col)
+		UI.text(self, Vector2(r.position.x + 40, y + 18), "%s  (%s%s)" % [str(cp.n), str(cp.dao), ": his own road, +%d" % int(cp.road) if int(cp.road) > 0 else ""], 14, cp.col)
+		UI.text(self, Vector2(r.position.x + 400, y + 18), "%s  %d%s" % [str(cp.rank), int(cp.xp), "/%d" % int(cp.next) if int(cp.next) > 0 else ""], 13, UI.C_TEXT)
+		UI.text(self, Vector2(r.position.x + 40, y + 34), "Worn: %s" % str(cp.kept) if str(cp.kept) != "" else "Nothing of his own making is worn yet.", 12, UI.C_TEXT if str(cp.kept) != "" else UI.C_DIM)
+		y += 42.0
+	y += 14.0
+	UI.text(self, Vector2(r.position.x + 24, y + 10), "The beasts he keeps (L): %d of %d" % [Game.pets.size(), Pets.room(Game)], 17, UI.C_GOLD)
+	y += 22.0
+	if Game.pets.is_empty():
+		UI.wrapped(self, Vector2(r.position.x + 24, y), main.told("None. When a pack of the land is beaten or runs, one of it may stay, if he has on him what its kind eats: a fish, a bundle of herbs, mushrooms."), 12, UI.C_DIM.lightened(0.2), r.size.x - 48)
+		y += 40.0
+	for i in Game.pets.size():
+		var p: Dictionary = Game.pets[i]
+		UI.text(self, Vector2(r.position.x + 24, y + 14), "%s%s" % [Pets.title(p), "  (at his heel)" if i == Game.pet and not Pets.away(Game, p) else ""], 14, UI.C_JADE)
+		UI.bar(self, Rect2(r.position.x + 420, y + 4, 200, 10), float(p.bond) / Pets.BOND_MAX, UI.C_JADE)
+		UI.wrapped(self, Vector2(r.position.x + 24, y + 32), main.told(Pets.text(Game, p)), 11, UI.C_TEXT, r.size.x - 48)
+		y += 70.0
+	y = maxf(y, r.position.y + r.size.y - 78.0)
+	UI.text(self, Vector2(r.position.x + 24, y + 10), "Places of peace (M)", 17, UI.C_GOLD)
+	UI.wrapped(self, Vector2(r.position.x + 24, y + 30), main.told(Retreats.text(Game)), 12, UI.C_TEXT, r.size.x - 48)
 
 ## The Sects (the Rivers and Lakes release, sects.gd, sides.gd): his own and the four down the river: what each
 ## is called, which side its town is on, how he stands with it, its three sayings and its way, and how much of
@@ -1795,6 +1913,12 @@ func _draw() -> void:
 		return
 	if mode == "deeps":
 		_draw_deeps()
+		return
+	if mode == "channels":
+		_draw_channels()
+		return
+	if mode == "hands":
+		_draw_hands()
 		return
 	if mode == "rites":
 		_draw_rites()

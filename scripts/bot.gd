@@ -18,7 +18,7 @@ var finished := false
 var report_path := "build/bot_report.json"
 var shots_dir := ""
 var min_time := 3600.0
-var max_time := 51.0 * 3600.0
+var max_time := 54.0 * 3600.0
 var shots_taken := {}
 var logged := 0
 
@@ -205,7 +205,7 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	# Part XXXIX: the desk is carried down to the Cloud Gate
 	"the_red_seal": ["open"], "the_two_roads": ["ask"], "the_covenant": ["dig"],
 	# Part XLII: the clod and the Dao are given to the Loom-Mother
-	"the_joy_of_fish": ["teach"]}
+	"the_joy_of_fish": ["teach"], "the_first_form": ["show"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -743,6 +743,8 @@ func _world(d: float) -> void:
 	var s := Game.cur_step()
 	if s.is_empty():
 		return
+	# (pets.gd: a hand is held out to a beast that stays only inside a step that asks for one)
+	world.tame_want = str(s.kind) == "tame"
 	# 1) rest when hurt or out of qi
 	if _hp_ratio() < 0.5 or _qi_ratio() < 0.15:
 		_start_meditate("rest")
@@ -1026,6 +1028,26 @@ func _world(d: float) -> void:
 		"terra":
 			# Part XLII (terra.gd): open ground of the step's country that will take the shape, and Y
 			_terra_step(s)
+		"train":
+			# Part XLIII (channels.gd): the next point of the plan the insight in hand will open; with none, to the wild
+			var tp := Channels.next(Game)
+			if tp == "" or not Channels.open(Game, tp):
+				_grind()
+			else:
+				print("[bot] opened a point of the chart: %s" % str(Channels.nodes()[tp].n))
+				cool = 0.5
+		"craft":
+			# Part XLIII (crafts.gd): what the step asks for is gathered with his own hands, and made
+			_make_step(s)
+		"tame":
+			# Part XLIII (pets.gd): what the beast eats, then a pack of its kind (the hand is held out, world.tame_want)
+			_tame_step(s)
+		"fetch":
+			# Part XLIII (pets.gd): a beast is sent out, and waited for
+			_fetch_step(s)
+		"retreat":
+			# Part XLIII (retreats.gd): to a place of peace of the kind the step names, and M
+			_retreat_step(s)
 		"sect":
 			# Part XLI (sects.gd): the tasks of a sect of the Rivers and Lakes, taken in order at its hall and done
 			# as a hunt or a rescue is done (the choice takes and reports, _choice)
@@ -1138,6 +1160,157 @@ func _sights_step(s: Dictionary) -> void:
 		_travel(area)
 		return
 	_walk_to(e.pos, "sight:" + str(e.sight))
+
+## Part XLIII (crafts.gd): a "craft" step.  What the thing is made of is gathered where the land surely has it
+## (as a meal's is), and it is made on the first free ground in front of him.
+const MAKE_AREA := {"fell": "bamboo", "quarry": "mountain", "angle": "marsh", "reap": "bamboo"}
+
+func _gather(good: String) -> void:
+	var work := str(HAUL_WORK.get(good, "reap"))
+	_toil_step(work, str(MAKE_AREA[work]))
+
+func _make_step(s: Dictionary) -> void:
+	if not world.using.is_empty():
+		world.move_dir = Vector2i.ZERO
+		return
+	var thing := Crafts.wanted(s)
+	var ms: Dictionary = Crafts.missing(Game, thing)
+	if not ms.is_empty():
+		_gather(str(ms.keys()[0]))
+		return
+	if world.is_floor():
+		_goto_layer(str(world.wd.parent))
+		return
+	if world.move_t < 0.0 and world.make_why() == "" and Music.town_at(Atlas.owner_id(world.wd, world.ptile), world.ptile) == "":
+		world.move_dir = Vector2i.ZERO
+		if world.make(thing):
+			print("[bot] making: %s" % str(Crafts.THINGS[thing].n))
+		cool = 0.5
+		return
+	var here0: Vector2i = world.target if world.move_t >= 0.0 else world.ptile
+	if toil_key != "make" or toil_at.x < 0 or not _cook_ok(toil_at, toil_dir):
+		toil_key = "make"
+		toil_at = Vector2i(-1, -1)
+		var dist := _bfs_dist(here0, 160)
+		var bd := 1 << 30
+		for tl in dist:
+			if int(dist[tl]) >= bd or world.ent_at(tl) != null:
+				continue
+			for d in DIRS:
+				if _cook_ok(tl, d):
+					bd = int(dist[tl])
+					toil_at = tl
+					toil_dir = d
+					break
+		if toil_at.x < 0:
+			toil_key = ""
+			_travel("bamboo")
+			return
+	var here: Vector2i = world.target if world.move_t >= 0.0 else world.ptile
+	if here == toil_at:
+		world.move_dir = Vector2i.ZERO
+		if world.move_t < 0.0:
+			world.facing = toil_dir
+		return
+	_walk_to(toil_at, "make:%d:%d" % [toil_at.x, toil_at.y])
+
+## Part XLIII (pets.gd): a "tame" step.  A beast stays only for what its kind eats: that first, with his own
+## hands; then a pack of the kind the step names, which is fought, or runs, and one of it does not.
+const PET_AREA := "bamboo"
+const PET_OF := ["bamboo_wolf"]
+
+func _tame_step(s: Dictionary) -> void:
+	var of: Array = s.get("of", PET_OF)
+	var food := ""
+	for f in of:
+		var k: Dictionary = Pets.kind_of(str(f))
+		if not k.is_empty() and not Game.pets.any(func(p): return str(p.foe) == str(f)):
+			food = str(k.diet)
+			break
+	if food == "" or Game.pets.size() >= Pets.room(Game):
+		_grind()
+		return
+	if int(Game.inv.get(food, 0)) <= 0:
+		_gather(food)
+		return
+	_hunt_in(str(s.get("area", PET_AREA)), of)
+
+## Part XLIII (pets.gd): a "fetch" step.  A beast that can be sent is sent; while one is out there is the wild.
+## (A journey begun past the taming has none: it asks one to stay first.)
+func _fetch_step(_s: Dictionary) -> void:
+	if Game.pets.is_empty():
+		world.tame_want = true
+		_tame_step({})
+		return
+	var i := Pets.sendable(Game)
+	if i >= 0 and not Game.pets.any(func(p): return Pets.away(Game, p)):
+		if Pets.send(Game, i, Game.area):
+			print("[bot] sent out to gather: %s" % Pets.title(Game.pets[i]))
+		cool = 0.5
+		return
+	_grind()
+
+## Part XLIII (retreats.gd): a "retreat" step.  To the top of the nearest peak of the realm (or, `where`
+## "deep", to the back of the cave of the step's region); a pack within earshot is seen off first; then M.
+var retreat_id := ""
+
+func _retreat_step(s: Dictionary) -> void:
+	if not world.using.is_empty():
+		world.move_dir = Vector2i.ZERO
+		return
+	var goal := Vector2i(-1, -1)
+	if str(s.get("where", "summit")) == "deep":
+		var fid := Caves.fid(str(s.area), -1)
+		if world.layer != fid:
+			_goto_layer(fid)
+			return
+		for e in _kind("pickup"):
+			if str(e.id).begins_with("cave_cache:"):
+				goal = e.pos
+	else:
+		var realm := Data.layer_of(str(s.get("area", "mountain")))
+		if world.layer != realm:
+			_goto_layer(realm)
+			return
+		var lw: Dictionary = world.wd
+		if retreat_id != "" and (Peaks.by_id(lw, retreat_id).is_empty() or (bool(s.get("new", false)) and Game.retreats.has(retreat_id))):
+			retreat_id = ""
+		if retreat_id == "":
+			var bd := 1 << 30
+			for pk in lw.get("peaks", []):
+				if not Game.seen.has(str(pk.area)) or (s.has("area") and str(pk.area) != str(s.area)) or (bool(s.get("new", false)) and Game.retreats.has(str(pk.id))):
+					continue
+				var c: Vector2i = pk.c
+				var dd: int = absi(c.x - world.ptile.x) + absi(c.y - world.ptile.y)
+				if dd < bd:
+					bd = dd
+					retreat_id = str(pk.id)
+		if retreat_id == "":
+			_grind()
+			return
+		goal = Peaks.by_id(lw, retreat_id).c
+	if goal.x < 0:
+		_grind()
+		return
+	# (the back of a cave is anywhere within two tiles of where its cache lay: the tile itself may not be stood on)
+	var here: Vector2i = world.target if world.move_t >= 0.0 else world.ptile
+	if str(Retreats.at(world.wd, here).get("kind", "")) != str(s.get("where", "summit")):
+		_walk_to(goal, "retreat:%d:%d" % [goal.x, goal.y])
+		return
+	world.move_dir = Vector2i.ZERO
+	path = []
+	if world.move_t >= 0.0:
+		return
+	var ph: Dictionary = world.peace_here()
+	if not ph.is_empty() and int(ph.p) <= 0:
+		# something is hunting within earshot: it is seen off, and he comes back
+		var e2 = _nearest_enemy("", false)
+		if e2 != null:
+			_walk_to(e2.pos, "enemy:" + e2.id)
+		return
+	if world.sit("sit"):
+		print("[bot] sitting at %s" % str(ph.r.n))
+	cool = 0.5
 
 ## Part XLII (terra.gd): a piece of open ground of the step's country that will take the step's shape (any
 ## step that names none: raised), stood beside and faced, and Y.
