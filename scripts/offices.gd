@@ -107,6 +107,19 @@ const OFFICES := {
 		"You were priced at the rope. High. That is why you are in here talking and not out there paying. Do not be flattered: a price is only what it would cost us to take it.",
 		"The Banner-Lord is Banner-Lord because nobody has put him on his back. When somebody does, there will be another, and we shall follow that one. There is no law in Knifegate you could not learn in a morning.",
 		"The Banner gives work to the strong, pays at once, and does not say thank you. If you want thanks, go back west to the reed-pipers. If you want to be told the truth to your face, sit down."]},
+	# ---- the Sea Floor release: whoever answers for each of the three towns under the sea
+	"reeve_shuttlereef": {"n": "Thread-Warden Lian of Shuttlereef", "area": "jiaoshi", "in": "shuttle_hall", "asset": "folk_jiaoren", "lines": [
+		"The Loom-Mother says what is woven. I say how much thread there is to weave it with. This autumn that is a short conversation.",
+		"You breathe through our gauze. Then you are wearing a month of somebody's work across your mouth. I do not say it to shame you. I say it because nobody up there seems to know.",
+		"West yard, the retting. East yard, the looms. Go and stand in either and watch. Nobody will mind. They may hand you something heavy."]},
+	"reeve_redbranch": {"n": "Net-Reeve Gan of Redbranch", "area": "shanhu", "in": "branch_hall", "asset": "folk_founder", "lines": [
+		"Every net in the forest is in this book: the day it went down, the day it comes up. Three years. Not two years and eleven months.",
+		"The Kiln-Master burns what dies and I count what lives. We have not agreed on a number since the river came.",
+		"The kiln is west and the glass is east. Lime goes one way and floats come back. If you are walking that way with empty hands, say so at the counting-house."]},
+	"reeve_lampdeep": {"n": "Lamp-Reeve Xu of Lampdeep", "area": "beiming", "in": "lamp_hall", "asset": "folk_scholar", "lines": [
+		"I keep the lamps. There are four hundred and six. If one goes out, somebody is lost between two houses, so none goes out.",
+		"Old Ao keeps the hall and I keep it going. He tells travellers how big the sea is. I tell them where the inn is. Both are needed.",
+		"Salt in the west yard, roe in the east. The Tail-Gate is further on and is nobody's: we hear it, and that is as near as most of us care to go."]},
 	# ---- the Son of Heaven and his Empress, where the Nine Cauldrons are
 	"emperor": {"n": "The Son of Heaven", "area": "tushan", "in": "cauldron_hall", "asset": "folk_scholar", "lines": [
 		"We are the Son of Heaven. You need not kneel; the floor is cold, and the last man who knelt had to be helped up by the Empress. Whoever holds the Nine Cauldrons holds the Mandate, and nobody has wanted them moved.",
@@ -120,7 +133,7 @@ const OFFICES := {
 		"If you want a thing done, child, ask a hearth. If you want it remembered, come to us. We are very good at remembering; it is all we have been let do."]},
 }
 const ORDER := ["master_discipline", "master_outer", "treasurer", "head_qingshi", "post_cloudfoot", "reeve_well", "harbour_longmen", "guild_tushan", "warden_yanggu",
-	"speaker_featherfall", "reeve_tearwater", "registrar_youdu", "reeve_landfall", "moorer_lightfoot", "reeve_fourstreams", "hall_reed", "hall_cold", "hall_black", "hall_wolf", "emperor", "empress"]
+	"speaker_featherfall", "reeve_tearwater", "registrar_youdu", "reeve_landfall", "moorer_lightfoot", "reeve_fourstreams", "hall_reed", "hall_cold", "hall_black", "hall_wolf", "reeve_shuttlereef", "reeve_redbranch", "reeve_lampdeep", "emperor", "empress"]
 
 ## The trades of a town, by what the ground floor of a house is used for (rooms.gd USES): what the
 ## shift is, how many hours of the day it takes, what it pays (a share of `wage`), and what is said

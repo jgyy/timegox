@@ -293,6 +293,10 @@ static func _price(g, what: String, k: float = 1.0) -> int:
 static func record(g, what: String, tid: String, who: String, k: float = 1.0) -> int:
 	if not Weal.TOWNS.has(tid) or not CRIMES.has(what):
 		return 0
+	# (the Sea Floor release: no price hangs at the gate of a crooked town, sides.gd, and no watch comes there
+	# to take one: a bill written there could never be paid or served, and stood against his name for good)
+	if Sides.lawless(tid):
+		return 0
 	var n := _price(g, what, k)
 	g.bounty[tid] = int(g.bounty.get(tid, 0)) + n
 	g.crimes.append({"what": what, "town": tid, "day": int(g.day), "n": n, "who": who})

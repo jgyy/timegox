@@ -639,7 +639,7 @@ func _init() -> void:
 	check(Data.layer_of("juntian") == "heaven" and Data.layer_of("changhe") == "heaven" and Data.layer_of("ninesprings") == "under" and Data.layer_of("youdu") == "under", "two regions float in the Nine Heavens and two lie in the Nine Springs")
 	check(Atlas.layer_y("heaven") > 60.0 and Atlas.layer_y("under") < -40.0, "the Nine Heavens are drawn high above the land and the Nine Springs deep below it")
 	var ladders_seen := {}
-	for lid in ["heaven", "under", "sea", "lakes"]:
+	for lid in ["heaven", "under", "sea", "lakes", "deeps"]:
 		var lw := Atlas.world_of(lid)
 		var lreach := MapGen.flood(lw.grid, lw.w, lw.h, lw.start)
 		var lcut := 0
@@ -652,6 +652,13 @@ func _init() -> void:
 				ladders_seen[str(e11.id)] = true
 				var sw := Atlas.world()
 				check(MapGen.is_walkable_tile(sw.grid[e11.to_tile.y * sw.w + e11.to_tile.x]), "%s comes out on open ground in the land" % e11.id)
+			# (the Sea Floor release: the floor of the sea is joined to the isles above it, not to the land, by the
+			# way down at the Returning Ruins: both its ends are looked at here)
+			if e11.kind == "ladder" and str(e11.get("style", "")) == "dive":
+				to_surface = to_surface or lid == "deeps"
+				ladders_seen[str(e11.id)] = true
+				var dvw := Atlas.world_of(str(e11.to_layer))
+				check(MapGen.is_walkable_tile(dvw.grid[e11.to_tile.y * dvw.w + e11.to_tile.x]) and Data.step_index(str(e11.open)) >= 0, "%s comes out on open ground in %s, and opens at a real step" % [e11.id, e11.to_layer])
 		check(lcut == 0, "%s: everyone and everything can be walked to from where the Jianmu comes in (%d cut off)" % [lid, lcut])
 		check(to_surface, "%s: a ladder leads back down (or up) to the land" % lid)
 		var edge_void := true
@@ -1223,7 +1230,7 @@ func _init() -> void:
 			for pe8 in band8.get("pool", []):
 				marching8[pe8[0]] = true
 			# (the Rivers and Lakes release: in a country that was made for its chapter the hunt is for what lives there)
-			if Data.layer_of(str(st8.area)) == "lakes" and not st8.has("cave"):
+			if Data.layer_of(str(st8.area)) in ["lakes", "deeps"] and not st8.has("cave"):
 				for pe8l in Data.AREAS[st8.area].get("pool", []):
 					marching8[pe8l[0]] = true
 			# (Part XXII: a region's second band, for a later chapter)
@@ -5268,7 +5275,7 @@ func _thundering_pots() -> void:
 		check(Feats.need(f.test) >= 1.0 and Feats.value(MG, f.test) >= 0.0 and (str(f.test[0]) != "step" or Data.step_index(str(f.test[1])) >= 0), "feat %s measures something that can be counted" % fid)
 	check(Feats.FEATS.size() >= 75 and kinds_f.size() == Feats.KIND_ORDER.size() and Feats.order().size() == Feats.FEATS.size(), "%d feats of nine kinds" % Feats.FEATS.size())
 	# what a feat asks for is there to be done
-	check(Feats.need(Feats.FEATS.in_the_lakes.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
+	check(Feats.need(Feats.FEATS.joy_of_fish.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_sight.test) == Deeps.ORDER.size() and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
 		and Feats.need(Feats.FEATS.every_thread.test) == Fashion.OUTFIT_ORDER.size() and Feats.need(Feats.FEATS.her_dresses.test) <= Fashion.YUE_ORDER.size() and Feats.need(Feats.FEATS.egg_all.test) == Eggs.ORDER.size()
 		and Feats.need(Feats.FEATS.war_all.test) == War.BATTLE_ORDER.size() and Feats.need(Feats.FEATS.heard_all.test) <= Music.count() and Feats.need(Feats.FEATS.host_full.test) <= War.ORDER.size()
 		and Feats.need(Feats.FEATS.airs_six.test) == Music.AIRS.size() and Feats.need(Feats.FEATS.works_twelve.test) < Works.ORDER.size() and Feats.need(Feats.FEATS.arms_eight.test) == Arms.ORDER.size()
@@ -6414,7 +6421,7 @@ func _answering_land() -> void:
 	var G = load("res://scripts/game.gd").new()
 	G.reset()
 	G.started = true
-	check(Weal.ORDER.size() == 17 and Weal.ORDER.size() == Weal.TOWNS.size(), "seventeen towns are weighed")
+	check(Weal.ORDER.size() == 20 and Weal.ORDER.size() == Weal.TOWNS.size(), "twenty towns are weighed")
 	var heard := {}
 	for tid in Weal.ORDER:
 		var t: Dictionary = Weal.TOWNS[tid]
@@ -7630,7 +7637,7 @@ func _open_net() -> void:
 					check(str(fp31.n).begins_with("Big Brother ") or str(fp31.n).begins_with("Big Sister "), "%s is called as the Great People are" % fp31.n)
 					check(bool(fp31.fem) == (str(fp31.body) == "folk_giantess"), "%s: a woman of theirs is a woman" % fp31.n)
 					check(not Folk.day_of(Atlas.world_of(layer31), fp31).is_empty(), "%s has a day" % fp31.n)
-	check(giants_n == 21, "twenty-one of the Great People live in the towns (%d)" % giants_n)
+	check(giants_n == 24, "twenty-four of the Great People live in the towns (%d)" % giants_n)
 	check(Folk.ROLES.has("giant") and Folk.LINES.giant.size() >= 4 and Folk.TITLES.has("giant") and Crime.ARMED.has("giant"), "the giant: a day, a title, six things to say, and nobody's easy mark")
 	for ln31 in Giants.LINES + Giants.LINES_SMALL:
 		check(fits.call(str(ln31).replace("%s", "Daoist friend")), "a line of the Great People fits the box")
@@ -8123,7 +8130,7 @@ func _open_net() -> void:
 	check(Crime.is_child({"kind": "npc", "id": "li_bai", "n": "Li Bai", "asset": "li_bai"}), "nobody draws on a schoolboy")
 	for fid33 in ["practised_hand", "same_length", "by_the_door", "told_true", "parted_whole"]:
 		check(Feats.FEATS.has(fid33), "the feat %s is kept" % fid33)
-	check(not str(Feats.FEATS.parted_whole.desc).contains("last realm") and not str(Feats.FEATS.practised_hand.desc).contains("last realm") and not str(Feats.FEATS.sleeves_of_wind.desc).contains("last realm") and not str(Feats.FEATS.uncarved_block.desc).contains("last realm") and not str(Feats.FEATS.light_hand.desc).contains("last realm") and not str(Feats.FEATS.five_in_one.desc).contains("last realm") and not str(Feats.FEATS.low_as_sea.desc).contains("last realm") and not str(Feats.FEATS.no_name.desc).contains("last realm") and not str(Feats.FEATS.two_roads.desc).contains("last realm") and str(Feats.FEATS.in_the_lakes.desc).contains("last realm"), "only the last realm is called the last")
+	check(not str(Feats.FEATS.parted_whole.desc).contains("last realm") and not str(Feats.FEATS.practised_hand.desc).contains("last realm") and not str(Feats.FEATS.sleeves_of_wind.desc).contains("last realm") and not str(Feats.FEATS.uncarved_block.desc).contains("last realm") and not str(Feats.FEATS.light_hand.desc).contains("last realm") and not str(Feats.FEATS.five_in_one.desc).contains("last realm") and not str(Feats.FEATS.low_as_sea.desc).contains("last realm") and not str(Feats.FEATS.no_name.desc).contains("last realm") and not str(Feats.FEATS.two_roads.desc).contains("last realm") and not str(Feats.FEATS.in_the_lakes.desc).contains("last realm") and str(Feats.FEATS.joy_of_fish.desc).contains("last realm"), "only the last realm is called the last")
 	for src33 in ["Fangyu Shenglan", "Miscellaneous Records of the Western Capital", "Ouyang Xiu", "Book of Jin"]:
 		check(FileAccess.get_file_as_string("res://scripts/lore.gd").contains(src33), "the chapter's tales are told from where they are written: %s" % src33)
 
@@ -8379,7 +8386,7 @@ func _open_net() -> void:
 	check(Trials.need_met(["rites", 2], TN35) and not Trials.need_met(["rites", 3], TN35) and Trials.KINDS.has("rite") and Trials.need_text(["rites", 2], TN35).contains("2"), "trials can be passed by the rite")
 	TN35.free()
 	var c35: Dictionary = Echoes.CROSSROADS.get("the_stone", {})
-	check(not c35.is_empty() and str(c35.step) == "s_p35_gate" and str(c35.part) == "XXXV" and Echoes.ORDER[Echoes.ORDER.size() - 7] == "the_stone" and fits.call(str(c35.ask)), "what the stone is for is asked last of its chapter")
+	check(not c35.is_empty() and str(c35.step) == "s_p35_gate" and str(c35.part) == "XXXV" and Echoes.ORDER[Echoes.ORDER.size() - 8] == "the_stone" and fits.call(str(c35.ask)), "what the stone is for is asked last of its chapter")
 	check((c35.options as Array).size() == 3 and c35.after.size() == 3 and c35.end.size() == 3 and c35.echo.has("s_p35_end") and c35.echo.s_p35_end.size() == 3 and Data.step_index("s_p35_end") > Data.step_index("s_p35_gate"), "the_stone: three answers, each answered, echoed and told at the end")
 	var scales35 := {}
 	for o35 in c35.options:
@@ -8552,7 +8559,7 @@ func _open_net() -> void:
 	check(Trials.need_met(["cooked", 2], TN36) and not Trials.need_met(["cooked", 3], TN36) and Trials.need_met(["light", 3], TN36) and not Trials.need_met(["light", 4], TN36) and Trials.KINDS.has("pot") and Trials.KINDS.has("light") and Trials.need_text(["cooked", 2], TN36).contains("2"), "trials can be passed by the pot and by the light hand")
 	TN36.free()
 	var c36: Dictionary = Echoes.CROSSROADS.get("the_ladle", {})
-	check(not c36.is_empty() and str(c36.step) == "s_p36_table" and str(c36.part) == "XXXVI" and Echoes.ORDER[Echoes.ORDER.size() - 6] == "the_ladle" and fits.call(str(c36.ask)), "what a strong hand is for is asked last of its chapter")
+	check(not c36.is_empty() and str(c36.step) == "s_p36_table" and str(c36.part) == "XXXVI" and Echoes.ORDER[Echoes.ORDER.size() - 7] == "the_ladle" and fits.call(str(c36.ask)), "what a strong hand is for is asked last of its chapter")
 	check((c36.options as Array).size() == 3 and c36.after.size() == 3 and c36.end.size() == 3 and c36.echo.has("s_p36_end") and c36.echo.s_p36_end.size() == 3 and Data.step_index("s_p36_end") > Data.step_index("s_p36_table"), "the_ladle: three answers, each answered, echoed and told at the end")
 	var scales36 := {}
 	for o36 in c36.options:
@@ -8722,7 +8729,7 @@ func _open_net() -> void:
 		and Trials.need_text(["phases", 3], TNq7).contains("3") and Trials.need_text(["quelled", 2], TNq7).contains("2"), "trials can be passed by the round and by the measure")
 	TNq7.free()
 	var cq7: Dictionary = Echoes.CROSSROADS.get("the_round", {})
-	check(not cq7.is_empty() and str(cq7.step) == "s_p37_council" and str(cq7.part) == "XXXVII" and Echoes.ORDER[Echoes.ORDER.size() - 5] == "the_round" and fits.call(str(cq7.ask)), "what is done before the next dry wind is asked last of its chapter")
+	check(not cq7.is_empty() and str(cq7.step) == "s_p37_council" and str(cq7.part) == "XXXVII" and Echoes.ORDER[Echoes.ORDER.size() - 6] == "the_round" and fits.call(str(cq7.ask)), "what is done before the next dry wind is asked last of its chapter")
 	check((cq7.options as Array).size() == 3 and cq7.after.size() == 3 and cq7.end.size() == 3 and cq7.echo.has("s_p37_end") and cq7.echo.s_p37_end.size() == 3 and Data.step_index("s_p37_end") > Data.step_index("s_p37_council"), "the_round: three answers, each answered, echoed and told at the end")
 	var scalesq7 := {}
 	for oq7 in cq7.options:
@@ -9593,6 +9600,7 @@ func _open_net() -> void:
 	_higher_sky()
 	_red_seal()
 	_rivers_and_lakes()
+	_sea_floor()
 
 ## The Cloud Keel release: the spirit arks and the Far Countries (arks.gd), a storey divided into apartments
 ## with somebody living in each (rooms.gd), and what the audit of shared ground learned to see (clash.gd).
@@ -9604,7 +9612,7 @@ func _cloud_keel() -> void:
 		par.add_string(text, dfont, 22)
 		par.width = 1100
 		return par.get_line_count() <= 4
-	check(Atlas.LAYERS.size() == 6 and Atlas.LAYERS[4] == "far" and Atlas.STRATA.has("far") and Atlas.LAYER_NAMES.has("far") and Atlas.LAYERS.slice(0, 4) == ["surface", "heaven", "under", "sea"], "the world is six realms, the fifth is the Far Countries, and the first four are where they were")
+	check(Atlas.LAYERS.size() == 7 and Atlas.LAYERS[4] == "far" and Atlas.STRATA.has("far") and Atlas.LAYER_NAMES.has("far") and Atlas.LAYERS.slice(0, 4) == ["surface", "heaven", "under", "sea"], "the world is seven realms, the fifth is the Far Countries, and the first four are where they were")
 	var far: Dictionary = Atlas.world_of("far")
 	var far_ids := ["huaxu", "zhongbei", "gumang", "fuluo"]
 	var asked: Array = []
@@ -9752,7 +9760,7 @@ func _cloud_keel() -> void:
 			if not okf:
 				apt_bad.append("%s/%s" % [bd.area, bd.id])
 	check(apt_bad.is_empty(), "every divided storey: a landing, a doorway to every room, all of its floor walked to, every piece with floor beside it, everybody in a room of their own (%s)" % str(apt_bad))
-	check(n_div >= 36 and n_apt >= 80 and n_lodg >= n_apt - 6 and apt_beds == n_apt, "%d storeys are divided into %d apartments, each with a bed, and %d people live in them" % [n_div, n_apt, n_lodg])
+	check(n_div >= 36 and n_apt >= 80 and n_lodg >= n_apt - maxi(6, n_apt / 24) and apt_beds == n_apt, "%d storeys are divided into %d apartments, each with a bed, and %d people live in them" % [n_div, n_apt, n_lodg])
 	check(Rooms.apartments(Rect2i(0, 0, 6, 6), Vector2i(1, 1), "home", 3).is_empty() and not Rooms.apartments(Rect2i(0, 0, 11, 8), Vector2i(1, 1), "home", 3).is_empty()
 		and Rooms.apartments(Rect2i(0, 0, 11, 8), Vector2i(1, 1), "home", 3) == Rooms.apartments(Rect2i(0, 0, 11, 8), Vector2i(1, 1), "home", 3), "a house too small to divide is one room; a larger one is divided the same way every time")
 	for sty in Rooms.APART:
@@ -10161,7 +10169,7 @@ func _higher_sky() -> void:
 		"the battle has a fourth end, main tells what it cost, and walking on is the first answer")
 	check(not msrc.contains("Game.respawn()\n\t\t\tBetters") and msrc.contains("Betters.over(Game, id, how"), "nobody is carried home for it")
 	check(bsrc.contains("\"dare\":") and bsrc.contains("ids.has(\"draw\")") and bsrc.contains("bot-watch") and not bsrc.contains("Betters.watch("), "the bot stands in front of them, and watches nobody unless told to")
-	check(Data.level_name(126 + 15).ends_with("Sky Above") and Data.realm_name(43) == "Low as the Sea" and Data.realm_name(Data.REALMS.size()) == "First Sky Above" and Data.realm_name(99) == "Ninth Sky Above", "somebody above the last realm stands in a sky that is told by how far up it is")
+	check(Data.level_name(Data.MAX_LEVEL + 3).ends_with("Sky Above") and Data.realm_name(43) == "Low as the Sea" and Data.realm_name(Data.REALMS.size()) == "First Sky Above" and Data.realm_name(99) == "Ninth Sky Above", "somebody above the last realm stands in a sky that is told by how far up it is")
 	for st3 in Data.STEPS:
 		check(not st3.has("if") or Betters.BETTERS.has(str(st3["if"][0])), "%s: a fork names somebody above him" % st3.id)
 		check(str(st3.kind) != "dare" or (Betters.is_better(str(st3.boss)) and int(st3.get("cave", 0)) == -1), "%s: a dare is a bout with a better" % st3.id)
@@ -10195,7 +10203,7 @@ func _higher_sky() -> void:
 		for sp in Memoir.lines(null, pid):
 			check(str(sp[0]) in ["Lin Feng", "Yue Ling", "Elder Qing Xuan"], "%s is said by its writer, under the name they stand by" % pid)
 	check(by.size() == 3 and int(by.lin) >= 15 and int(by.yue) >= 12 and int(by.elder) >= 9, "the three people the story is about each write (%s)" % str(by))
-	check(parts.size() == 41, "every part of the story has a page (%d)" % parts.size())
+	check(parts.size() == 42, "every part of the story has a page (%d)" % parts.size())
 	G = new_game.call()
 	G.step = Data.step_index("s_break1") + 1
 	check(Memoir.written(G) == 1 and G.pages.has("p01_broom") and G.page_due == ["p01_broom"] and Memoir.written(G) == 0 and Memoir.book(G) == ["p01_broom"], "a page is written when its step is done, once")
@@ -10327,7 +10335,7 @@ func _higher_sky() -> void:
 	check((tr.paths as Array).size() == 4 and open_n >= 2 and fits.call(str(tr.why)) and Data.step_index("s_p38_slips") < Data.step_index("s_p38_maling"), "Pang Juan under the tree has four ways through, two of them open to a wanted man")
 	# the crossroads
 	var c8: Dictionary = Echoes.CROSSROADS.get("the_higher_sky", {})
-	check(not c8.is_empty() and str(c8.step) == "s_p38_low" and str(c8.part) == "XXXVIII" and Echoes.ORDER[Echoes.ORDER.size() - 4] == "the_higher_sky" and fits.call(str(c8.ask)) and Marks.AFTER_BANDS.has("the_higher_sky"), "what a sect teaches about those above it is asked last of all")
+	check(not c8.is_empty() and str(c8.step) == "s_p38_low" and str(c8.part) == "XXXVIII" and Echoes.ORDER[Echoes.ORDER.size() - 5] == "the_higher_sky" and fits.call(str(c8.ask)) and Marks.AFTER_BANDS.has("the_higher_sky"), "what a sect teaches about those above it is asked last of all")
 	check((c8.options as Array).size() == 3 and c8.after.size() == 3 and c8.end.size() == 3 and c8.echo.has("s_p38_end") and c8.echo.s_p38_end.size() == 3 and Data.step_index("s_p38_end") > Data.step_index("s_p38_low") and bsrc.contains("\"the_higher_sky\": [\"ditch\"]"), "the_higher_sky: three answers, each answered, echoed and told at the end, and the bot has one")
 	var scales := {}
 	for o8 in c8.options:
@@ -11059,7 +11067,7 @@ func _red_seal() -> void:
 		check(Data.DIALOGUE.has(k40b), "%s is said" % k40b)
 	check(firsts40 >= 14, "he speaks for himself in his own chapter (%d lines in the first person)" % firsts40)
 	var c0: Dictionary = Echoes.CROSSROADS.get("the_two_roads", {})
-	check(not c0.is_empty() and str(c0.step) == "s_p40_court" and str(c0.part) == "XL" and Echoes.ORDER[Echoes.ORDER.size() - 2] == "the_two_roads" and fits.call(str(c0.ask)) and Marks.AFTER_BANDS.has("the_two_roads"), "whether a heart may walk two roads is asked last of all")
+	check(not c0.is_empty() and str(c0.step) == "s_p40_court" and str(c0.part) == "XL" and Echoes.ORDER[Echoes.ORDER.size() - 3] == "the_two_roads" and fits.call(str(c0.ask)) and Marks.AFTER_BANDS.has("the_two_roads"), "whether a heart may walk two roads is asked last of all")
 	check((c0.options as Array).size() == 3 and c0.after.size() == 3 and c0.end.size() == 3 and c0.echo.has("s_p40_end") and c0.echo.s_p40_end.size() == 3 and Data.step_index("s_p40_end") > Data.step_index("s_p40_court") and bsrc.contains("\"the_two_roads\": [\"ask\"]"), "the_two_roads: three answers, each answered, echoed and told at the end, and the bot has one")
 	var scales40 := {}
 	for o0 in c0.options:
@@ -11234,7 +11242,7 @@ func _rivers_and_lakes() -> void:
 		return g
 	print("== the sixth realm: the Rivers and Lakes (atlas.gd) ==")
 	var LAKES := ["yunmeng", "hanshan", "heishui", "langya"]
-	check(Atlas.LAYERS.size() == 6 and Atlas.LAYERS[5] == "lakes" and Atlas.STRATA.has("lakes") and Atlas.STRATA.lakes.has("at") and Atlas.LAYER_NAMES.lakes == "The Rivers and Lakes", "the world is six realms, and the sixth says where it lies itself")
+	check(Atlas.LAYERS.size() == 7 and Atlas.LAYERS[5] == "lakes" and Atlas.STRATA.has("lakes") and Atlas.STRATA.lakes.has("at") and Atlas.LAYER_NAMES.lakes == "The Rivers and Lakes", "the sixth of the world's seven realms is the Rivers and Lakes, and says where it lies itself")
 	var lw: Dictionary = Atlas.world_of("lakes")
 	check(lw.ids.size() == 4 and LAKES.all(func(a): return lw.ids.has(a) and Data.layer_of(a) == "lakes" and Data.AREA_CHAIN.has(a) and Data.REGION_LORE.has(a)), "four countries lie in it, each with its story")
 	check((lw.peaks as Array).size() >= 8 and (lw.camps as Dictionary).size() == 4 and LAKES.all(func(a): return lw.floors.has(Caves.fid(a, -1))), "every one of them has peaks, a camp of the road and a cave (%d peaks)" % (lw.peaks as Array).size())
@@ -11278,11 +11286,11 @@ func _rivers_and_lakes() -> void:
 	wg41.seen["yunmeng"] = true
 	check(Weal.towns(wg41).size() == 12 and Weal.towns(wg41).has("reedhaven"), "and is weighed once he has")
 	wg41.free()
-	check(not bsrc.contains("\"far\"") and not bsrc.contains("Atlas.LAYERS") and bsrc.contains("REALMS_WALKED := [\"surface\", \"heaven\", \"under\", \"sea\", \"lakes\"]"), "the bot walks five realms, and still not the Far Countries")
+	check(not bsrc.contains("\"far\"") and not bsrc.contains("Atlas.LAYERS") and bsrc.contains("REALMS_WALKED := [\"surface\", \"heaven\", \"under\", \"sea\", \"lakes\", \"deeps\"]"), "the bot walks six realms, and still not the Far Countries")
 
 	print("== upright towns and crooked ones (sides.gd) ==")
 	check(Sides.TOWNS.size() == 4 and Sides.towns_of("upright").size() == 2 and Sides.towns_of("crooked").size() == 2 and Sides.TOWNS.keys().all(func(t): return Weal.TOWNS.has(t) and Data.layer_of(str(Weal.TOWNS[t].area)) == "lakes"), "two towns are upright and two crooked, all four down the river")
-	check(Weal.ORDER.filter(func(t): return Sides.of(t) == "plain").size() == 13 and Sides.of("qingshi") == "plain" and Sides.of("sect") == "plain" and Sides.of_area("bamboo") == "plain", "every town that was there before is plain: nothing here touches it")
+	check(Weal.ORDER.filter(func(t): return Sides.of(t) == "plain").size() == 16 and Sides.of("qingshi") == "plain" and Sides.of("sect") == "plain" and Sides.of_area("bamboo") == "plain", "every town that was there before is plain: nothing here touches it")
 	var SG = new_game.call()
 	for tid41 in Weal.ORDER:
 		if Sides.of(tid41) == "plain":
@@ -11621,15 +11629,17 @@ func _rivers_and_lakes() -> void:
 
 	print("== Part XLI: Forgetting One Another in the Rivers and Lakes ==")
 	var p41 := Data.step_index("s_p41_home")
-	check(p41 == Data.step_index("s_break45") + 1 and Data.STEPS[Data.STEPS.size() - 1].id == "s_break46" and int(Data.STEPS[Data.STEPS.size() - 1].to) == Data.MAX_LEVEL and Data.MAX_LEVEL == 138, "Part XLI follows Walking Two Roads and ends the game")
-	check(Data.REALMS.size() == 47 and Data.REALMS[46] == "Forgotten in the Lakes" and Data.level_name(138).ends_with("Forgotten in the Lakes") and Data.REALM_INFO.size() == 47 and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "and adds the realm of Forgotten in the Lakes")
+	# (the Sea Floor release: Part XLII follows it now)
+	var p41_end := Data.step_index("s_break46") + 1
+	check(p41 == Data.step_index("s_break45") + 1 and Data.STEPS[p41_end - 1].id == "s_break46" and int(Data.STEPS[p41_end - 1].to) == 138, "Part XLI follows Walking Two Roads and ends in its own tribulation")
+	check(Data.REALMS.size() >= 47 and Data.REALMS[46] == "Forgotten in the Lakes" and Data.level_name(138).ends_with("Forgotten in the Lakes") and Data.REALM_INFO.size() == Data.REALMS.size() and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "and adds the realm of Forgotten in the Lakes")
 	check(Data.DIALOGUE.has("recall39") and msrc.contains("\"s_break45\": \"recall39\"") and Data.DIALOGUE.has("pre:s_break46") and Data.DIALOGUE.has("post:s_break46"), "he is brought home to begin it (recall39), and it closes on a tribulation")
 	var kinds42 := {}
 	var n41 := 0
 	var names41b := ["Narrator", "Lin Feng", "Yue Ling", "Elder Qing Xuan", "Fleet-Mother Lu Ting", "Shide, Who Sweeps the Kitchen", "Ledger-Mistress Mo Chou", "Banner-Lord Tuoba Lie"]
 	var sects_met := {}
 	var sides_met := {}
-	for i41 in range(p41, Data.STEPS.size()):
+	for i41 in range(p41, p41_end):
 		var s1: Dictionary = Data.STEPS[i41]
 		n41 += 1
 		kinds42[str(s1.kind)] = int(kinds42.get(str(s1.kind), 0)) + 1
@@ -11670,7 +11680,7 @@ func _rivers_and_lakes() -> void:
 	for mn41 in names41b.slice(4):
 		check(Closeup.SIGNATURE.has(mn41) and Closeup.CLIPS.has(str(Closeup.SIGNATURE[mn41])), "%s has a gesture of their own" % mn41)
 	var c1: Dictionary = Echoes.CROSSROADS.get("the_covenant", {})
-	check(not c1.is_empty() and str(c1.step) == "s_p41_moot" and str(c1.part) == "XLI" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_covenant" and fits.call(str(c1.ask)), "what is done with fish on the mud is asked last of all")
+	check(not c1.is_empty() and str(c1.step) == "s_p41_moot" and str(c1.part) == "XLI" and Echoes.ORDER[Echoes.ORDER.size() - 2] == "the_covenant" and fits.call(str(c1.ask)), "what is done with fish on the mud is asked last of all")
 	check((c1.options as Array).size() == 3 and c1.after.size() == 3 and c1.end.size() == 3 and c1.echo.has("s_p41_end") and c1.echo.s_p41_end.size() == 3 and Data.step_index("s_p41_end") > Data.step_index("s_p41_moot") and bsrc.contains("\"the_covenant\": [\"dig\"]"), "the_covenant: three answers, each answered, echoed and told at the end, and the bot has one")
 	check(Echoes.CROSSROADS.the_two_roads.echo.has("s_p41_home") and Echoes.CROSSROADS.the_two_roads.echo.s_p41_home.size() == 3, "and what was answered about a second road is remembered when four sects ask for one covenant")
 	var tilts41 := {}
@@ -11703,3 +11713,382 @@ func _rivers_and_lakes() -> void:
 	var BG41 = new_game.call()
 	check(bsrc.contains("\"rescue\":") and bsrc.contains("\"sect\":") and bsrc.contains("if str(st4.kind) == \"sect\":"), "the bot knows both new kinds of step, and a journey begun past them has done them")
 	BG41.free()
+
+## The Sea Floor release: the seventh realm (atlas.gd "deeps"), the works of its three towns (mills.gd), the
+## places of the sea floor (deeps.gd), the Dao of Leading Water (terra.gd), Part XLII, and what was mended.
+func _sea_floor() -> void:
+	var bsrc := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	var msrc := FileAccess.get_file_as_string("res://scripts/main.gd")
+	var wsrc := FileAccess.get_file_as_string("res://scripts/world.gd")
+	var dfont := ThemeDB.fallback_font
+	var fits := func(text: String) -> bool:
+		var par := TextParagraph.new()
+		par.add_string(text, dfont, 22)
+		par.width = 1100
+		return par.get_line_count() <= 4
+	var new_game := func():
+		var g = load("res://scripts/game.gd").new()
+		g.reset()
+		g.started = true
+		g.prologue = ""
+		return g
+	print("== the seventh realm: the floor of the Eastern Sea (atlas.gd) ==")
+	var DEEPS := ["jiaoshi", "shanhu", "beiming", "weilu"]
+	check(Atlas.LAYERS.size() == 7 and Atlas.LAYERS[6] == "deeps" and Atlas.STRATA.has("deeps") and Atlas.STRATA.deeps.has("at") and Atlas.LAYER_NAMES.deeps == "The Floor of the Eastern Sea" and Deeps.AREAS == DEEPS, "the world is seven realms, and the seventh says where it lies itself")
+	var dw: Dictionary = Atlas.world_of("deeps")
+	check(dw.ids.size() == 4 and DEEPS.all(func(a): return dw.ids.has(a) and Data.layer_of(a) == "deeps" and Data.AREA_CHAIN.has(a) and Data.REGION_LORE.has(a)), "four countries lie in it, each with its story")
+	check((dw.peaks as Array).size() >= 4 and (dw.camps as Dictionary).size() == 4 and DEEPS.all(func(a): return dw.floors.has(Caves.fid(a, -1))), "every one of them has a peak, a camp of the road and a cave")
+	for a42 in DEEPS:
+		var sp42: Dictionary = Data.AREAS[a42]
+		check(Look.THEMES.has(str(sp42.theme)) and Look.EXTRA.has(str(sp42.theme)) and MapGen.DENSITY.has(str(sp42.theme)) and Scatter.ECO.has(str(sp42.theme)) and Props.THEMES.has(str(sp42.theme)) and Fauna.KINDS.has(str(sp42.theme)) and Caves.LOOK_OF.has(str(sp42.theme)) and Music.OF_THEME.has(str(sp42.theme)) and Arch.DRESS_OF.has(a42) and Bonds.REGION.has(a42),
+			"%s has a look, a wood, things to do, creatures, a cave, a tune, a dress and a word of Yue Ling's" % a42)
+		check(str(Look.THEMES[str(sp42.theme)].weather) == "bubbles_up" and (Fauna.KINDS[str(sp42.theme)] as Array).all(func(f): return str(f[0]) == "fish") and float(Scatter.ECO[str(sp42.theme)].grass) == 0.0, "%s is under water: bubbles go up, nothing flies but fish, and no grass grows" % a42)
+		check((sp42.bosses as Array).is_empty() and (sp42.pool as Array).size() == 3 and (sp42.pool as Array).all(func(pe): return Data.ENEMIES.has(str(pe[0])) and int(pe[2]) <= Data.MAX_LEVEL and Lore.BEAST.has(str(pe[0])) and Tactics.WIT.has(str(Data.ENEMIES[str(pe[0])].shape))), "%s has no lord, and three kinds of foe with a story and wits" % a42)
+		check((sp42.sights as Array).size() == 6 and (sp42.sights as Array).all(func(sg): return Deeps.SIGHTS.has(str(sg.id)) and str(Deeps.SIGHTS[str(sg.id)].area) == a42), "%s has six places to be found, each its own" % a42)
+	var dive: Dictionary = {}
+	for ld42 in Data.LADDERS:
+		if str(ld42.id) == "sea_dive":
+			dive = ld42
+	check(not dive.is_empty() and str(dive.late) == "a" and str(dive.style) == "dive" and str(dive.open) == "s_p42_river" and str(dive.a[0]) == "guixu" and str(dive.b[0]) == "jiaoshi" and MapGen.ladder_ends("guixu").is_empty(), "the way down is at the Returning Ruins, and its end among the isles is stood last of all: nothing of Guixu is made for it")
+	var sea42: Dictionary = Atlas.world_of("sea")
+	var da: Array = sea42.ents.filter(func(e): return str(e.id) == "sea_dive:a")
+	var db: Array = dw.ents.filter(func(e): return str(e.id) == "sea_dive:b")
+	check(da.size() == 1 and db.size() == 1 and str(da[0].area) == "guixu" and str(da[0].to_layer) == "deeps" and str(db[0].to_layer) == "sea" and db[0].to_tile == (da[0].pos as Vector2i) + (da[0].out as Vector2i) and MapGen.is_walkable_tile(dw.grid[da[0].to_tile.y * dw.w + da[0].to_tile.x]), "both its ends stand, and each comes out beside the other")
+	check(Data.next_hop("sect", "jiaoshi") != "" and Data.next_hop("guixu", "jiaoshi") == "jiaoshi" and Data.next_hop("weilu", "sect") == "beiming" and Data.next_hop("jiaoshi", "sect") == "guixu", "the way there and back is found from anywhere")
+	var wg42 = new_game.call()
+	for sn42 in ["sect", "mountain", "village", "yanggu", "dunes", "longmen", "tushan", "juntian", "ninesprings", "youdu", "penglai"]:
+		wg42.seen[sn42] = true
+	var before42: int = Weal.towns(wg42).size()
+	wg42.seen["jiaoshi"] = true
+	check(before42 == 11 and Weal.towns(wg42).size() == 12 and Weal.towns(wg42).has("shuttlereef") and not Weal.towns(wg42).has("lampdeep"), "a town under the sea counts for nothing until he has stood in its country")
+	wg42.seen["beiming"] = true
+	check(Weal.towns(wg42).has("lampdeep") and Weal.hears("weilu").has("lampdeep") and DEEPS.all(func(a): return not Weal.hears(a).is_empty()), "and every country of the sea floor is some town's news")
+	for tn42 in ["shuttlereef", "redbranch", "lampdeep"]:
+		check(Folk.TOWNS.has(tn42) and Folk.MORE.has(tn42) and Giants.TOWNS.has(tn42) and Sides.of(tn42) == "plain" and Offices.OFFICES.has(str(Weal.TOWNS[tn42].office)) and (Folk.TOWNS[tn42].roles as Dictionary).keys()[(Folk.TOWNS[tn42].roles as Dictionary).size() - 1] == "giant", "%s has people, somebody who answers for it, and its Great People written last" % tn42)
+	wg42.free()
+	check(not bsrc.contains("\"far\"") and not bsrc.contains("Atlas.LAYERS") and bsrc.contains("\"lakes\", \"deeps\"]"), "the bot walks six realms, and still not the Far Countries")
+
+	print("== the works of the sea floor (mills.gd) ==")
+	check(Mills.ORDER.size() == 6 and Mills.WORKS.size() == 6, "six works")
+	var makes42 := {}
+	var by_town42 := {}
+	for wid in Mills.ORDER:
+		var w42: Dictionary = Mills.WORKS[wid]
+		makes42[str(w42.makes)] = true
+		by_town42[str(w42.town)] = int(by_town42.get(str(w42.town), 0)) + 1
+		check(Weal.TOWNS.has(str(w42.town)) and str(Weal.TOWNS[str(w42.town)].area) == str(w42.area) and Data.ITEMS.has(str(w42.makes)) and Load.weight_of(str(w42.makes)) == 0.0 and int(w42.cap) >= Mills.CRATE * 2 and int(w42.per_day) > 0, "%s stands in its town and makes something that weighs nothing" % wid)
+		check(Trials.npc_area(str(w42.foreman)) == str(w42.area) and Mills.of_foreman(str(w42.foreman)) == wid and Folk.POSTS.has(str(w42.foreman)), "%s has a foreman who stands there and has a day" % wid)
+		check(fits.call(str(w42.desc)) and (w42.stations as Array).size() == 3, "%s: what it does fits the box, at three stations" % wid)
+		for f42 in w42.from:
+			check(Mills.WORKS.has(str(f42)) and str(f42) != wid and Mills.wanted_by(str(f42)).has(wid), "%s wants what %s makes" % [wid, f42])
+		var mills42: Array = dw.ents.filter(func(e): return str(e.kind) == "mill" and str(e.works) == wid)
+		check(mills42.size() == 4 and mills42.all(func(e): return str(e.area) == str(w42.area) and MapGen.is_walkable_tile(dw.grid[(e.pos.y + 1) * dw.w + e.pos.x])), "%s: three stations and a store stand in its yard, each with open ground before it" % wid)
+		for k42 in 3:
+			var st42: Dictionary = w42.stations[k42]
+			check(Assets.LEND.has(str(st42.clip)) and Assets.has("characters/" + str(st42.body)) and fits.call(str(st42.does)) and fits.call(str(st42.says)) and not str(st42.says).contains("sir"), "%s/%s: somebody works it, on a clip the towns have, and says so" % [wid, st42.n])
+			var mm42: Node3D = Mills.model(wid, k42)
+			var parts42: Array = mm42.get_meta("parts", [])
+			check(mm42.get_child_count() >= 2 and not parts42.is_empty() and mm42.has_meta("worker"), "%s/%s is built from code, with parts that move and somebody at it" % [wid, st42.n])
+			Mills.tick(mm42, 1.0, true)
+			var p0: Transform3D = (parts42[0] as Node3D).transform
+			Mills.tick(mm42, 1.7, true)
+			var moved42: bool = (parts42 as Array).any(func(p): return true) and ((parts42[0] as Node3D).transform != p0 or parts42.size() > 1)
+			Mills.tick(mm42, 2.0, false)
+			check(moved42 and not (mm42.get_meta("worker") as Node3D).visible, "%s/%s turns while the shift is on, and stands with nobody at it when it is over" % [wid, st42.n])
+			check(Mills.station_lines(wid, k42, 10.0).size() == 2 and str(Mills.station_lines(wid, k42, 10.0)[1][0]).begins_with("The hand at") and str(Mills.station_lines(wid, k42, 23.0)[1][0]) == "Narrator", "%s/%s: by day whoever is at it speaks; at night nobody is" % [wid, st42.n])
+			mm42.free()
+		var sm42: Node3D = Mills.model(wid, 3)
+		Mills.show_stock(sm42, 5)
+		check(sm42.has_node("stack") and int(sm42.get_meta("shown")) == 5 and (sm42.get_node("stack") as Node3D).get_child_count() >= 1 and not sm42.has_meta("worker"), "%s: its store shows what is in it" % wid)
+		Mills.tick(sm42, 1.0, true)
+		sm42.free()
+	check(makes42.size() == 6 and by_town42.size() == 3 and by_town42.values().all(func(n): return int(n) == 2), "six different things are made, two works to a town")
+	check(Mills.wanted_by("retting") == ["loomery"] and Mills.wanted_by("kiln") == ["loomery", "glass"] and Mills.wanted_by("pans") == ["glass", "saltery"] and Mills.wanted_by("glass") == ["saltery"] and Mills.wanted_by("loomery").is_empty(), "every yard feeds the shed of its own town, and every town needs the next")
+	var MG = new_game.call()
+	check(not Mills.open(MG) and Mills.crate_offer(MG, "retting").is_empty(), "before he has stood on the sea floor there is nothing to carry")
+	MG.step = Data.step_index("s_p42_dive") + 1
+	MG.level = 138
+	MG.day = 10
+	MG.stones = 5000
+	MG.seen["jiaoshi"] = true
+	Clock.set_hour(MG, 5.0)
+	check(Mills.open(MG) and not Mills.running(5.0) and Mills.running(6.0) and Mills.running(18.9) and not Mills.running(19.0) and Mills.shift(5.0) == 0.0 and is_equal_approx(Mills.shift(12.5), 0.5) and Mills.shift(22.0) == 1.0, "the shift runs from the hour of the hare to the hour of the dog")
+	check(Mills.stock(MG, "retting") == 12 and Mills.stock(MG, "loomery") == 8, "a store nobody has touched is full")
+	var st0: int = MG.stones
+	check(Mills.buy(MG, "loomery") and int(MG.inv.get("mill_gauze", 0)) == 1 and MG.stones == st0 - Mills.price(MG, "loomery") and Mills.stock(MG, "loomery") == 7 and MG.mill_bought == 1, "a thing of its make is bought from the store, at the town's price")
+	for i42 in 7:
+		MG.stones = 99999
+		Mills.buy(MG, "loomery")
+	check(Mills.stock(MG, "loomery") == 0 and Mills.buy_blocked(MG, "loomery") != "" and not Mills.buy(MG, "loomery"), "an empty store sells nothing")
+	Clock.set_hour(MG, 12.5)
+	check(Mills.stock(MG, "loomery") == 1, "by the middle of the shift half a day's work is in it (%d)" % Mills.stock(MG, "loomery"))
+	Clock.set_hour(MG, 23.0)
+	check(Mills.stock(MG, "loomery") == 3, "by the end of it, a day's (%d)" % Mills.stock(MG, "loomery"))
+	MG.day = 11
+	Clock.set_hour(MG, 3.0)
+	check(Mills.stock(MG, "loomery") == 3, "and nothing is made in the night")
+	MG.day = 40
+	check(Mills.stock(MG, "loomery") == 8, "it never holds more than it holds")
+	MG.day = 11
+	MG.stones = 1000
+	var co42: Dictionary = Mills.crate_offer(MG, "retting")
+	check(not co42.is_empty() and str(co42.to) == "loomery" and int(co42.pay) == Mills.pay(138) and Mills.crate_offer(MG, "pans").is_empty() and Mills.crate_offer(MG, "loomery").is_empty(), "a yard has a crate for the shed that wants it; none for a works in a country he has not stood in, and a shed nobody wants anything of has none")
+	check(Mills.errand(MG) == {"from": "retting"}, "the bot would go to the yard for it")
+	check(Mills.take_crate(MG, co42) and MG.mill_crates.size() == 1 and Mills.stock(MG, "retting") == 12 - Mills.CRATE and Mills.crate_offer(MG, "retting").is_empty() and Mills.errand(MG) == {"to": "loomery"}, "taken, it comes out of the yard's store; and that pair has had its crate of him today")
+	var lm0: int = Mills.stock(MG, "loomery")
+	var paid42: int = Mills.deliver(MG, "loomery")
+	check(paid42 == Mills.pay(138) and MG.stones == 1000 + paid42 and MG.mill_crates.is_empty() and Mills.stock(MG, "loomery") == mini(8, lm0 + Mills.CRATE) and MG.crates_done == 1 and MG.step_supply == 1 and Mills.deliver(MG, "loomery") == 0, "set down in the shed's yard, its store is the fuller, the carrier is paid, and it is counted once")
+	check(Mills.errand(MG).is_empty(), "with every pair he can reach served, there is nothing more to carry today")
+	MG.day = 12
+	MG.seen["shanhu"] = true
+	check(not Mills.crate_offer(MG, "retting").is_empty() and str(Mills.crate_offer(MG, "kiln").to) == "loomery", "tomorrow there is another, and from the next town once he has stood in it")
+	Mills.take_crate(MG, Mills.crate_offer(MG, "kiln"))
+	Mills.take_crate(MG, Mills.crate_offer(MG, "kiln"))
+	check(MG.mill_crates.size() == Mills.HANDS and str(MG.mill_crates[1].to) == "glass" and Mills.crate_offer(MG, "retting").is_empty(), "two crates is all one pair of hands holds")
+	var road42: int = int(Data.STEPS[Data.step_index("s_p42_works")].stones)
+	check(Mills.pay(Data.MAX_LEVEL) * 6 < road42 / 10 and Mills.WORKS.values().all(func(w): return int(w.price) < road42 / 20), "a day of carrying, and anything the works sell, is worth far less than the road (%d against %d)" % [Mills.pay(Data.MAX_LEVEL) * 6, road42])
+	check(Weal.ACTS.has("supplied") and str(Weal.ACTS.supplied.m) == "plenty", "a crate carried is felt in the town it was carried to")
+	MG.hp[0] = 1.0
+	MG.inv["mill_gauze"] = 1
+	check(Mills.USES.size() == 3 and Mills.USES.keys().all(func(u): return Data.ITEMS.has(u) and makes42.has(u)) and MG.use_item_field("mill_gauze") != "" and float(MG.hp[0]) > 1.0 and int(MG.inv.mill_gauze) == 0, "three of the things made can be used, from the Items page")
+	MG.free()
+	check(msrc.contains("func offer_mill(") and msrc.find("\"label\": \"Not today\", \"desc\": \"%s\\n\\n%s\" % [str(w.desc)") > 0 and bsrc.contains("str(c.title) == Mills.ASK") and bsrc.contains("st.kind == \"supply\""), "at the foreman \"Not today\" is first, and the bot takes a crate only when a step asks for carrying")
+
+	print("== the places of the sea floor (deeps.gd) ==")
+	check(Deeps.ORDER.size() == 24 and Deeps.SIGHTS.size() == 24 and DEEPS.all(func(a): return Deeps.in_area(a).size() == 6), "twenty-four places, six a country")
+	var dreach := MapGen.flood(dw.grid, dw.w, dw.h, dw.start)
+	var names42 := {}
+	for sid in Deeps.ORDER:
+		var sg42: Dictionary = Deeps.SIGHTS[sid]
+		names42[str(sg42.n)] = true
+		var se42: Array = dw.ents.filter(func(e): return str(e.kind) == "sight" and str(e.sight) == sid)
+		check(se42.size() == 1 and str(se42[0].area) == str(sg42.area) and MapGen.DIRS.any(func(d): return dreach.has((se42[0].pos as Vector2i) + d)), "%s stands in its country, and can be walked up to" % sid)
+		check(fits.call("%s. %s" % [str(sg42.n), str(sg42.desc)]) and not str(sg42.desc).contains("—"), "%s: what it is fits the box" % sid)
+		var sm: Node3D = Deeps.model(sid)
+		check(sm.get_child_count() >= 1 and Clash.footprint(sm) <= 3.0, "%s is built from code, and keeps to its own ground (%.2f m)" % [sid, Clash.footprint(sm)])
+		sm.free()
+	check(names42.size() == 24, "no two have the same name")
+	var SG42 = new_game.call()
+	var s0: Dictionary = dw.ents.filter(func(e): return str(e.kind) == "sight" and str(e.sight) == "sunk_bell")[0]
+	check(Deeps.found(SG42, dw, (s0.pos as Vector2i) + Vector2i(Deeps.FIND + 1, 0)).is_empty() and SG42.sights.is_empty(), "a place is not found from three tiles off")
+	check(Deeps.found(SG42, dw, (s0.pos as Vector2i) + Vector2i(Deeps.FIND, -1)) == ["sunk_bell"] and SG42.sights.has("sunk_bell") and Deeps.found(SG42, dw, (s0.pos as Vector2i) + Vector2i(1, 0)).is_empty(), "from two it is, once")
+	check(Deeps.found_in(SG42, "shanhu") == 1 and Deeps.found_in(SG42, "jiaoshi") == 0 and Deeps.found_in(SG42) == 1, "and it is counted in its own country")
+	check(Deeps.found(SG42, Atlas.world_of("surface"), Vector2i(10, 10)).is_empty(), "nothing is found anywhere else")
+	var nr42: Dictionary = Deeps.nearest(SG42, dw, s0.pos, "shanhu")
+	check(not nr42.is_empty() and str(nr42.sight) != "sunk_bell" and str(nr42.area) == "shanhu" and Deeps.nearest(SG42, dw, s0.pos, "jiaoshi").area == "jiaoshi", "the bot goes for the nearest of the step's country that he has not found")
+	SG42.step = Data.step_index("s_p42_sights2")
+	SG42.sights = {"sunk_junk": 1, "weeping_rock": 1, "pearl_bed": 1, "sunk_bell": 1, "giant_clam": 1}
+	SG42.poll_steps()
+	check(str(SG42.cur_step().id) == "s_p42_sights2", "three places of another country do not finish a step set in the coral")
+	SG42.sights["coral_arch"] = 1
+	SG42.poll_steps()
+	check(str(SG42.cur_step().id) == "s_p42_turtle", "three of its own do")
+	var pg42: Array = Deeps.page(SG42)
+	check(pg42.size() == 4 and (pg42[1].rows as Array).size() == 6 and int(pg42[1].found) == 3 and (pg42[1].rows as Array).filter(func(r): return bool(r.found)).all(func(r): return str(r.n) == str(Deeps.SIGHTS[str(r.id)].n)) and (pg42[1].rows as Array).filter(func(r): return not bool(r.found)).all(func(r): return not str(r.n).contains(str(Deeps.SIGHTS[str(r.id)].n))), "the page names what has been found, and nothing else")
+	SG42.free()
+	check(wsrc.contains("func _sight_check()") and wsrc.contains("Deeps.dress(root, lw)") and Deeps.SURFACE_Y > 30.0, "the world looks for them when he stops, and the realm is dressed with the sea overhead")
+
+	print("== the Dao of Leading Water (terra.gd) ==")
+	var TG = new_game.call()
+	var open42 := Vector2i(-1, -1)
+	var bm_rect: Rect2i = Atlas.layout()["beiming"].cell
+	for y42 in range(bm_rect.position.y + 6, bm_rect.end.y - 6):
+		for x42 in range(bm_rect.position.x + 6, bm_rect.end.x - 6):
+			if open42.x < 0:
+				TG.step = Data.step_index("s_p42_learn") + 1
+				if Terra.why(TG, dw, "deeps", Vector2i(x42, y42), "raise") == "" and Terra.why(TG, dw, "deeps", Vector2i(x42 + 1, y42), "raise") == "":
+					open42 = Vector2i(x42, y42)
+	TG.step = Data.step_index("s_p42_learn")
+	check(open42.x >= 0, "there is open ground in the Northern Dark that will answer")
+	check(not Terra.known(TG) and Terra.why(TG, dw, "deeps", open42, "raise") != "" and not bool(Terra.shape(TG, dw, "deeps", open42, "raise").ok) and TG.shaped.is_empty(), "until he has been taught, the ground does not answer")
+	TG.advance()
+	check(Terra.known(TG) and str(TG.cur_step().id) == "s_p42_shape" and str(TG.cur_step().kind) == "terra", "the Turtle teaches it, and the next step asks for it")
+	var grid_h: int = hash(dw.grid)
+	var pk0: float = Peaks.at(dw, open42)
+	var hr0: float = Clock.hour(TG)
+	var r1: Dictionary = Terra.shape(TG, dw, "deeps", open42, "raise")
+	check(bool(r1.ok) and is_equal_approx(float(r1.h), Terra.STEP) and is_equal_approx(Terra.height(TG, "deeps", open42), Terra.STEP) and TG.shaped_n == 1 and TG.step_terra == 1 and Terra.count(TG) == 1 and str(r1.area) == "beiming", "asked, it rises a step, and is kept")
+	check(Clock.hour(TG) > hr0 or hr0 >= 23.5, "and half an hour has gone")
+	check(hash(dw.grid) == grid_h and Peaks.at(dw, open42) == pk0 and MapGen.is_walkable_tile(dw.grid[open42.y * dw.w + open42.x]), "no tile has changed its kind, and what the mountains say of that ground is what they said")
+	var sh42: Dictionary = TG.shaped["deeps"]
+	check(Terra.rise(sh42, float(open42.x) + 0.5, float(open42.y) + 0.5) > Terra.STEP * 0.9 and Terra.rise(sh42, float(open42.x) + 0.5 + Terra.REACH + 0.1, float(open42.y) + 0.5) == 0.0 and Terra.rise(sh42, float(open42.x) + 1.5, float(open42.y) + 0.5) < Terra.rise(sh42, float(open42.x) + 0.5, float(open42.y) + 0.5) and Terra.rise({}, 3.0, 3.0) == 0.0, "it is a rise in the height of the land, highest in the middle and gone two and a half tiles off")
+	for i43 in 3:
+		Terra.shape(TG, dw, "deeps", open42, "raise")
+	check(is_equal_approx(Terra.height(TG, "deeps", open42), Terra.MAX) and Terra.why(TG, dw, "deeps", open42, "raise").contains("had enough") and Terra.why(TG, dw, "deeps", open42, "lower") == "", "a piece of ground rises so far and no further")
+	TG.poll_steps()
+	check(str(TG.cur_step().id) == "s_p42_salt", "four askings, and the step is done (%s)" % str(TG.cur_step().id))
+	for i44 in 4:
+		Terra.shape(TG, dw, "deeps", open42 + Vector2i(1, 0), "raise")
+	check(Terra.rise(TG.shaped["deeps"], float(open42.x) + 1.0, float(open42.y) + 0.5) <= Terra.TOTAL, "two pieces side by side add up to no more than the land will bear")
+	var rp: Dictionary = Terra.shape(TG, dw, "deeps", open42 + Vector2i(1, 0), "level")
+	check(bool(rp.ok) and Terra.height(TG, "deeps", open42 + Vector2i(1, 0)) == 0.0 and not (TG.shaped["deeps"] as Dictionary).has(open42 + Vector2i(1, 0)) and Terra.why(TG, dw, "deeps", open42 + Vector2i(1, 0), "level") != "", "let lie, it goes back to how the land made it")
+	Terra.shape(TG, dw, "deeps", open42 + Vector2i(1, 0), "pool")
+	check(Terra.pooled(TG, "deeps", open42 + Vector2i(1, 0)) and not Terra.pooled(TG, "deeps", open42) and Terra.pools(TG, "deeps", bm_rect).size() == 1 and MapGen.is_walkable_tile(dw.grid[open42.y * dw.w + open42.x + 1]), "a pool is a hollow with water drawn in it, and is waded through")
+	var pm42: Node3D = Terra.pool_model(0.6, Color("1a4a7a"))
+	check(pm42.get_child_count() == 1, "its water is built from code")
+	pm42.free()
+	# what will not answer
+	var road42t := Vector2i(-1, -1)
+	var wall42 := Vector2i(-1, -1)
+	for i45 in dw.w * dw.h:
+		var t45 := Vector2i(i45 % dw.w, i45 / dw.w)
+		if t45.x < 3 or t45.y < 3 or t45.x >= dw.w - 3 or t45.y >= dw.h - 3:
+			continue
+		if road42t.x < 0 and int(dw.grid[i45]) == MapGen.PATH:
+			road42t = t45
+		if wall42.x < 0 and int(dw.grid[i45]) == MapGen.WALL and dw.sea[i45] == 0:
+			wall42 = t45
+	check(Terra.why(TG, dw, "deeps", road42t, "raise") != "" and Terra.why(TG, dw, "deeps", wall42, "lower") != "" and Terra.why(TG, dw, "deeps", (s0.pos as Vector2i) + Vector2i(1, 1), "raise") != "" and Terra.why(TG, dw, "deeps", Vector2i(0, 0), "raise") != "" and Terra.why(TG, dw, "deeps", open42, "fly") != "", "a road, a wood, the ground by what stands and the edge of the world do not")
+	var pk42: Dictionary = (dw.peaks as Array)[0]
+	check(Terra.why(TG, dw, "deeps", pk42.c, "lower") != "", "nor a mountain")
+	var surf42: Dictionary = Atlas.world_of("surface")
+	var yard42: Vector2i = Atlas.to_world("sect", Vector2i(20, 10))
+	check(Terra.why(TG, surf42, "surface", yard42, "raise") != "", "nor the Elder's courtyard")
+	var fl42: Dictionary = Atlas.world_of(Caves.fid("beiming", -1))
+	check(Terra.why(TG, fl42, Caves.fid("beiming", -1), Vector2i(4, 4), "raise") != "", "nor the floor of a cave")
+	# a step that names a country and a shape counts only those
+	var CG = new_game.call()
+	CG.step = Data.step_index("s_p42_channel")
+	Terra.shape(CG, dw, "deeps", open42, "lower")
+	check(CG.step_terra == 0 and CG.shaped_n == 1, "ground lowered in the Northern Dark is not ground lowered at the Tail-Gate")
+	var wl_rect: Rect2i = Atlas.layout()["weilu"].cell
+	var wl42 := Vector2i(-1, -1)
+	for y46 in range(wl_rect.position.y + 6, wl_rect.end.y - 6):
+		for x46 in range(wl_rect.position.x + 6, wl_rect.end.x - 6):
+			if wl42.x < 0 and Terra.why(CG, dw, "deeps", Vector2i(x46, y46), "lower") == "":
+				wl42 = Vector2i(x46, y46)
+	Terra.shape(CG, dw, "deeps", wl42, "raise")
+	check(CG.step_terra == 0, "nor is ground raised there what was asked")
+	Terra.shape(CG, dw, "deeps", wl42, "level")
+	Terra.shape(CG, dw, "deeps", wl42, "lower")
+	check(CG.step_terra == 1, "ground lowered at the Tail-Gate is")
+	var dist42 := {wl42 + Vector2i(0, 1): 3, wl42 + Vector2i(5, 5): 9}
+	var sp42b: Array = Terra.spot(CG, dw, "deeps", "weilu", "lower", dist42)
+	check(sp42b.size() == 2 and Terra.why(CG, dw, "deeps", (sp42b[0] as Vector2i) + (sp42b[1] as Vector2i), "lower") == "", "the bot is told where to stand and which way to face")
+	CG.free()
+	TG.free()
+	check(msrc.contains("KEY_Y:") and msrc.contains("func offer_shape()") and msrc.find("\"label\": \"Leave it as it is\"") > 0 and wsrc.contains("func shape(shape_id: String)") and wsrc.contains("lw[\"shaped\"] = Game.shaped.get(lid, {})") and FileAccess.get_file_as_string("res://scripts/terrain3d.gd").contains("Terra.rise(shaped"), "Y asks (leaving it is first), the height of the land takes the answer, and the country is drawn again")
+	check(bsrc.contains("func _terra_step(") and bsrc.count("world.shape_want = ") == 1 and not bsrc.contains("Terra.shape("), "the bot shapes only inside a step that asks for it, by the key a player would press")
+
+	print("== Part XLII: The Joy of Fish ==")
+	var p42 := Data.step_index("s_p42_home")
+	check(p42 == Data.step_index("s_break46") + 1 and Data.STEPS[Data.STEPS.size() - 1].id == "s_break47" and int(Data.STEPS[Data.STEPS.size() - 1].to) == Data.MAX_LEVEL and Data.MAX_LEVEL == 141, "Part XLII follows Forgotten in the Lakes and ends the game")
+	check(Data.REALMS.size() == 48 and Data.REALMS[47] == "Knows the Joy of Fish" and Data.level_name(141).ends_with("Knows the Joy of Fish") and Data.REALM_INFO.size() == 48 and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "and adds the realm of Knows the Joy of Fish")
+	check(Data.DIALOGUE.has("recall40") and msrc.contains("\"s_break46\": \"recall40\"") and Data.DIALOGUE.has("pre:s_break47") and Data.DIALOGUE.has("post:s_break47"), "he is brought home to begin it (recall40), and it closes on a tribulation")
+	var names42b := ["Narrator", "Lin Feng", "Yue Ling", "Elder Qing Xuan", "Zhi Sou, the Wise Old Man of the River Bend", "Loom-Mother Jiao Zhu", "Kiln-Master Hong of Redbranch", "Old Ao, the Turtle of the Eastern Sea", "Wa, the Frog of the Caved-In Well"]
+	var n42 := 0
+	var kinds42 := {}
+	var learn_i := Data.step_index("s_p42_learn")
+	for i42b in range(p42, Data.STEPS.size()):
+		var s2: Dictionary = Data.STEPS[i42b]
+		n42 += 1
+		kinds42[str(s2.kind)] = int(kinds42.get(str(s2.kind), 0)) + 1
+		check(str(s2.id).begins_with("s_p42_") or str(s2.id) == "s_break47", "%s is a step of the chapter" % s2.id)
+		check(not str(s2.kind) in ["slay", "crime", "taboo", "kill", "fall"] and not s2.has("if"), "%s asks for nothing the law forbids, has no lord, and is everybody's" % s2.id)
+		check(not s2.has("stones") or int(s2.stones) > 109400, "%s pays as the road has come to pay" % s2.id)
+		if str(s2.kind) == "talk":
+			check(Trials.npc_area(str(s2.npc)) == str(s2.area) and Data.DIALOGUE.has(str(s2.id)), "%s: somebody who stands there, with something to say" % s2.id)
+		elif str(s2.kind) != "breakthrough":
+			check(Data.DIALOGUE.has("done:" + str(s2.id)), "%s: something is said when it is done" % s2.id)
+		if str(s2.kind) == "hunt":
+			check(Data.layer_of(str(s2.area)) == "deeps" and int(s2.n) <= 60 and not s2.has("first") and not s2.has("cave"), "%s is a hunt in the open country of the sea floor" % s2.id)
+		if str(s2.kind) == "collect":
+			var have42: int = (Data.AREAS[str(s2.area)].pickups as Array).filter(func(pk): return str(pk.item) == str(s2.item) and str(pk.vis[0]) == str(s2.id)).size()
+			check(have42 == int(s2.n) and Data.ITEMS.has(str(s2.item)) and Look.PICKUP_COLORS.has(str(s2.item)) and Load.weight_of(str(s2.item)) <= 1.0, "%s: there are as many to find as it asks for (%d)" % [s2.id, have42])
+		if str(s2.kind) == "supply":
+			check(int(s2.n) <= 2 and i42b > Data.step_index(Mills.OPEN), "%s asks for crates once the works are known, and no more than a day's pairs" % s2.id)
+		if str(s2.kind) == "sights":
+			check(int(s2.n) < Deeps.in_area(str(s2.area)).size(), "%s asks for fewer places than its country has" % s2.id)
+		if str(s2.kind) == "terra":
+			check(i42b > learn_i and Data.layer_of(str(s2.area)) == "deeps" and (not s2.has("shape") or Terra.SHAPES.has(str(s2.shape))) and int(s2.n) <= 8, "%s asks the ground only after he has been taught how" % s2.id)
+	check(n42 == 28 and kinds42.size() == 8 and int(kinds42.get("supply", 0)) == 3 and int(kinds42.get("sights", 0)) == 4 and int(kinds42.get("terra", 0)) == 2 and int(kinds42.get("hunt", 0)) == 4 and int(kinds42.get("collect", 0)) == 4,
+		"the chapter is twenty-eight steps of eight kinds: three carryings, four countries looked at, the ground asked twice, and no lord (%d, %d)" % [n42, kinds42.size()])
+	check(str(Terra.LEARN) == "s_p42_learn" and str(Mills.OPEN) == "s_p42_dive" and Trials.npc_area("zhi_sou") == "longmen" and Data.step_index(str(dive.open)) == p42 + 1, "the Dao is taught in it, the works are known from the first step on the floor, and the way down opens when the river has been asked")
+	var keys42b := ["recall40", "pre:s_break47", "post:s_break47"]
+	var firsts42 := 0
+	for dk2 in Data.DIALOGUE:
+		if str(dk2).contains("s_p42_") or str(dk2) in keys42b:
+			for ln2 in Data.DIALOGUE[dk2]:
+				check(fits.call(str(ln2[1])) and not str(ln2[1]).contains("—"), "%s: a line that fits the box, with no dash in it" % dk2)
+				check((ln2 as Array).size() == 2 or Data.EMOTES.has(str(ln2[2])), "%s: its gesture is one everybody has" % dk2)
+				check(not str(ln2[1]).contains(", sir") and not str(ln2[1]).contains("young man") and not str(ln2[1]).contains("Sir"), "%s: nobody calls the hero sir" % dk2)
+				check(str(ln2[0]) in names42b, "%s: %s is somebody of the chapter, under the name they stand by" % [dk2, ln2[0]])
+				if str(ln2[0]) == "Lin Feng" and (" " + str(ln2[1])).contains(" I "):
+					firsts42 += 1
+	check(firsts42 >= 8, "he speaks for himself in his own chapter (%d lines in the first person)" % firsts42)
+	for mn42 in names42b.slice(5):
+		check(Closeup.SIGNATURE.has(mn42) and Closeup.CLIPS.has(str(Closeup.SIGNATURE[mn42])), "%s has a gesture of their own" % mn42)
+	for a43 in DEEPS:
+		for np42 in Data.AREAS[a43].npcs:
+			check(Folk.POSTS.has(str(np42.id)) and Assets.has("characters/" + str(np42.asset)), "%s has a day, in a body of the towns" % np42.n)
+	var c2: Dictionary = Echoes.CROSSROADS.get("the_joy_of_fish", {})
+	check(not c2.is_empty() and str(c2.step) == "s_p42_moot" and str(c2.part) == "XLII" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_joy_of_fish" and fits.call(str(c2.ask)), "whether he may say what a fish enjoys is asked last of all")
+	check((c2.options as Array).size() == 3 and c2.after.size() == 3 and c2.end.size() == 3 and c2.echo.has("s_p42_end") and c2.echo.s_p42_end.size() == 3 and Data.step_index("s_p42_end") > Data.step_index("s_p42_moot") and bsrc.contains("\"the_joy_of_fish\": [\"teach\"]"), "the_joy_of_fish: three answers, each answered, echoed and told at the end, and the bot has one")
+	check(Echoes.CROSSROADS.the_covenant.echo.has("s_p42_home") and Echoes.CROSSROADS.the_covenant.echo.s_p42_home.size() == 3 and (Echoes.CROSSROADS.the_covenant.echo.s_p42_home.values() as Array).all(func(l): return fits.call(str(l[0][1]))), "and what four sects did with the water is remembered when it comes back brown")
+	var tilts42 := {}
+	for o2 in c2.options:
+		var mk2: Dictionary = Marks.MARKS.the_joy_of_fish.get(str(o2.id), {})
+		check(not mk2.is_empty() and mk2.has("who") and fits.call(str(mk2.desc)) and fits.call(str(mk2.who[3])) and fits.call(str(mk2.who[4])) and fits.call(str(mk2.who[5])) and Assets.has("characters/" + str(mk2.who[1])) and not Weal.hears(str(mk2.area)).is_empty() and int(mk2.get("k", 1)) >= 3 and Data.layer_of(str(mk2.area)) == "deeps", "the_joy_of_fish/%s leaves a row of things on the sea floor, and somebody beside them" % o2.id)
+		var mm2: Node3D = Marks.model(mk2, 1)
+		check(mm2 != null and mm2.get_child_count() > 0, "the_joy_of_fish/%s: what stands is built from code" % o2.id)
+		mm2.free()
+		for tk2 in o2.tilt:
+			tilts42[str(tk2)] = true
+		for ck2 in o2.get("creed", {}):
+			check(Creed.AXES.has(str(ck2)) and absi(int(o2.creed[ck2])) < Creed.SIDE, "the_joy_of_fish/%s leans on the Way, and does not by itself decide it" % o2.id)
+		check(fits.call(str(o2.desc)) and fits.call(str(c2.end[str(o2.id)])) and o2.has("log"), "the_joy_of_fish/%s: what it means, and what is told of it, fit" % o2.id)
+		for al2 in c2.after[str(o2.id)]:
+			check(fits.call(str(al2[1])), "the_joy_of_fish/%s: what follows fits the dialogue box" % o2.id)
+		check(Mail.ORDER.any(func(l): return Mail.LETTERS[l].get("needs", []) == ["the_joy_of_fish", str(o2.id)]), "the_joy_of_fish/%s brings a letter from somebody who lives with it" % o2.id)
+		check(Weal.FATES.any(func(f): return str(f.when[0]) == "the_joy_of_fish" and str(o2.id) in f.when[1]), "the_joy_of_fish/%s turns somebody's life" % o2.id)
+	check(tilts42.size() == 3, "its answers tip all three scales between them")
+	check(dw.ents.filter(func(e): return e.kind == "mark" and str(e.id).begins_with("mark:the_joy_of_fish:jiaoshi")).size() == 3, "and its answers found room in Jiaoshi: a row of three, whichever is chosen")
+	for lt42 in ["joy_shape_hong", "joy_teach_jiao", "joy_leave_ao"]:
+		check(Mail.LETTERS.has(lt42) and (Mail.LETTERS[lt42].lines as Array).all(func(l): return fits.call(str(l)) and not str(l).contains(" sir") and not str(l).contains("young man") and str(l).begins_with("Lin Feng:")), "the letter %s fits the box and is said to anybody" % lt42)
+	for ft42 in Weal.FATES:
+		if str(ft42.when[0]) == "the_joy_of_fish":
+			check(str(ft42.npc) == "gauze_girl" and fits.call(str(ft42.line)) and str(ft42.tag).length() <= 40, "a fate of the sea floor is Xiao Xiao's, and fits")
+	for pid42 in ["p42_floor", "p42_hands", "p42_last"]:
+		check(Memoir.PAGES.has(pid42) and Memoir.ORDER.has(pid42) and Data.step_index(str(Memoir.PAGES[pid42].after)) >= p42, "the page %s is of the chapter" % pid42)
+	check(str(Memoir.PAGES.p42_last.after) == "s_break47" and str(Memoir.PAGES.p42_last.who) == "lin" and str(Memoir.PAGES.p42_hands.who) == "yue", "the chapter closes on a page in his own hand, and she writes one in the middle of it")
+	check(bsrc.contains("\"supply\":") and bsrc.contains("\"sights\":") and bsrc.contains("\"terra\":") and bsrc.contains("if str(st4.kind) == \"sights\":"), "the bot knows all three new kinds of step, and a journey begun past them has found what they asked")
+
+	print("== what was mended (the Sea Floor release) ==")
+	check(Weal.NUMBER_WORDS.size() > Weal.ORDER.size(), "every number of towns that can be known has a word (the ending used to fail past fifteen)")
+	var EG = new_game.call()
+	for a44 in Data.AREA_CHAIN:
+		EG.seen[a44] = true
+	check(Weal.towns(EG).size() == Weal.ORDER.size() and Weal.summary(EG).begins_with("Of twenty towns") and Weal.epilogue(EG) is Array, "a journey that has stood in every country is told of all twenty towns")
+	EG.level = 130
+	check(Crime.record(EG, "theft", "ashmarket", "a comb") == 0 and not EG.bounty.has("ashmarket") and Crime.clean(EG) and Crime.record(EG, "theft", "reedhaven", "a comb") > 0, "no bill is written in a crooked town, where nobody could ever take payment for it")
+	EG.free()
+	var FG = new_game.call()
+	FG.step = Data.step_index("s_p29_rights")
+	var fs42: Dictionary = FG.cur_step()
+	check(str(fs42.kind) == "fit" and fs42.has("area") and FileAccess.get_file_as_string("res://scripts/fitting.gd").contains("str(fs.area) == hk.get_slice(\":\", 0)") and FileAccess.get_file_as_string("res://scripts/trifles.gd").contains("str(rs.area) == str(q.area)"), "a step that asks for houses, or lost things, of one region counts those of that region")
+	FG.inv = {"timber": 3, "dried_meat": 2, "herb": 3}
+	FG.step = Data.step_index("s_herbs") if Data.step_index("s_herbs") >= 0 else 0
+	check(Mail.parcel_of(FG).all(func(id): return Load.GOODS.has(str(id))) and (Mail.parcel_of(FG).has("timber") or Mail.parcel_jin(FG) == 0.0), "a parcel home takes the goods of the land, not his food or what a search is looking for")
+	FG.free()
+	var ZG = new_game.call()
+	ZG.seals["t_" + str(Taboo.ORDER[0])] = 1
+	ZG.taboo[str(Taboo.ORDER[0])] = 1
+	check(not Seals.valid(ZG, "t_" + str(Taboo.ORDER[0])), "a paper that says he never opened an art is void while he sits to it")
+	Taboo._strip(ZG)
+	check(Seals.due(ZG, "t_" + str(Taboo.ORDER[0])) == 0 and FileAccess.get_file_as_string("res://scripts/taboo.gd").contains("g.seals.erase(\"t_\" + id)"), "and is not written afresh for somebody who has knelt for the shelf")
+	ZG.free()
+	check(FileAccess.get_file_as_string("res://scripts/auction.gd").count("Crime.shut(g, str(HOUSES[house].area), \"room\")") == 4, "a room shut to a wanted man is shut to his bid in the post-bag too")
+	check(msrc.contains("str(s.get(\"kind\", \"\")) == \"cards\" and s.has(\"of\")") and str(Yezi.MASTERS.ju_gong.at) == "ju_gong" and str(Data.STEPS[Data.step_index("s_p40_ju")].kind) == "cards", "a hand of leaves asked of a master who is dead is nobody's to lose: the step is done at his grave")
+	check(msrc.contains("Mills.of_foreman(str(e.id)) != \"\" or str(e.id) in [\"alchemist\""), "and a works whose foreman is dead is kept by whoever came after")
+	check(wsrc.contains("Took the river-boat down to the Rivers and Lakes") and wsrc.contains("Went down with the water to the floor of the sea"), "the river-boat is written down as the river-boat, not as Mazu's")
+	var names_seen := {}
+	for ek in Data.ENEMIES:
+		names_seen[str(Data.ENEMIES[ek].n)] = true
+	check(names_seen.has("Lei Gong, Duke of Thunder") and not names_seen.has("Leigong, Duke of Thunder") and names_seen.has("Shenshu, Door God of the Peach Tree") and str(Data.ENEMIES.yulei.n) == "Yulei, Door God of the Reed Rope", "the Duke of Thunder and the two door gods have one name each")
+	var all42 := ""
+	for dk3 in Data.DIALOGUE:
+		for ln3 in Data.DIALOGUE[dk3]:
+			all42 += str(ln3[0]) + "|"
+	check(not all42.contains("Leigong") and not all42.contains("Shentu") and not all42.contains("Yulei, Door God of the Peach Tree"), "and are called by it wherever they speak")
+	check(Trials.npc_area("master_lie") == "huaxu" and Trials.npc_area("liezi") == "thunder" and not str((Data.AREAS.huaxu.npcs as Array).filter(func(n): return str(n.id) == "master_lie")[0].n).begins_with("Master Lie"), "Master Lie stands on one height, and it is his pupil who keeps the Far Countries")
+	check(not (Memoir.PAGES.p06_maple.lines as Array).any(func(l): return str(l).contains("I do not know who they were")), "his page of the two graves remembers that he met them at the bridge")

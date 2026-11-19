@@ -43,7 +43,7 @@ const WOMEN := ["Boundary-Keeper Ning", "Kitchen-Sister Ning", "Bell-Warden Ning
 ## men the story names who stand in no region's list of people (fathers, gods, the dead)
 const MEN := ["Lin Shan", "Elder", "Qiu Ye", "Fang Hu", "Iron Fang", "Chiyou", "Yu", "Gun", "Kang", "Geng", "Wang", "Zao Jun", "Hundun", "Xu Fu", "Emperor", "King", "Lord", "Duke", "Patriarch",
 	"General", "Marshal", "Judge", "Yama", "Taisui", "Gou Mang", "Lei Gong", "Uncle", "Grandpa", "Father", "Zhurong", "Huilu", "Suiren", "Batu", "Nie", "Shitou", "Temur", "Xuan Wu", "Xiu", "Feilian",
-	"Shentu", "Yulei", "Yinglong", "Niu Lang", "Tiger", "He Bo", "Yu Qiang", "Li", "Saint", "Giant", "Admiral", "Dan", "Navid", "Pei", "Mo", "Tie"]
+	"Shenshu", "Yulei", "Yinglong", "Niu Lang", "Tiger", "He Bo", "Yu Qiang", "Li", "Saint", "Giant", "Admiral", "Dan", "Navid", "Pei", "Mo", "Tie"]
 ## words that begin a new clause (the one spoken of carries over, but its subject is still to come)
 const JOINS := ["and", "but", "so", "then", "or", "yet"]
 ## words that begin a clause inside another ("He is gone before Lin Feng can answer, and the flowers

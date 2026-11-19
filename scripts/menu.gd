@@ -28,10 +28,10 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Root & Rites", "In Their Own Words", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "The Land", "The Way", "The Law", "The Wild", "The Almanac", "Bestiary", "World Map", "Annals", "Seals & Lists", "Leaves", "The Sects", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "rites", "words", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "land", "way", "law", "wild", "almanac", "bestiary", "map", "annals", "seals", "leaves", "sects", "resume"]
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Root & Rites", "In Their Own Words", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "The Land", "The Way", "The Law", "The Wild", "The Almanac", "Bestiary", "World Map", "Annals", "Seals & Lists", "Leaves", "The Sects", "The Sea Floor", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "rites", "words", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "land", "way", "law", "wild", "almanac", "bestiary", "map", "annals", "seals", "leaves", "sects", "deeps", "resume"]
 		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, true, true, Game.companion or Game.bond > 0,
-			Game.dao != "" or not Game.met.is_empty(), Game.prologue == "", not Game.pages.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, Game.done(Seals.OPEN), Game.prologue == "", Game.prologue == "", true]
+			Game.dao != "" or not Game.met.is_empty(), Game.prologue == "", not Game.pages.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, Game.done(Seals.OPEN), Game.prologue == "", Game.prologue == "", Game.prologue == "", true]
 	elif mode == "bestiary":
 		labels = []
 		ids = []
@@ -67,7 +67,7 @@ func _build() -> void:
 		labels.append("Back")
 		ids.append("back")
 		enabled.append(true)
-	elif mode == "way" or mode == "almanac" or mode == "wild" or mode == "seals" or mode == "sects":
+	elif mode == "way" or mode == "almanac" or mode == "wild" or mode == "seals" or mode == "sects" or mode == "deeps":
 		# creed.gd, almanac.gd, wilds.gd: a page to read
 		labels = ["Back"]
 		ids = ["back"]
@@ -249,6 +249,12 @@ func _build() -> void:
 			labels.append("%s x%d" % [Data.ITEMS[iid].n, Game.inv.get(iid, 0)])
 			ids.append(iid)
 			enabled.append(Game.inv.get(iid, 0) > 0)
+		# (the Sea Floor release, mills.gd: what he has that the works of the sea floor made, and can be used)
+		for mid in Mills.USES:
+			if int(Game.inv.get(mid, 0)) > 0:
+				labels.append("%s x%d" % [Data.ITEMS[mid].n, Game.inv.get(mid, 0)])
+				ids.append(mid)
+				enabled.append(true)
 		labels.append("Back")
 		ids.append("back")
 		enabled.append(true)
@@ -267,7 +273,7 @@ func press(act: String) -> void:
 				var k := ls.find(map_layer)
 				map_layer = ls[(k + (1 if act == "right" else -1) + ls.size()) % ls.size()]
 		"cancel":
-			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words", "seals", "leaves", "sects"]:
+			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words", "seals", "leaves", "sects", "deeps"]:
 				mode = "root"
 				cursor = 0
 				_build()
@@ -361,7 +367,7 @@ func press(act: String) -> void:
 				"forbidden":
 					main.pop()
 					main.open_forbidden()
-				"works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words", "seals", "leaves", "sects":
+				"works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words", "seals", "leaves", "sects", "deeps":
 					mode = id
 					cursor = 0
 					msg = ""
@@ -751,6 +757,40 @@ func _draw_rites() -> void:
 			UI.text(self, Vector2(r.position.x + 660, y), "performed%s" % ("" if times == 1 else " %d times" % times), 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, 120.0)
 
 ## The Wild (wilds.gd): how the countries he has hunted in stand, and what that is doing to the towns.
+## The Sea Floor (the Sea Floor release: deeps.gd, mills.gd, terra.gd): the places of the floor of the Eastern
+## Sea he has found, country by country; the six works, what each makes and of what, and what is in its store
+## this hour; the crates in his hands; and what he has asked of the ground.
+func _draw_deeps() -> void:
+	UI.text(self, Vector2(60, 70), "The Sea Floor", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 16)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	UI.text(self, r.position + Vector2(24, 36), "The floor of the Eastern Sea: %d of %d places found" % [Game.sights.size(), Deeps.ORDER.size()], 19, UI.C_GOLD)
+	var y := r.position.y + 50.0
+	var col_w := (r.size.x - 48.0) / 4.0
+	var k := 0
+	for pg in Deeps.page(Game):
+		var x := r.position.x + 24.0 + col_w * float(k)
+		UI.text(self, Vector2(x, y + 16), str(Data.AREAS[str(pg.area)].n).get_slice(",", 0) if bool(pg.seen) else "A country not yet stood in", 14, UI.C_JADE if bool(pg.seen) else UI.C_DIM)
+		var yy := y + 36.0
+		for row in pg.rows:
+			UI.wrapped(self, Vector2(x, yy), main.told(str(row.n)), 11, UI.C_TEXT if bool(row.found) else UI.C_DIM.darkened(0.2), col_w - 12.0)
+			yy += 34.0
+		k += 1
+	y += 250.0
+	UI.text(self, Vector2(r.position.x + 24, y), "The works, and what is in their stores this hour (%s)" % ("the shift is on" if Mills.running(Clock.hour(Game)) else "the shift is over"), 16, UI.C_GOLD)
+	y += 8.0
+	for wp in Mills.page(Game):
+		var known: bool = wp.known
+		draw_rect(Rect2(r.position.x + 24, y + 4, 6, 26), wp.col if known else UI.C_DIM.darkened(0.3))
+		UI.text(self, Vector2(r.position.x + 40, y + 18), str(wp.n) if known else "A works not yet seen", 13, wp.col if known else UI.C_DIM)
+		if known:
+			UI.text(self, Vector2(r.position.x + 330, y + 18), "%s: %d of %d" % [str(wp.makes), int(wp.stock), int(wp.cap)], 12, UI.C_TEXT)
+			UI.text(self, Vector2(r.position.x + 40, y + 32), "of %s%s" % [str(wp.raw), ("; wants what " + " and ".join(wp.from) + " make" + ("s" if (wp.from as Array).size() == 1 else "")) if not (wp.from as Array).is_empty() else ""], 11, UI.C_DIM.lightened(0.2), HORIZONTAL_ALIGNMENT_LEFT, 740)
+		y += 36.0
+	var hands := "No crate in his hands." if Game.mill_crates.is_empty() else "In his hands: " + ", ".join(Game.mill_crates.map(func(c): return "a crate for %s" % str(Mills.WORKS[str(c.to)].short))) + "."
+	UI.wrapped(self, Vector2(r.position.x + 24, y + 14), main.told("%s %d crates carried in all (%d spirit stones). %s" % [hands, Game.crates_done, Game.mill_paid, Terra.text(Game)]), 12, UI.C_TEXT, r.size.x - 48)
+
 ## The Sects (the Rivers and Lakes release, sects.gd, sides.gd): his own and the four down the river: what each
 ## is called, which side its town is on, how he stands with it, its three sayings and its way, and how much of
 ## what hangs on its wall he has done; and, under them, how the roads stand (raids.gd, traffic.gd).
@@ -1303,6 +1343,7 @@ const MAP_NAMES := {
 	"penglai": "Penglai", "fangzhang": "Fangzhang", "yingzhou": "Yingzhou", "guixu": "Guixu",
 	"huaxu": "Huaxu", "zhongbei": "Zhongbei", "gumang": "Gumang", "fuluo": "Fuluo",
 	"yunmeng": "Yunmeng", "hanshan": "Cold Mountain", "heishui": "Black Water", "langya": "Wolf-Tooth Pass",
+	"jiaoshi": "Weaving-Rooms", "shanhu": "Coral Forest", "beiming": "Northern Dark", "weilu": "Tail-Gate",
 }
 
 ## The whole open world, the Unbroken Land within the Four Seas: every region in its own colours and
@@ -1751,6 +1792,9 @@ func _draw() -> void:
 		return
 	if mode == "sects":
 		_draw_sects()
+		return
+	if mode == "deeps":
+		_draw_deeps()
 		return
 	if mode == "rites":
 		_draw_rites()

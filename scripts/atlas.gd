@@ -85,11 +85,18 @@ const STRATA := {
 	# boat puts in; Cold Mountain; the Black Water; and the Wolf-Tooth Pass in the east
 	"lakes": {"n": "The Rivers and Lakes", "w": 520, "h": 200, "y": 0.0, "land": 1.24, "holes": 178, "start": ["yunmeng", Vector2i(13, 32)], "at": Vector2i(300, 1300),
 		"sites": {"yunmeng": [80, 100, 0], "hanshan": [196, 82, 0], "heishui": [312, 114, 0], "langya": [430, 96, 0]}},
+	# the Sea Floor release: the floor of the Eastern Sea, down the drain of the Returning Ruins (Data.LADDERS
+	# "sea_dive": its end among the isles is stood last of all, so nothing of Guixu moves).  The weaving-rooms of
+	# the Jiaoren in the west, where the water sets him down; the coral forest; the Northern Dark; and the
+	# Tail-Gate in the east, where the sea drains and is never less.  It lies far under the isles (world.gd
+	# dresses it with the sea overhead: deeps.gd)
+	"deeps": {"n": "The Floor of the Eastern Sea", "w": 520, "h": 200, "y": 0.0, "land": 1.24, "holes": 181, "start": ["jiaoshi", Vector2i(13, 32)], "at": Vector2i(2600, 1500),
+		"sites": {"jiaoshi": [80, 98, 0], "shanhu": [196, 112, 0], "beiming": [312, 84, 0], "weilu": [430, 100, 0]}},
 }
-const LAYER_NAMES := {"surface": "The Unbroken Land", "heaven": "The Nine Heavens", "under": "The Nine Springs", "sea": "The Eastern Sea", "far": "The Far Countries", "lakes": "The Rivers and Lakes"}
+const LAYER_NAMES := {"surface": "The Unbroken Land", "heaven": "The Nine Heavens", "under": "The Nine Springs", "sea": "The Eastern Sea", "far": "The Far Countries", "lakes": "The Rivers and Lakes", "deeps": "The Floor of the Eastern Sea"}
 ## every realm, in the order they were found (the bot and the story keep to the first four: nothing of
 ## the story is asked for in the Far Countries; Part XLI is set in the sixth, the Rivers and Lakes)
-const LAYERS := ["surface", "heaven", "under", "sea", "far", "lakes"]
+const LAYERS := ["surface", "heaven", "under", "sea", "far", "lakes", "deeps"]
 
 static var _layout := {}
 static var _world := {}

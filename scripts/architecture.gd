@@ -87,12 +87,20 @@ const DRESS := {
 	"ash": {"wall": "4a4248", "roof": "1a161c", "roof2": "121014", "column": "6a1e1e", "beam": "2a2228", "trim": "a83a30", "lanterns": true, "glow": Color(1.0, 0.25, 0.15, 0.5), "k": 0.85},
 	# Knifegate of the Wolf Banner, crooked: raw ochre stone under flat roofs, iron-dark posts, a chimney for every hearth
 	"fang": {"wall": "a88a5a", "roof": "5a4a38", "roof2": "443828", "column": "2e2a28", "beam": "4a3a2a", "trim": "c84a2a", "kind": "flat", "chimney": true, "k": 0.85},
+	# the Sea Floor release: the three towns under the sea.  Shuttlereef of the Jiaoren: shell-white walls under
+	# roofs of black coral, sea-green posts, windows lit like the inside of a pearl
+	"shell": {"wall": "e8e4d8", "roof": "2a3440", "roof2": "1e2630", "column": "3a9a8a", "beam": "4a7a84", "trim": "f0d8e0", "lanterns": true, "glow": Color(0.7, 0.95, 1.0, 0.45), "k": 0.8},
+	# Redbranch of the kilns: lime-washed walls, roofs the red of old coral, a chimney for every fire
+	"coral": {"wall": "f0e8dc", "roof": "b84a3a", "roof2": "8e3428", "column": "c86a4a", "beam": "8a4a3a", "trim": "f8d8b0", "chimney": true, "k": 0.8},
+	# Lampdeep in the Northern Dark: slate walls, flat roofs, and a lit float at every door
+	"lamp": {"wall": "4a5468", "roof": "1e2434", "roof2": "161a28", "column": "2a3a5a", "beam": "343e56", "trim": "c8d870", "kind": "flat", "lanterns": true, "glow": Color(0.8, 1.0, 0.5, 0.6), "k": 0.85},
 }
 ## which country builds which way
 const DRESS_OF := {"dunes": "sand", "longmen": "river", "karst": "river", "tushan": "forge", "volcano": "forge", "yanggu": "dawn", "fusang": "dawn",
 	"juntian": "sky", "changhe": "sky", "ninesprings": "pearl", "youdu": "shade", "penglai": "sea", "fangzhang": "sea", "yingzhou": "sea", "guixu": "sea",
 	"huaxu": "cloud", "zhongbei": "spring", "gumang": "dusk", "fuluo": "noon",
-	"yunmeng": "reed", "hanshan": "hermit", "heishui": "ash", "langya": "fang"}
+	"yunmeng": "reed", "hanshan": "hermit", "heishui": "ash", "langya": "fang",
+	"jiaoshi": "shell", "shanhu": "coral", "beiming": "lamp", "weilu": "lamp"}
 ## styles that keep their own roof whatever country they stand in
 const OWN_ROOF := ["shrine", "hall", "hermitage", "aerie", "bathhouse"]
 ## what a window is lit with (set by `house` for the building being built)
@@ -1077,6 +1085,7 @@ const SETTLE := {
 	"penglai": ["stilt", "house", "pavilion"], "fangzhang": ["pavilion", "shrine", "house"], "yingzhou": ["shrine", "ruin"], "guixu": ["ruin", "ruin"],
 	"huaxu": ["pavilion", "house", "tower"], "zhongbei": ["house", "pavilion", "shrine"], "gumang": ["house", "ruin"], "fuluo": ["tower", "ruin"],
 	"yunmeng": ["stilt", "stilt", "shrine"], "hanshan": ["shrine", "pavilion", "house"], "heishui": ["ruin", "house", "tower"], "langya": ["tower", "ruin", "house"],
+	"jiaoshi": ["ruin", "shrine", "house"], "shanhu": ["ruin", "pavilion"], "beiming": ["ruin", "tower"], "weilu": ["ruin", "ruin"],
 }
 static var _mesh_cache := {}
 

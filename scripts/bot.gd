@@ -164,8 +164,9 @@ const PICK_PLAN := {"qilin": "ride"}
 ## studied, the drawings kept, the axe given, the wheel given hours) and the wide world (the palace
 ## opened, the sea-roads, the names to the wind, the map copied); and for the last question the
 ## wheel's answer, as a builder of engines, if it has built three of them.
-## the realms the story is set in (the Rivers and Lakes release added the sixth; nothing of the story lies in the fifth)
-const REALMS_WALKED := ["surface", "heaven", "under", "sea", "lakes"]
+## the realms the story is set in (the Rivers and Lakes release added the sixth, the Sea Floor release the
+## seventh; nothing of the story lies in the fifth)
+const REALMS_WALKED := ["surface", "heaven", "under", "sea", "lakes", "deeps"]
 const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatch"], "palace": ["open"], "dragon_boon": ["sea"], "drawings": ["keep"], "nineteen": ["wind"],
 	"ancestor": ["strike"], "widow": ["truth"], "crows": ["pardon"], "axe": ["give"], "cauldron_map": ["copy"], "furnace": ["return"],
 	"the_wheel": ["hours"], "the_player": ["keep"], "the_works": ["wheel", "hand", "dao", "ask"],
@@ -202,7 +203,9 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	"the_needle": ["turn"],
 	"the_belts": ["wait"], "the_stone": ["keep"], "the_ladle": ["teach"], "the_round": ["watch"], "the_higher_sky": ["ditch"],
 	# Part XXXIX: the desk is carried down to the Cloud Gate
-	"the_red_seal": ["open"], "the_two_roads": ["ask"], "the_covenant": ["dig"]}
+	"the_red_seal": ["open"], "the_two_roads": ["ask"], "the_covenant": ["dig"],
+	# Part XLII: the clod and the Dao are given to the Loom-Mother
+	"the_joy_of_fish": ["teach"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -440,6 +443,10 @@ func _apply_start() -> void:
 		if str(st4.kind) == "jobs":
 			for jid in ["job_tally", "job_mill"]:
 				Game.jobs[jid] = "done"
+		# (Part XLII, deeps.gd: the places of the sea floor a step behind him had him find)
+		if str(st4.kind) == "sights":
+			for sg4 in Deeps.in_area(str(st4.area)).slice(0, int(st4.n)):
+				Game.sights[sg4] = 0
 		# (Part XLI, sects.gd: the tasks a sect had of him by then)
 		if str(st4.kind) == "sect":
 			for stt in Sects.tasks_of(str(st4.sect)).slice(0, int(st4.n)):
@@ -1010,6 +1017,15 @@ func _world(d: float) -> void:
 		"rescue":
 			# Part XLI (raids.gd): the nearest raid on a road or a camp that still stands, fought as anything is
 			_rescue_step(s)
+		"supply":
+			# Part XLII (mills.gd): a crate from a works that has one to a works that wants it
+			_supply_step(s)
+		"sights":
+			# Part XLII (deeps.gd): the nearest place of the sea floor in the step's country not yet found
+			_sights_step(s)
+		"terra":
+			# Part XLII (terra.gd): open ground of the step's country that will take the shape, and Y
+			_terra_step(s)
 		"sect":
 			# Part XLI (sects.gd): the tasks of a sect of the Rivers and Lakes, taken in order at its hall and done
 			# as a hunt or a rescue is done (the choice takes and reports, _choice)
@@ -1097,6 +1113,72 @@ func _rescue_step(s: Dictionary) -> void:
 		_start_meditate("respawn")
 		return
 	_walk_to(r.tile, "raid:" + str(r.key))
+
+## Part XLII (mills.gd): to the foreman of the works a crate in his hands is for; with empty hands, to one
+## that has a crate to be carried; with every pair of works served today, he waits for the morning.
+func _supply_step(_s: Dictionary) -> void:
+	var er: Dictionary = Mills.errand(Game)
+	if er.is_empty():
+		_start_meditate("respawn")
+		return
+	var wid := str(er.get("to", er.get("from", "")))
+	_goto_entity(str(Mills.WORKS[wid].area), str(Mills.WORKS[wid].foreman))
+
+## Part XLII (deeps.gd): to the nearest place of the sea floor in the step's country that he has not found
+## (it is found from two tiles off; he walks on up to it and reads it).
+func _sights_step(s: Dictionary) -> void:
+	var area := str(s.area)
+	if world.layer != Data.layer_of(area):
+		_travel(area)
+		return
+	var e: Dictionary = Deeps.nearest(Game, world.wd, world.ptile, area)
+	if e.is_empty():
+		return
+	if Game.area != area and Atlas.owner_id(world.wd, world.ptile) != area:
+		_travel(area)
+		return
+	_walk_to(e.pos, "sight:" + str(e.sight))
+
+## Part XLII (terra.gd): a piece of open ground of the step's country that will take the step's shape (any
+## step that names none: raised), stood beside and faced, and Y.
+var terra_at := Vector2i(-1, -1)
+var terra_dir := Vector2i.ZERO
+var terra_key := ""
+func _terra_step(s: Dictionary) -> void:
+	var area := str(s.area)
+	var shape := str(s.get("shape", "raise"))
+	if world.layer != Data.layer_of(area) or (Game.area != area and terra_key != shape + area):
+		terra_key = ""
+		_travel(area)
+		return
+	if world.move_t < 0.0 and Atlas.owner_id(world.wd, world.ptile + world.facing) == area and Terra.why(Game, world.wd, world.layer, world.ptile + world.facing, shape) == "":
+		world.move_dir = Vector2i.ZERO
+		world.shape_want = shape
+		_press("shape", 0.6)
+		return
+	var here0: Vector2i = world.target if world.move_t >= 0.0 else world.ptile
+	if terra_key != shape + area or terra_at.x < 0 or Terra.why(Game, world.wd, world.layer, terra_at + terra_dir, shape) != "":
+		terra_key = shape + area
+		terra_at = Vector2i(-1, -1)
+		var free := {}
+		var dist := _bfs_dist(here0, 160)
+		for tl in dist:
+			if tl == here0 or world.ent_at(tl) == null:
+				free[tl] = dist[tl]
+		var sp: Array = Terra.spot(Game, world.wd, world.layer, area, shape, free)
+		if sp.is_empty():
+			terra_key = ""
+			_travel(area)
+			return
+		terra_at = sp[0]
+		terra_dir = sp[1]
+	var here: Vector2i = world.target if world.move_t >= 0.0 else world.ptile
+	if here == terra_at:
+		world.move_dir = Vector2i.ZERO
+		if world.move_t < 0.0:
+			world.facing = terra_dir
+		return
+	_walk_to(terra_at, "terra:%d:%d" % [terra_at.x, terra_at.y])
 
 ## Part XLI: a hunt for the foes `of` in region `area`, outside any step of that kind (a sect's task).
 func _hunt_in(area: String, of: Array) -> void:
@@ -2030,6 +2112,14 @@ func _choice() -> void:
 				want = ks
 		if want < 0 and not st.is_empty() and st.kind == "sect":
 			want = ids.find("take:" + Sects.next(Game, str(st.sect)))
+		_nav(ids.size(), c.cursor, want if want >= 0 else ids.find("later"))
+		return
+	if str(c.title) == Mills.ASK:
+		# the foreman of a works (mills.gd): set down what was carried here; in a step that asks for carrying,
+		# take the crate that is offered; else nothing today
+		want = ids.find("deliver")
+		if want < 0 and not st.is_empty() and st.kind == "supply":
+			want = ids.find("take")
 		_nav(ids.size(), c.cursor, want if want >= 0 else ids.find("later"))
 		return
 	if str(c.title) == main.PLIGHT_ASK:

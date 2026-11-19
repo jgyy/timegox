@@ -198,6 +198,9 @@ func _unhandled_input(ev: InputEvent) -> void:
 		KEY_V:
 			# open the cloud-kite, or fold it in the air (the High Roads release: peaks.gd, glider.gd)
 			press("glide")
+		KEY_Y:
+			# ask something of the ground in front of him (the Sea Floor release: terra.gd)
+			press("shape")
 		KEY_UP, KEY_W:
 			press("up")
 		KEY_DOWN, KEY_S:
@@ -245,6 +248,8 @@ func press(act: String) -> void:
 			Game.toast(Phases.cycle(Game))
 		elif act == "view":
 			world.toggle_view()
+		elif act == "shape":
+			offer_shape()
 		elif act == "talk":
 			talk_yue()
 		elif act == "cancel":
@@ -742,6 +747,15 @@ func interact(e: Dictionary) -> void:
 		"machine":
 			# the Hundred Works (works.gd): what it is and what it does
 			say([["Narrator", Works.site_desc(str(e.work))]])
+		"mill":
+			# the Sea Floor release (mills.gd): a station of a works, and whoever is at it; or its store
+			if int(e.k) >= (Mills.WORKS[str(e.works)].stations as Array).size():
+				say([["Narrator", Mills.store_text(Game, str(e.works))]])
+			else:
+				say(Mills.station_lines(str(e.works), int(e.k), Clock.hour(Game)))
+		"sight":
+			# the Sea Floor release (deeps.gd): a place of the sea floor: what it is
+			say(Deeps.lines(str(e.sight)))
 		"hold":
 			# the Three Burrows release (hold.gd): a plot of the hero's own town: what it is
 			say([["Narrator", Hold.desc_of(Game, e)]])
@@ -1295,6 +1309,10 @@ func talk_npc(e: Dictionary) -> void:
 				Game.toast("Obtained %s" % Data.ITEMS.willow_switch.n)
 		)
 		return
+	# the Sea Floor release (mills.gd): the foreman of one of the works of the sea floor
+	if Mills.of_foreman(str(e.id)) != "" and Mills.open(Game):
+		offer_mill(e, Mills.of_foreman(str(e.id)))
+		return
 	# Part XXIII (war.gd): a field battle, begun by a word with whoever commands on that field
 	if not s.is_empty() and s.kind == "war" and str(s.npc) == str(e.id) and str(s.area) == str(e.get("area", Game.area)):
 		say(Echoes.told(Game, str(s.id), Data.DIALOGUE.get(str(s.id), [])), func(): start_war(str(s.battle), {"step": str(s.id)}))
@@ -1529,7 +1547,20 @@ func visit_grave(e: Dictionary) -> void:
 	var needed := false
 	if not s.is_empty():
 		needed = str(s.get("npc", "")) == str(e.id) or str(e.id) in s.get("npcs", [])
-	var counter: bool = e.has("office") or e.has("trade") or str(e.id) in ["alchemist", "smith", "dyer_su", "tailor_qiao", Jobs.CLERK, Hold.STEWARD, Gamble.DEALER]
+		# (the Sea Floor release: a step that asks for a hand of leaves won from a master who stood in the land,
+		# Ju Gong under the Mulberry Silk Woods, used to stop for good at his grave: the table could only be
+		# offered by a word with him.  The leaves lie where he dealt them, and the hand is nobody's to lose)
+		if str(s.get("kind", "")) == "cards" and s.has("of") and Yezi.MASTERS.has(str(s.of)) and str(Yezi.MASTERS[str(s.of)].get("at", "")) == str(e.id):
+			lines.append(["Narrator", "The leaves are still on the mat, dealt for two. Lin Feng turns his own hand face up, and then the other. There is nobody to pour. He pours."])
+			say(lines, func():
+				var cd: Dictionary = Game.cards.get(str(s.of), {})
+				cd["won"] = int(cd.get("won", 0)) + 1
+				Game.cards[str(s.of)] = cd
+				Game.poll_steps()
+			)
+			return
+	# (the Sea Floor release, mills.gd: a works whose foreman is dead is kept by whoever came after)
+	var counter: bool = e.has("office") or e.has("trade") or Mills.of_foreman(str(e.id)) != "" or str(e.id) in ["alchemist", "smith", "dyer_su", "tailor_qiao", Jobs.CLERK, Hold.STEWARD, Gamble.DEALER]
 	if counter:
 		lines.append(["Narrator", Crime.heir_line(Game, e)])
 	if str(e.id) == "elder" and Taboo.marked(Game) and not (needed and str(s.kind) == "talk"):
@@ -2636,6 +2667,70 @@ func offer_sect(e: Dictionary, sect_id: String) -> void:
 		)
 	)
 
+## The Sea Floor release (terra.gd): Y, facing open ground: what is asked of it.  "Leave it as it is" is first.
+## (The bot says which it means, world.shape_want, and is not asked.)
+func offer_shape() -> void:
+	if Game.prologue != "" or not Terra.known(Game):
+		if Game.prologue == "":
+			Game.toast(Terra.why(Game, world.wd, world.layer, world.ptile + world.facing, "raise"))
+		return
+	if world.shape_want != "":
+		var sw: String = world.shape_want
+		world.shape_want = ""
+		world.shape(sw)
+		return
+	var at: Vector2i = world.ptile + world.facing
+	var opts: Array = [{"id": "leave", "label": "Leave it as it is", "desc": "The ground lies as it lies. %s" % Terra.text(Game), "col": UI.C_DIM}]
+	for sh in Terra.ORDER:
+		var wy: String = world.shape_why(sh)
+		opts.append({"id": sh, "label": str(Terra.SHAPES[sh].n), "note": "%+.1f m" % Terra.height(Game, world.layer, at) if Terra.height(Game, world.layer, at) != 0.0 else "",
+			"desc": str(Terra.SHAPES[sh].desc) + ("\n\n" + wy if wy != "" else "\n\nIt takes half an hour, and it stays."), "col": UI.C_JADE if wy == "" else UI.C_DIM, "enabled": wy == ""})
+	choose(Terra.ASK, opts, func(id: String):
+		if id == "" or id == "leave":
+			return
+		world.shape(id)
+	)
+
+## The Sea Floor release (mills.gd): the foreman of a works: what is made here and how ("Not today" first), a
+## thing of its make from the store, a crate for a works that wants it, and the crates brought for this one.
+func offer_mill(e: Dictionary, wid: String) -> void:
+	var w: Dictionary = Mills.WORKS[wid]
+	var brought: Array = Mills.crates_for(Game, wid)
+	var co: Dictionary = Mills.crate_offer(Game, wid)
+	var opts: Array = [{"id": "later", "label": "Not today", "desc": "%s\n\n%s" % [str(w.desc), Mills.store_text(Game, wid)], "col": UI.C_DIM}]
+	if not brought.is_empty():
+		opts.append({"id": "deliver", "label": "Set down what was carried here", "note": "%d crate%s" % [brought.size(), "" if brought.size() == 1 else "s"],
+			"desc": "The crate for %s goes into its yard, and the stations that were waiting on it start again. A carrier is paid %d spirit stones a crate." % [str(w.short), Mills.pay(Game.level)], "col": UI.C_JADE})
+	if not co.is_empty():
+		opts.append({"id": "take", "label": "Carry a crate to %s" % str(Mills.WORKS[str(co.to)].short), "note": "%d stones" % int(co.pay),
+			"desc": "%s wants what is made here (%s), and nobody can be spared from a station to take it. Two crates is all one pair of hands will hold; each pair of works has one of him a day." % [str(Mills.WORKS[str(co.to)].n), str(Data.ITEMS[str(w.makes)].n).to_lower()], "col": UI.C_GOLD})
+	var bb := Mills.buy_blocked(Game, wid)
+	opts.append({"id": "buy", "label": "Buy a %s from the store" % str(w.unit), "note": "%d stones" % Mills.price(Game, wid),
+		"desc": "%s\n\n%s%s" % [str(Data.ITEMS[str(w.makes)].desc), Mills.store_text(Game, wid), ("\n\n" + bb) if bb != "" else ""], "col": UI.C_TEXT if bb == "" else UI.C_DIM, "enabled": bb == ""})
+	opts.append({"id": "ask", "label": "Ask what goes in and what comes out", "desc": "What it is made from: %s." % str(w.raw)})
+	say([[str(e.n), "%s. %s" % [str(w.n), "The shift is on. Mind your sleeves near anything that turns." if Mills.running(Clock.hour(Game)) else "The shift is over. The store is as they left it."]]], func():
+		choose(Mills.ASK, opts, func(id: String):
+			match id:
+				"deliver":
+					var paid := Mills.deliver(Game, wid)
+					Feats.poll(Game)
+					say([["Narrator", "Lin Feng sets the crate down in the yard. Somebody looks up from a station, counts it, and goes back to work a little faster."], [str(e.n), "Counted. That is %d spirit stones, and a morning's work we should not have had. They will not thank you. They will make more." % paid]], func(): Game.poll_steps())
+				"take":
+					if Mills.take_crate(Game, co):
+						Game.toast("A crate for %s" % str(Mills.WORKS[str(co.to)].short))
+						say([[str(e.n), "For %s, in %s. The foreman there will count it. Carry it level." % [str(Mills.WORKS[str(co.to)].short), str(Data.AREAS[str(Mills.WORKS[str(co.to)].area)].n).get_slice(",", 0)]]])
+				"buy":
+					if Mills.buy(Game, wid):
+						Game.toast("Bought: %s" % str(Data.ITEMS[str(w.makes)].n))
+				"ask":
+					var lines: Array = [[str(e.n), "What goes in: %s. What comes out: %s." % [str(w.raw), str(Data.ITEMS[str(w.makes)].n).to_lower()]], [str(e.n), str(w.desc)]]
+					var wants: Array = Mills.wanted_by(wid)
+					if not wants.is_empty():
+						lines.append([str(e.n), "And it goes on from here to %s. Nothing made down here is finished where it is made." % " and ".join(wants.map(func(x): return str(Mills.WORKS[x].short)))])
+					say(lines)
+		)
+	)
+
 const HOLD_ASK := "The steward's table at Guiyun: what is to be done?"
 
 ## The Three Burrows release (hold.gd): the steward's table: what is in the chest, and what is drawn up
@@ -3160,7 +3255,7 @@ const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "reca
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
 	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
-	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31", "s_break38": "recall32", "s_break39": "recall33", "s_break40": "recall34", "s_break41": "recall35", "s_break42": "recall36", "s_break43": "recall37", "s_break44": "recall38", "s_break45": "recall39"}
+	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31", "s_break38": "recall32", "s_break39": "recall33", "s_break40": "recall34", "s_break41": "recall35", "s_break42": "recall36", "s_break43": "recall37", "s_break44": "recall38", "s_break45": "recall39", "s_break46": "recall40"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,

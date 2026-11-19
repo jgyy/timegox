@@ -293,6 +293,9 @@ func _bundle(lid: String) -> Dictionary:
 					# the Eastern Sea (Part XII): real sea round the isles, the same ocean as the land's
 					# (and the Far Countries, the Cloud Keel release: lands of their own in a sea no keel has crossed)
 					Terrain3D.world_sea(root, lw)
+				"deeps":
+					# the Sea Floor release (deeps.gd): the water overhead, the light through it, the dark at the edge
+					Deeps.dress(root, lw)
 			if OS.has_environment("AZ_PROFILE"):
 				print("[profile] realm %s dressed (sea, sky) by %d ms" % [lid, (Time.get_ticks_usec() - pb0) / 1000])
 			root.visible = false
@@ -412,7 +415,16 @@ func use_ladder(e: Dictionary) -> void:
 	var sail: bool = str(e.get("style", "")) == "sail"
 	trip = {"t": 0.0, "dur": 2.6 if climb or sail else 0.7, "to_layer": str(e.to_layer), "to_tile": e.to_tile, "dir": int(e.get("dir", 1)), "climb": climb or sail, "sail": sail, "swapped": false}
 	move_dir = Vector2i.ZERO
-	if sail:
+	# the Sea Floor release: the way down with the water at the Returning Ruins, and up again with the tide
+	var dive: bool = str(e.get("style", "")) == "dive"
+	if dive:
+		trip.dur = 3.2
+		trip.climb = true
+		Game.note("Went down with the water to the floor of the sea" if str(e.to_layer) == "deeps" else "Came up with the tide to the Returning Ruins")
+	elif sail and str(e.id).begins_with("river_boat"):
+		# (the Sea Floor release: the river-boat of Longmen used to be written down as Mazu's, bound for Fusang)
+		Game.note("Took the river-boat down to the Rivers and Lakes" if str(e.to_layer) == "lakes" else "Took the river-boat home to Longmen")
+	elif sail:
 		Game.note("Sailed with Mazu to " + ("the Isles of the Eastern Sea" if str(e.to_layer) == "sea" else "Fusang"))
 	elif climb:
 		var verb := "Climbed the Jianmu into " if int(e.get("dir", 1)) > 0 else "Went down the Jianmu into "
@@ -716,6 +728,8 @@ func _build_view(id: String) -> void:
 	var sl := Atlas.slice(lw, id)
 	var r: Rect2i = sl.rect
 	var shore := {}
+	# (the Sea Floor release, terra.gd: the ground he has shaped is a term in the height field)
+	lw["shaped"] = Game.shaped.get(lid, {})
 	var shm := Terrain3D.world_heights(lw, r, shore)
 	var bl: Array = []
 	for bd in lw.buildings:
@@ -817,6 +831,12 @@ func _build_view(id: String) -> void:
 			ak.set_meta("ark", true)
 			root.add_child(ak)
 			_label(ak, "The ark of %s" % str(Arks.DOCKS[dk].n), 6.4, Color("c8f4e8"), 28).visibility_range_end = 90.0
+	# (the Sea Floor release, terra.gd: the pools he has let fill, drawn a little under the lip of each hollow)
+	for pl in Terra.pools(Game, lid, r):
+		var pm := Terra.pool_model(float(pl[1]), Look.theme(str(spec.theme)).water)
+		var pw: Vector3 = Terrain3D.world_pos(pl[0]) + bb.off
+		pm.position = Vector3(pw.x, _ground(bb, pw) + float(pl[1]) * 0.55, pw.z) - root.position
+		root.add_child(pm)
 	# the high road between the towns (roads.gd), paved where it crosses this region
 	var rdm := Roads.mesh(lid, r, func(x: float, z: float) -> float: return _ground(bb, Vector3(x, 0.0, z) + Vector3(bb.off.x, 0.0, bb.off.z)) - bb.off.y)
 	if rdm != null:
@@ -1267,6 +1287,23 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 			n.add_child(Models.shadow_disc(1.0, 0.35))
 			_label(n, str(Impact.OBSTACLES.get(str(e.what), {}).get("n", "")).capitalize(), 2.2 if str(e.what) != "spring_ox" else 2.6, Color("e8dcc0"), 26)
 			n.set_meta("model", om)
+		"mill":
+			# the Sea Floor release (mills.gd): a station of one of the works, with whoever works it, or its store
+			var wm := Mills.model(str(e.works), int(e.k))
+			n.add_child(wm)
+			n.add_child(Models.shadow_disc(1.1, 0.3))
+			var wst: Array = Mills.WORKS[str(e.works)].stations
+			var wl := _label(n, str(wst[int(e.k)].n) if int(e.k) < wst.size() else "The store of %s" % str(Mills.WORKS[str(e.works)].short), 2.9, Color("e8d8a0"), 24)
+			n.set_meta("label", wl)
+			n.set_meta("model", wm)
+		"sight":
+			# the Sea Floor release (deeps.gd): a place of the sea floor
+			var sm := Deeps.model(str(e.sight))
+			sm.rotation.y = Terrain3D.hash2(e.pos.x, e.pos.y, 3.0) * TAU
+			n.add_child(sm)
+			var sl := _label(n, str(Deeps.SIGHTS[str(e.sight)].n), 3.4, Color("c8f0e8"), 26)
+			n.set_meta("label", sl)
+			n.set_meta("model", sm)
 		"machine":
 			# the Hundred Works (works.gd, machines.gd): something Lin Feng built, or Gongshu Ban did
 			var mm := Machines.model(str(Works.STORY_SITES[e.work].model) if Works.STORY_SITES.has(str(e.work)) else str(e.work))
@@ -2620,6 +2657,8 @@ func _move(d: float) -> void:
 				Load.walked(Game, riding_here())
 				# (the Rivers and Lakes release, raids.gd: a raid on the road or on a camp, come up to)
 				_raid_check()
+				# (the Sea Floor release, deeps.gd: a place of the sea floor come within sight of)
+				_sight_check()
 			var rid := Atlas.owner_id(wd, ptile)
 			if rid != area_id:
 				_enter_region(rid)
@@ -2902,7 +2941,7 @@ func _snap_cam() -> void:
 ## how far off the people, packs and things of the land are drawn (metres), and the big ones
 const ENT_SHOW := 92.0
 const ENT_SHOW_BIG := 150.0
-const ENT_BIG := ["boss", "prop", "machine", "mark", "hold", "seal", "ladder", "abode", "stele", "portal"]
+const ENT_BIG := ["boss", "prop", "machine", "mark", "hold", "seal", "ladder", "abode", "stele", "portal", "mill", "sight"]
 var frame_n := 0
 
 func _update_view(d: float) -> void:
@@ -3757,6 +3796,18 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, 
 		"machine":
 			Machines.animate(n.get_meta("model"), t + float(e.pos.x))
 			(n.get_meta("label") as Label3D).visible = dist < 12.0
+		"mill":
+			# (mills.gd: the machine turns and whoever works it is at it while the shift is on; the store shows
+			# what has been made)
+			var wmn: Node3D = n.get_meta("model")
+			if dist < 46.0:
+				Mills.tick(wmn, t, Mills.running(Clock.hour(Game)))
+				if int(e.k) >= (Mills.WORKS[str(e.works)].stations as Array).size():
+					Mills.show_stock(wmn, Mills.stock(Game, str(e.works)))
+			(n.get_meta("label") as Label3D).visible = dist < 10.0
+		"sight":
+			# (deeps.gd: its name is over it once it has been found)
+			(n.get_meta("label") as Label3D).visible = dist < 26.0 and Game.sights.has(str(e.sight))
 		"mark", "hold":
 			if n.has_meta("model"):
 				Machines.animate(n.get_meta("model"), t + float(e.pos.x))
@@ -4684,7 +4735,7 @@ func _draw_hud() -> void:
 		UI.wrapped(self, Vector2(VIEW.x - 506, 35 - (15 - osz)), obj, osz, UI.C_TEXT, 486)
 	# (the line grew a key with every release and was still drawn 580 px wide: since G was added its
 	# end was cut off, "Esc men")
-	UI.text(self, Vector2(VIEW.x - 1084, VIEW.y - 14), "Arrows/WASD move   Q/E camera   P eyes   R ride   T talk   F strike   H hand   K phase   G sword qi   V glide   C work   B cook   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 1000.0)
+	UI.text(self, Vector2(VIEW.x - 1084, VIEW.y - 14), "Arrows/WASD move   Q/E camera   P eyes   R ride   T talk   F strike   H hand   K phase   G sword qi   V glide   C work   B cook   Y shape   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 1000.0)
 	_draw_minimap()
 	_draw_clock()
 	if banner_t > 0.0:
@@ -4703,11 +4754,13 @@ func _draw_hud() -> void:
 		banner_text = ""
 	# interaction hint
 	var fe = face_entity()
-	if fe != null and move_t < 0.0 and trip.is_empty() and using.is_empty() and fe.kind in ["npc", "boss", "ladder", "stele", "abode", "prop", "folk", "machine", "mark", "hold", "trifle", "trifle_home"]:
+	if fe != null and move_t < 0.0 and trip.is_empty() and using.is_empty() and fe.kind in ["npc", "boss", "ladder", "stele", "abode", "prop", "folk", "machine", "mark", "hold", "trifle", "trifle_home", "mill", "sight"]:
 		# (the Small Fish release: a small thing faced had its hint written and was never in this list)
 		var hint := "Talk" if fe.kind != "folk" else "Talk to %s" % str(fe.n)
-		if fe.kind == "machine" or fe.kind == "mark" or fe.kind == "hold":
+		if fe.kind == "machine" or fe.kind == "mark" or fe.kind == "hold" or fe.kind == "sight":
 			hint = "Look"
+		if fe.kind == "mill":
+			hint = "Watch the work"
 		match fe.kind:
 			"prop":
 				hint = str(Props.kind_of(fe).get("verb", "Look"))
@@ -4715,7 +4768,7 @@ func _draw_hud() -> void:
 				hint = "Challenge"
 			"ladder":
 				var lst := str(fe.get("style", ""))
-				hint = ("Climb" if lst == "climb" else ("Board the boat" if lst == "sail" else "Take the stairs")) if ladder_open(fe) else "Look"
+				hint = ("Climb" if lst == "climb" else ("Board the boat" if lst == "sail" else (("Go down with the water" if str(fe.get("to_layer", "")) == "deeps" else "Go up with the tide") if lst == "dive" else "Take the stairs"))) if ladder_open(fe) else "Look"
 				# the Hollow Hills release: the mouth of a cave, the way out of one, and the shaft between its galleries
 				if lst in ["cave", "cave_out", "cave_up", "cave_down"]:
 					hint = {"cave": "Go down into the cave", "cave_out": "Climb out into the daylight", "cave_up": "Climb back up the rope", "cave_down": "Climb down the shaft"}[lst]
@@ -5199,3 +5252,49 @@ func folk_say(pid: String, line: String, clip: String = "") -> void:
 	var m: Node3D = fn.get_meta("model")
 	if clip != "":
 		Models.act(m, clip if Assets.has_clip(m, clip) else "shock", t)
+
+# ---------------------------------------------------------------- the Sea Floor release
+## deeps.gd: he has stopped within sight of a place of the sea floor he had not found: it is told, once.
+func _sight_check() -> void:
+	if layer != Deeps.LAYER:
+		return
+	var got: Array = Deeps.found(Game, wd, ptile)
+	if got.is_empty():
+		return
+	for sid in got:
+		Game.toast("Found: %s (%d of %d on the sea floor)" % [str(Deeps.SIGHTS[sid].n), Game.sights.size(), Deeps.ORDER.size()])
+	Feats.poll(Game)
+	Game.poll_steps()
+
+## terra.gd: the shape the bot means to ask of the ground in front of him ("": the player is asked)
+var shape_want := ""
+
+## Why the ground in front of him cannot be given `shape_id` now ("" if it can).
+func shape_why(shape_id: String) -> String:
+	if is_floor() or not using.is_empty() or traveling() or move_t >= 0.0 or not glide.is_empty():
+		return "Not now."
+	return Terra.why(Game, wd, layer, ptile + facing, shape_id)
+
+## terra.gd: ask `shape_id` of the open ground in front of him.  The ground of that country is drawn again
+## as it now lies.
+func shape(shape_id: String) -> bool:
+	var wy := shape_why(shape_id)
+	if wy != "":
+		Game.toast(wy)
+		return false
+	var res: Dictionary = Terra.shape(Game, wd, layer, ptile + facing, shape_id)
+	if not bool(res.ok):
+		Game.toast(str(res.why))
+		return false
+	start_gesture("kneel")
+	Game.toast("The ground %s. (%s)" % [str(Terra.SHAPES[shape_id].verb), Clock.text(Game)])
+	if not headless():
+		main.fx_pulse()
+		var a := str(res.area)
+		if views.has(a):
+			_free_view(a)
+			views.erase(a)
+			_stream(true)
+	Feats.poll(Game)
+	Game.poll_steps()
+	return true

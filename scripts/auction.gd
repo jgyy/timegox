@@ -201,6 +201,9 @@ static func post_blocked(g, house: String, k: int, amount: int) -> String:
 		return "The rooms are not open."
 	if not g.seen.has(str(HOUSES[house].area)):
 		return "He has never stood in that room, and the house takes no bid from a stranger."
+	# (the Sea Floor release: a room shut to a wanted man at its door is shut to his bid in the post-bag too)
+	if Crime.shut(g, str(HOUSES[house].area), "room") != "":
+		return Crime.shut(g, str(HOUSES[house].area), "room")
 	if k == SEALED and Seals.count(g) < Seals.ROOM:
 		return "The sealed room is opened by %d papers." % Seals.ROOM
 	for b in g.sealed_bids:

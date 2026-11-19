@@ -296,6 +296,15 @@ const MARKS := {
 		"toll": {"area": "yunmeng", "m": ["covenant", "toll"], "k": 3, "n": "The Toll-Ropes", "desc": "Two posts either side of the track along the bank, a rope between them at the height of a man's chest, and a stool beside it with a slate. The rope has a strip of red cloth tied at the middle so that carters see it by dusk. The grass is worn bare on both sides.",
 			"who": ["The Girl with the Slate", "folk_maiden", Color("b85a3a"), "Four coppers. No, that is your price. I have looked at you. It is not for arguing; if it were for arguing it would be a market.", "I price everybody. The Fleet-Mother was three. She gave me a bowl of fish and I still wrote three. She laughed. Nobody at home laughs when I write it.", "Nothing has been taken on this bank since the rope went up. Not a hen. I am told to say so to people who complain. I would say so anyway. It is true."]},
 	},
+	# Part XLII (the Sea Floor release): what was done with a Dao that moves the ground and a clod that grows
+	"the_joy_of_fish": {
+		"shape": {"area": "jiaoshi", "m": ["joy", "shape"], "k": 3, "n": "The Measured Terraces", "desc": "A step of the sea floor a hand high and dead level, edged with shell, with a young red branch netted in the middle of it and a plumb-line left hanging from a post. Everything on it is growing. It is the only level ground in the country.",
+			"who": ["Hong's Daughter, Who Tends the Steps", "folk_maiden", Color("c86a5a"), "I net the terraces. They are very good terraces. Father drew them and the man from the mountain raised them in eleven days, and the coral has taken on every one.", "My grandmother walks here in the evening and says: it used to slope. That is all she says. I do not know what I am meant to do about it having sloped.", "I asked the Loom-Mother who made the sea. She said nobody. I said then who made this. She went and sat at her loom."]},
+		"teach": {"area": "jiaoshi", "m": ["joy", "teach"], "k": 3, "n": "The Children's Mounds", "desc": "A mound of sand about the size of a sleeping dog, lopsided, with a shell pressed into the top and a name scratched on the shell. Whoever raised it was aiming at something else. There are forty of them now, and the children know every one by sight.",
+			"who": ["Xiao Bei, Who Raised the Crooked One", "folk_boy", Color("7ac0c8"), "That one is mine. It was meant to be a wall for the kelp. It is not a wall. The Loom-Mother says it is a very good not-a-wall and I am to leave it.", "You put your hand flat and you ask. You do not push. I pushed, the first time, and got a hole. The hole is over there. It is also mine.", "The man from the mountain could do a hundred in a morning. He did one, to show, and then he sat on his hands. I watched him sit on them."]},
+		"leave": {"area": "jiaoshi", "m": ["joy", "leave"], "k": 3, "n": "The Thread Round Nothing", "desc": "Four pegs of black coral and a length of sea-hemp tied round them, a pace square, enclosing a piece of sand that is exactly like the sand outside it. A slip of gauze is knotted to one peg. It says: as it lay.",
+			"who": ["Old Bei's Apprentice, Who Tied the Thread", "folk_youth", Color("8a9aa8"), "The Loom-Mother had us peg it the day he let the clod go. Nothing is inside it. That is what it is for. People stop and look in and then look at the rest of the floor.", "The Kiln-Master would not come by here for a month. Then a red tip came on the old arch, and he came, and stood, and went away again.", "I do not know whether he was right. I know that if he had been wrong we could not have undone it, and that this way we can still be wrong ourselves."]},
+	},
 	# Part XXXVIII (the Higher Sky release): what the sect teaches about those above it
 	"the_higher_sky": {
 		"gall": {"area": "mountain", "m": ["sky", "gall"], "k": 3, "n": "The Galls of the Outer Court", "desc": "A post as high as a seated man's head with a crossbar, and on the crossbar a dried gall on a loop of hemp, at exactly the height of a mouth. A board under it has three names on it, and room left for more.",
@@ -938,6 +947,37 @@ static func model(sp: Dictionary, i: int = 0) -> Node3D:
 						var k40 := r40 if left else r40 - morn
 						b.ball(Vector3((-0.22 if left else 0.2) + 0.07 * float(k40 % 2), 0.425, -0.06 + 0.065 * float(k40 / 2)), 0.03, MB.tag(Color("8a6a34"), MB.WOOD), true)
 						b.ball(Vector3((-0.22 if left else 0.2) + 0.07 * float(k40 % 2), 0.45, -0.06 + 0.065 * float(k40 / 2)), 0.022, MB.tag(Color("4a3a20"), MB.WOOD), true)
+		"joy":
+			# what was done with the sea floor (the Sea Floor release): a level step edged with shell and a netted
+			# branch, a crooked mound with a shell on it, or four pegs and a thread round nothing
+			match str(a[1]):
+				"shape":
+					b.box(Vector3(0, 0.1, 0), Vector3(2.0, 0.2, 1.6), MB.tag(Color("d8ccac"), MB.STONE))
+					for e42 in 10:
+						b.hemi(Vector3(-0.9 + 0.2 * e42, 0.2, 0.8), Vector3(0.09, 0.05, 0.07), MB.tag(Color("f0e8dc"), MB.STONE))
+					b.limb(Vector3(0, 0.2, 0), Vector3(0.05, 0.9 + 0.1 * float(i % 3), 0), 0.07, 0.03, MB.tag(Color("c8483a"), MB.STONE), 6)
+					for e42 in 4:
+						var a42 := TAU * e42 / 4.0 + 0.4 * i
+						b.limb(Vector3(0.02, 0.5 + 0.1 * e42, 0), Vector3(cos(a42) * 0.35, 0.8 + 0.1 * e42, sin(a42) * 0.35), 0.035, 0.012, MB.tag(Color("d85a4a"), MB.STONE), 5)
+					b.torus(Vector3(0, 0.45, 0), 0.4, 0.012, MB.tag(Color("4a4a52"), MB.METAL), Vector3.ZERO)
+					b.torus(Vector3(0, 0.8, 0), 0.34, 0.012, MB.tag(Color("4a4a52"), MB.METAL), Vector3.ZERO)
+					b.cyl(Vector3(0.85, 0.75, -0.6), 0.03, 1.1, wd, Vector3.ZERO, 6)
+					b.limb(Vector3(0.85, 1.28, -0.6), Vector3(0.85, 0.5, -0.45), 0.006, 0.006, MB.tag(Color("2a2a30"), MB.CLOTH), 3)
+					b.cone(Vector3(0.85, 0.44, -0.45), 0.035, 0.12, MB.tag(Color("6a6a72"), MB.METAL), Vector3(PI, 0, 0), 6)
+				"teach":
+					b.sph(Vector3(0.1 * float(i % 3 - 1), 0.18, 0), Vector3(0.7 + 0.1 * float(i % 2), 0.36 + 0.08 * float(i % 3), 0.5), MB.tag(Color("d0c4a0"), MB.STONE), Vector3(0, 0.5 * i, 0.12))
+					b.sph(Vector3(0.35, 0.14, 0.25), Vector3(0.3, 0.2, 0.26), MB.tag(Color("c4b894"), MB.STONE))
+					b.hemi(Vector3(0.08 * float(i % 3 - 1), 0.52 + 0.08 * float(i % 3), 0), Vector3(0.12, 0.06, 0.1), MB.tag(Color("f4ecdc"), MB.STONE), Vector3(0.2, 0.7 * i, 0))
+					g.disc(Vector3(-0.8, 0.02, 0.5), 0.3, Color(0.3, 0.5, 0.6, 0.35), 10, Color(0.3, 0.5, 0.6, 0.0))
+				_:
+					for e42 in 4:
+						var px42 := -0.5 if e42 % 2 == 0 else 0.5
+						var pz42 := -0.5 if e42 < 2 else 0.5
+						b.cyl(Vector3(px42, 0.15, pz42), 0.03, 0.3, MB.tag(Color("1e1e26"), MB.STONE), Vector3.ZERO, 6)
+					for e42 in 4:
+						var c42: Array = [Vector3(-0.5, 0.24, -0.5), Vector3(0.5, 0.24, -0.5), Vector3(0.5, 0.24, 0.5), Vector3(-0.5, 0.24, 0.5)]
+						b.limb(c42[e42], c42[(e42 + 1) % 4], 0.008, 0.008, MB.tag(Color("c8d0a8"), MB.CLOTH), 3)
+					b.box(Vector3(-0.5, 0.2, -0.42), Vector3(0.01, 0.12, 0.06), MB.tag(Color("e8f4f4"), MB.CLOTH), Vector3(0.2, 0, 0))
 		"covenant":
 			# what four sects on the mud did (the Rivers and Lakes release): a post with four cords, four spades by a
 			# stream that has come back, or a rope across the track with a stool and a slate

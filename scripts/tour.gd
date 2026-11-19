@@ -2364,6 +2364,11 @@ func _run() -> void:
 		# the ten vehicles, traffic on the high road, a raid on a cart and on a camp, the hall of tasks, the page of
 		# the sects, the river-boat's landing, the map of the sixth realm, and Part XLI
 		await _lakes_shots(str(main.args.lakes))
+	if main.args.has("deeps"):
+		# the Sea Floor release (--deeps, or --deeps=a,b): the three towns under the sea, the six works at their
+		# stations, the places of the sea floor, the ground shaped by the Dao of Leading Water, the way down at
+		# the Returning Ruins, the page and the map of the seventh realm, and Part XLII
+		await _deeps_shots(str(main.args.deeps))
 	if main.args.has("roads"):
 		# the Two Roads release (--roads, or --roads=a,b): the table of leaves in both games, the counter that keeps
 		# one, the page of leaves, a stele offering a second road, the page of the Daos, a fuller street, and Part XL
@@ -7767,6 +7772,288 @@ func _fish_shots(which: String = "1") -> void:
 ## (the ten kinds in a row), "traffic" (the high road with what goes along it), "raid" (a cart set on, and a
 ## camp), "hall" (the counter and the hall of tasks, upright and crooked), "page" (Esc > The Sects, and the map
 ## of the sixth realm), "boat" (the landing at Longmen), "foes", "marks" and "cross" (Part XLI).
+func _deeps_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_burrows_state()
+	Game.level = 140
+	Game.step = Data.step_index("s_p42_channel")
+	Game.companion = true
+	Game.day = 352
+	Game.stones = 112000
+	Game.dao = "sword"
+	for rid in [Atlas.HUB] + Data.AREA_CHAIN:
+		Game.seen[rid] = true
+	for sg in ["sunk_junk", "weeping_rock", "kelp_cathedral", "coral_arch", "giant_clam", "sunk_bell", "kun_rib", "black_smoker", "yu_statue", "caved_well", "tail_gate"]:
+		Game.sights[sg] = 340
+	Game.mills = {"loomery": {"n": 5, "at": Mills.worked(Game)}, "glass": {"n": 3, "at": Mills.worked(Game)}}
+	Game.mill_crates = [{"from": "kiln", "to": "loomery", "pay": Mills.pay(140), "day": 352}]
+	Game.crates_done = 4
+	Game.mill_paid = 4 * Mills.pay(140)
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	var quiet := func():
+		Game.toasts.clear()
+		main.toast_list.clear()
+		Game.mail_told = 999
+		Game.fame_told = Fame.rank(Game)
+		Game.page_due = []
+		Game.rite_due = []
+		Game.done_pending = []
+	var ent := func(id: String) -> Dictionary:
+		for e in Atlas.world_of("deeps").ents:
+			if str(e.id) == id:
+				return e
+		return {}
+	if want.call("towns"):
+		for tw in [["shuttlereef", 10.5], ["redbranch", 12.0], ["lampdeep", 14.0]]:
+			var tid := str(tw[0])
+			var area := str(Weal.TOWNS[tid].area)
+			var c: Vector2i = Atlas.to_world(area, Folk.TOWNS[tid].at)
+			Clock.set_hour(Game, float(tw[1]))
+			w.teleport(_nearest_free(c + Vector2i(0, 1)), "deeps")
+			w.banner_t = 0.0
+			quiet.call()
+			await _wait(1.5)
+			var cp: Vector3 = w.wpos(c)
+			cp.y = w.ground_y(cp)
+			w.cam_override = Transform3D(Basis.IDENTITY, cp + Vector3(-26.0, 30.0, 40.0)).looking_at(cp + Vector3(4.0, 3.0, -6.0), Vector3.UP)
+			await _wait(0.8)
+			await _shot("town_" + tid)
+			w.cam_override = null
+			await _wait(0.6)
+			await _shot("street_" + tid)
+	if want.call("works"):
+		for wid in Mills.ORDER:
+			var e1: Dictionary = ent.call("mill:%s:1" % wid)
+			if e1.is_empty():
+				continue
+			Clock.set_hour(Game, 10.5)
+			w.teleport(_nearest_free(e1.pos + Vector2i(-2, 2)), "deeps")
+			w.facing = Vector2i(0, -1)
+			w.banner_t = 0.0
+			quiet.call()
+			await _wait(1.6)
+			var mp: Vector3 = w.wpos(e1.pos)
+			mp.y = w.ground_y(mp)
+			w.cam_override = Transform3D(Basis.IDENTITY, mp + Vector3(1.0, 3.6, 9.0)).looking_at(mp + Vector3(0.5, 1.0, 0.0), Vector3.UP)
+			await _wait(0.9)
+			await _shot("works_" + wid)
+			w.cam_override = null
+		# one station close to, the store, a yard at night, and the foreman's counter
+		var e2: Dictionary = ent.call("mill:loomery:1")
+		w.teleport(e2.pos + Vector2i(0, 1), "deeps")
+		w.facing = Vector2i(0, -1)
+		quiet.call()
+		await _wait(1.0)
+		var lp: Vector3 = w.wpos(e2.pos)
+		lp.y = w.ground_y(lp)
+		w.cam_override = Transform3D(Basis.IDENTITY, lp + Vector3(2.6, 2.2, 3.4)).looking_at(lp + Vector3(0, 1.0, 0), Vector3.UP)
+		await _wait(0.6)
+		await _shot("works_station_loom")
+		w.cam_override = null
+		main.interact(e2)
+		await _wait(0.5)
+		main.press("confirm")
+		await _wait(0.4)
+		await _shot("works_station_said")
+		main.set_stack(["world"])
+		Clock.set_hour(Game, 22.0)
+		await _wait(1.0)
+		w.cam_override = Transform3D(Basis.IDENTITY, lp + Vector3(1.5, 5.5, 12.5)).looking_at(lp + Vector3(1.0, 1.0, 0.0), Vector3.UP)
+		await _wait(0.8)
+		await _shot("works_night")
+		w.cam_override = null
+		Clock.set_hour(Game, 10.5)
+		var fm: Dictionary = ent.call("loomer_sha")
+		w.teleport(_nearest_free(fm.pos + Vector2i(0, 1)), "deeps")
+		quiet.call()
+		await _wait(0.8)
+		main.offer_mill(fm, "loomery")
+		await _wait(0.6)
+		main.press("confirm")
+		await _wait(0.3)
+		main.press("confirm")
+		await _wait(0.5)
+		if main.top_name() != "choice":
+			main.press("confirm")
+			await _wait(0.5)
+		if main.top_name() == "choice":
+			main.choice.cursor = 1
+			main.choice._show()
+			await _wait(0.3)
+		await _shot("works_counter")
+		main.set_stack(["world"])
+	if want.call("sights"):
+		for sg2 in [["sunk_junk", 11.0], ["coral_arch", 12.5], ["giant_clam", 13.0], ["sunk_bell", 15.0], ["kun_rib", 12.0], ["black_smoker", 12.0], ["yu_statue", 12.0], ["caved_well", 12.0], ["tail_gate", 16.0], ["whale_fall", 16.0]]:
+			var se: Dictionary = ent.call("sight:" + str(sg2[0]))
+			if se.is_empty():
+				continue
+			Game.sights[str(sg2[0])] = 340
+			Clock.set_hour(Game, float(sg2[1]))
+			w.teleport(_nearest_free(se.pos + Vector2i(-2, 1)), "deeps")
+			w.facing = Vector2i(1, 0)
+			w.banner_t = 0.0
+			quiet.call()
+			await _wait(1.6)
+			var sp: Vector3 = w.wpos(se.pos)
+			sp.y = w.ground_y(sp)
+			var tall: bool = str(sg2[0]) in ["kun_rib", "kelp_cathedral"]
+			w.cam_override = Transform3D(Basis.IDENTITY, sp + (Vector3(7.0, 4.0, 20.0) if tall else Vector3(3.5, 3.0, 9.0))).looking_at(sp + Vector3(0, 6.0 if tall else 1.8, 0), Vector3.UP)
+			await _wait(0.9)
+			await _shot("sight_" + str(sg2[0]))
+			w.cam_override = null
+		var se2: Dictionary = ent.call("sight:sunk_bell")
+		w.teleport(_nearest_free(se2.pos + Vector2i(0, 1)), "deeps")
+		quiet.call()
+		await _wait(0.8)
+		main.interact(se2)
+		await _wait(0.5)
+		main.press("confirm")
+		await _wait(0.4)
+		await _shot("sight_said")
+		main.set_stack(["world"])
+	if want.call("terra"):
+		Clock.set_hour(Game, 11.0)
+		Game.step = Data.step_index("s_p42_shape")
+		var dw: Dictionary = Atlas.world_of("deeps")
+		var from: Vector2i = Atlas.to_world("beiming", Vector2i(46, 50))
+		w.teleport(_nearest_free(from), "deeps")
+		quiet.call()
+		await _wait(1.2)
+		# the nearest open ground that answers, with room beside it
+		var at := Vector2i(-1, -1)
+		for rr in range(1, 30):
+			for dy in range(-rr, rr + 1):
+				for dx in range(-rr, rr + 1):
+					var q: Vector2i = from + Vector2i(dx, dy)
+					if at.x < 0 and Terra.why(Game, dw, "deeps", q, "raise") == "" and Terra.why(Game, dw, "deeps", q + Vector2i(3, 0), "pool") == "" and Terra.why(Game, dw, "deeps", q + Vector2i(-3, 0), "lower") == "" and w.tile_free(q + Vector2i(0, 2)):
+						at = q
+		if at.x >= 0:
+			w.teleport(at + Vector2i(0, 2), "deeps")
+			w.facing = Vector2i(0, -1)
+			quiet.call()
+			await _wait(1.2)
+			var tp: Vector3 = w.wpos(at)
+			tp.y = w.ground_y(tp)
+			var tcam := Transform3D(Basis.IDENTITY, tp + Vector3(3.0, 7.5, 15.0)).looking_at(tp + Vector3(0, 0.5, 0), Vector3.UP)
+			w.cam_override = tcam
+			await _wait(0.8)
+			await _shot("terra_before")
+			w.cam_override = null
+			main.offer_shape()
+			await _wait(0.4)
+			if main.top_name() == "choice":
+				main.choice.cursor = 1
+				main.choice._show()
+				await _wait(0.3)
+				await _shot("terra_ask")
+			main.set_stack(["world"])
+			for k in 4:
+				Terra.shape(Game, dw, "deeps", at, "raise")
+				Terra.shape(Game, dw, "deeps", at + Vector2i(3, 0), "pool")
+				if k < 3:
+					Terra.shape(Game, dw, "deeps", at + Vector2i(-3, 0), "lower")
+			Clock.set_hour(Game, 11.5)
+			w.clear_cache()
+			w.teleport(at + Vector2i(0, 2), "deeps")
+			w.facing = Vector2i(0, -1)
+			quiet.call()
+			await _wait(1.6)
+			w.cam_override = tcam
+			await _wait(0.8)
+			await _shot("terra_after")
+			w.cam_override = null
+			w.teleport(at + Vector2i(1, 1), "deeps")
+			w.facing = Vector2i(-1, 0)
+			quiet.call()
+			await _wait(1.0)
+			await _shot("terra_on_the_mound")
+			Game.shaped = {}
+			w.clear_cache()
+		Game.step = Data.step_index("s_p42_channel")
+	if want.call("dive"):
+		Clock.set_hour(Game, 16.5)
+		var de: Dictionary = {}
+		for e3 in Atlas.world_of("sea").ents:
+			if str(e3.id) == "sea_dive:a":
+				de = e3
+		if not de.is_empty():
+			w.teleport(_nearest_free(de.pos + Vector2i(de.out)), "sea")
+			w.banner_t = 0.0
+			quiet.call()
+			await _wait(1.5)
+			await _shot("dive_at_guixu")
+		var le: Dictionary = ent.call("sea_dive:b")
+		if not le.is_empty():
+			Clock.set_hour(Game, 11.0)
+			w.teleport(_nearest_free(le.pos + Vector2i(1, 0)), "deeps")
+			w.banner_t = 0.0
+			quiet.call()
+			await _wait(1.5)
+			await _shot("dive_landing")
+			var lp2: Vector3 = w.wpos(le.pos)
+			lp2.y = w.ground_y(lp2)
+			w.cam_override = Transform3D(Basis.IDENTITY, lp2 + Vector3(-6.0, 1.6, 14.0)).looking_at(lp2 + Vector3(10.0, 16.0, -20.0), Vector3.UP)
+			await _wait(0.8)
+			await _shot("sea_overhead")
+			w.cam_override = null
+	if want.call("page"):
+		quiet.call()
+		main.set_stack(["world"])
+		Clock.set_hour(Game, 11.0)
+		w.teleport(_nearest_free(Atlas.to_world("jiaoshi", Vector2i(41, 33))), "deeps")
+		await _wait(0.6)
+		main.push("menu")
+		main.menu.mode = "deeps"
+		main.menu.cursor = 0
+		main.menu._build()
+		await _wait(0.3)
+		await _shot("page_the_sea_floor")
+		main.menu.mode = "map"
+		main.menu.map_layer = "deeps"
+		main.menu._build()
+		await _wait(0.4)
+		await _shot("map_sea_floor")
+		main.set_stack(["world"])
+	if want.call("foes"):
+		var fs: Array = []
+		for fid2 in ["silt_carp", "loom_crab", "tear_jelly", "net_ray", "bleach_polyp", "reef_eel", "well_frog", "summer_insect", "cramped_scholar", "silt_golem", "drain_wraith", "proud_flood"]:
+			fs.append(_foe(fid2))
+		await _gallery("part42_foes", fs, 1.0, 0.25)
+	if want.call("marks"):
+		var mk: Array = []
+		for oid in ["shape", "teach", "leave"]:
+			mk.append(Marks.model(Marks.MARKS.the_joy_of_fish[oid], 0))
+		await _gallery("part42_marks", mk, 1.6, 0.3)
+	if want.call("machines"):
+		for half in 2:
+			var ms: Array = []
+			for wid2 in Mills.ORDER.slice(half * 3, half * 3 + 3):
+				for k2 in 3:
+					var holder := Node3D.new()
+					var mm := Mills.model(wid2, k2)
+					mm.scale = Vector3.ONE * 0.8
+					mm.rotation.y = 0.5
+					Mills.tick(mm, 2.3 + k2, true)
+					holder.add_child(mm)
+					ms.append(holder)
+			await _gallery("works_machines_%d" % (half + 1), ms, 1.9, 0.0)
+	if want.call("cross"):
+		main.set_stack(["world"])
+		w.teleport(_nearest_free(Atlas.to_world("jiaoshi", Vector2i(39, 31))), "deeps")
+		Clock.set_hour(Game, 15.0)
+		quiet.call()
+		await _wait(1.0)
+		Game.picks.erase("the_joy_of_fish")
+		Game.cross_pending = ["the_joy_of_fish"]
+		main.ask_crossroads()
+		await _wait(0.6)
+		await _shot("crossroads_joy_of_fish")
+		main.set_stack(["world"])
+		Game.cross_pending = []
+
 func _lakes_shots(which: String = "1") -> void:
 	var only := which.split(",", false) if which != "1" else PackedStringArray()
 	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)

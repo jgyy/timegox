@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 138
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole", "Practised Hand", "Sleeves of Wind", "Uncarved Block", "Light Hand", "Five in One Hand", "Low as the Sea", "Hidden and Nameless", "Walking Two Roads", "Forgotten in the Lakes"]
+const MAX_LEVEL := 141
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole", "Practised Hand", "Sleeves of Wind", "Uncarved Block", "Light Hand", "Five in One Hand", "Low as the Sea", "Hidden and Nameless", "Walking Two Roads", "Forgotten in the Lakes", "Knows the Joy of Fish"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000, 900000, 940000, 980000, 940000, 980000, 1020000, 980000, 1020000, 1060000, 1020000, 1060000, 1100000, 1060000, 1100000, 1140000, 1100000, 1140000, 1180000, 1140000, 1180000, 1220000, 1180000, 1220000, 1260000, 1220000, 1260000, 1300000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700, 52400, 53100, 53800, 54500, 55200, 55900, 56600, 57300, 58000, 58700, 59400, 60100, 60800, 61500, 62200, 62900, 63600, 64300, 65000, 65700, 66400, 67100, 67800, 68500, 69200, 69900, 70600]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000, 900000, 940000, 980000, 940000, 980000, 1020000, 980000, 1020000, 1060000, 1020000, 1060000, 1100000, 1060000, 1100000, 1140000, 1100000, 1140000, 1180000, 1140000, 1180000, 1220000, 1180000, 1220000, 1260000, 1220000, 1260000, 1300000, 1260000, 1300000, 1340000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700, 52400, 53100, 53800, 54500, 55200, 55900, 56600, 57300, 58000, 58700, 59400, 60100, 60800, 61500, 62200, 62900, 63600, 64300, 65000, 65700, 66400, 67100, 67800, 68500, 69200, 69900, 70600, 71300, 72000, 72700]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -115,6 +115,8 @@ const REALM_INFO := [
 	{"life": 0, "title": "Who Rests at the Hinge", "note": "A keeper of monkeys said: three in the morning and four at night, and they were furious; four in the morning and three at night, and they were delighted. Nothing was altered, and joy and anger were both made use of. So the sage harmonizes with right and wrong alike and rests at the hinge of Heaven's wheel. This is called walking two roads. It is the realm of having stopped asking which of them is the road."},
 	# Part XLI (the Rivers and Lakes release): the fish that has stopped needing to be kept wet
 	{"life": 0, "title": "Who Is Forgotten in the Lakes", "note": "When the springs dry up the fish lie together on the mud, and wet one another with their breath, and moisten one another with spit. It is better to forget one another in the rivers and lakes. So the Zhuangzi. This is the realm of somebody who has been needed by every sect in the land at once, has put the water back, and has been allowed to go home without being thanked."},
+	# Part XLII (the Sea Floor release): the man on the bridge who was asked how he knew
+	{"life": 0, "title": "Who Knows the Joy of Fish", "note": "Two men stood on the bridge over the Hao. One said: the minnows swim out so easily, that is the joy of fish. The other said: you are not a fish, how do you know? The first said: you asked me how I knew, so you knew already that I knew. I knew it from up here, on the bridge. A cultivator of this realm has been down among the fish and come up again, and still says only: from here."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -643,9 +645,9 @@ const ENEMIES := {
 	"feilian": {"n": "Feilian, Earl of the Wind", "elem": "wood", "weak": "thunder", "col": Color("c8a868"), "shape": "qilin", "boss": true, "pal": {"mark": Color("4a3a2a"), "acc": Color("80f0c0")}},
 	"kui": {"n": "Kui, the One-Legged Thunder Ox", "elem": "thunder", "weak": "earth", "col": Color("7a8898"), "shape": "mammoth", "boss": true, "pal": {"acc": Color("fff070")}},
 	"jiufeng": {"n": "Jiufeng, the Nine-Headed Phoenix", "elem": "fire", "weak": "water", "col": Color("e05a3a"), "shape": "phoenix", "boss": true, "pal": {"sec": Color("f0c040")}},
-	"leigong": {"n": "Leigong, Duke of Thunder", "elem": "thunder", "weak": "earth", "col": Color("4a5a8a"), "shape": "crowmarshal", "boss": true, "pal": {"acc": Color("fff080")}},
+	"leigong": {"n": "Lei Gong, Duke of Thunder", "elem": "thunder", "weak": "earth", "col": Color("4a5a8a"), "shape": "crowmarshal", "boss": true, "pal": {"acc": Color("fff080")}},
 	"pixiu": {"n": "Pixiu, Who Ate the Gold of the Gate", "elem": "earth", "weak": "wood", "col": Color("e0b848"), "shape": "tiger", "boss": true, "pal": {"mark": Color("8a5a1a"), "acc": Color("60e0ff")}},
-	"shentu": {"n": "Shentu, Door God of the Peach Tree", "elem": "phys", "weak": "thunder", "col": Color("b83a2a"), "shape": "demon", "boss": true},
+	"shentu": {"n": "Shenshu, Door God of the Peach Tree", "elem": "phys", "weak": "thunder", "col": Color("b83a2a"), "shape": "demon", "boss": true},
 	"yulei": {"n": "Yulei, Door God of the Reed Rope", "elem": "phys", "weak": "fire", "col": Color("2a5a4a"), "shape": "warden", "boss": true},
 	"chong": {"n": "Chong, Who Lifts Heaven", "elem": "thunder", "weak": "earth", "col": Color("6a88c8"), "shape": "humanoid", "boss": true, "pal": {"sec": Color("e8c860"), "acc": Color("fff4c0")}},
 	"root_wyrm": {"n": "The Wyrm Who Gnaws the Jianmu", "elem": "earth", "weak": "wood", "col": Color("6a5a3a"), "shape": "serpent", "boss": true, "pal": {"acc": Color("c8f060")}},
@@ -1121,6 +1123,20 @@ const ENEMIES := {
 	"banner_wolf": {"n": "Wolf of the Banner", "elem": "earth", "weak": "wood", "col": Color("8a7a60"), "shape": "beast", "pal": {"sec": Color("4a4030"), "acc": Color("c83a2a")}},
 	"pass_raider": {"n": "Rider of the Pass", "elem": "phys", "weak": "thunder", "col": Color("7a4a3a"), "shape": "humanoid", "pal": {"sec": Color("3a2620"), "acc": Color("c8c0b0")}},
 	"tooth_golem": {"n": "Tooth of the Pass", "elem": "earth", "weak": "water", "col": Color("a89878"), "shape": "golem", "pal": {"sec": Color("5e5440"), "acc": Color("e8e0c8")}},
+	# ---- Part XLII: The Joy of Fish (the Sea Floor release): what the autumn floods brought down to the sea floor,
+	# in the four countries under the Eastern Sea
+	"silt_carp": {"n": "Carp Blind with Silt", "elem": "water", "weak": "thunder", "col": Color("9a8a68"), "shape": "carp", "pal": {"sec": Color("5a4e36"), "under": Color("d8d0b8"), "acc": Color("3a6a7a")}},
+	"loom_crab": {"n": "Crab That Cuts the Warp", "elem": "earth", "weak": "wood", "col": Color("a8584a"), "shape": "crab", "pal": {"sec": Color("5a2e28"), "acc": Color("e8dcc0")}},
+	"tear_jelly": {"n": "Jelly of Tears Not Wept", "elem": "water", "weak": "earth", "col": Color("b8d8e8"), "shape": "jelly", "pal": {"sec": Color("6a9ab8"), "acc": Color("f4f8ff")}, "bright": true},
+	"net_ray": {"n": "Ray That Slipped the Iron Net", "elem": "thunder", "weak": "earth", "col": Color("6a7a94"), "shape": "ray", "pal": {"sec": Color("363e50"), "under": Color("d0d4dc"), "acc": Color("e8d060")}},
+	"bleach_polyp": {"n": "Polyp Gone White", "elem": "wood", "weak": "fire", "col": Color("e0dcd0"), "shape": "plant", "pal": {"sec": Color("9a9488"), "acc": Color("c85a4a")}},
+	"reef_eel": {"n": "Eel of the Dead Branch", "elem": "dark", "weak": "thunder", "col": Color("3a3a48"), "shape": "serpent", "pal": {"sec": Color("1c1c26"), "acc": Color("c84a3a")}},
+	"well_frog": {"n": "Frog Who Measured the Sea", "elem": "water", "weak": "thunder", "col": Color("6a8a4a"), "shape": "blob", "pal": {"sec": Color("3a4e2a"), "acc": Color("e8d880")}},
+	"summer_insect": {"n": "Summer Insect Told of Ice", "elem": "fire", "weak": "water", "col": Color("c8a04a"), "shape": "moth", "pal": {"sec": Color("7a5a22"), "acc": Color("f0f4ff")}},
+	"cramped_scholar": {"n": "Scholar of One Corner", "elem": "dark", "weak": "thunder", "col": Color("4a4a5a"), "shape": "humanoid", "pal": {"sec": Color("26262e"), "acc": Color("c8c0a0")}},
+	"silt_golem": {"n": "Silt of a Hundred Rivers", "elem": "earth", "weak": "water", "col": Color("8a7650"), "shape": "golem", "pal": {"sec": Color("4e4230"), "acc": Color("c8b888")}},
+	"drain_wraith": {"n": "Thing the Tail-Gate Sent Back", "elem": "dark", "weak": "fire", "col": Color("3a4a5a"), "shape": "wraith", "pal": {"sec": Color("1a242e"), "acc": Color("8ac8d8")}},
+	"proud_flood": {"n": "Flood That Thinks It Is the Sea", "elem": "water", "weak": "earth", "col": Color("7a6a4a"), "shape": "serpent", "pal": {"sec": Color("42382a"), "acc": Color("d8c890")}},
 	"list_meng": {"n": "Brother Meng Zhi", "elem": "fire", "weak": "water", "col": Color("a85a3a"), "shape": "person:folk_youth"},
 	"list_bai_lu": {"n": "Senior Sister Bai Lu", "elem": "water", "weak": "thunder", "col": Color("7a9ab8"), "shape": "person:folk_maiden"},
 	"list_han_yue": {"n": "Senior Brother Han Yue", "elem": "thunder", "weak": "earth", "col": Color("4a5a8a"), "shape": "person:folk_guard", "boss": true},
@@ -1979,7 +1995,7 @@ const AREAS := {
 		"npcs": [{"id": "peach_keeper", "n": "Peach Keeper Tao Yao", "pos": Vector2i(10, 26), "col": Color("ffd0e0"), "vis": ["s_gd_intro", ""]},
 			# Part XVI: the door gods, home under the great peach tree because nobody pasted them up this year
 			{"id": "shenshu", "n": "Shenshu, Door God of the Peach Tree", "pos": Vector2i(12, 24), "col": Color("c83a2a"), "vis": ["s_p16_rally", ""]},
-			{"id": "yulei", "n": "Yulei, Door God of the Peach Tree", "pos": Vector2i(13, 26), "col": Color("2a3a5a"), "vis": ["s_p16_rally", ""]},
+			{"id": "yulei", "n": "Yulei, Door God of the Reed Rope", "pos": Vector2i(13, 26), "col": Color("2a3a5a"), "vis": ["s_p16_rally", ""]},
 			# Part XXX: the fowler with nets hung on all four sides, and the lord who walked by without a guard
 			{"id": "net_fowler", "n": "The Fowler of the Four Nets", "pos": Vector2i.ZERO, "col": Color("6a6a4a"), "asset": "folk_herder", "vis": ["s_p30_home", ""], "late": true, "peak": 0, "stand": "foot"},
 			{"id": "cheng_tang", "n": "Tang of Shang", "pos": Vector2i.ZERO, "col": Color("d8d0bc"), "vis": ["s_p30_pegs", ""], "late": true, "peak": 1, "stand": "foot"},
@@ -3667,7 +3683,7 @@ const AREAS := {
 		],
 		"npcs": [
 			{"id": "ark_master_yun", "n": "Ark-Master Yun of the Long Watch", "pos": Vector2i(38, 29), "col": Color("3a6a8a"), "asset": "folk_fisher"},
-			{"id": "master_lie", "n": "Master Lie, Who Rides the Wind", "pos": Vector2i(41, 30), "col": Color("d8d8c8"), "asset": "folk_grandpa"},
+			{"id": "master_lie", "n": "Yin Sheng, Master Lie's Pupil", "pos": Vector2i(41, 30), "col": Color("d8d8c8"), "asset": "folk_grandpa"},
 			{"id": "shipwright_mu", "n": "Shipwright Mu of the Cloud-Slip", "pos": Vector2i(24, 36), "col": Color("8a6a3a"), "asset": "folk_porter"},
 			{"id": "weigher_su", "n": "Mistress Su, Who Weighs the Wind", "pos": Vector2i(66, 35), "col": Color("6a8aa0"), "asset": "folk_shopwife"},
 			{"id": "dreaming_guest", "n": "The Guest Who Is Asleep Elsewhere", "pos": Vector2i(52, 35), "col": Color("c8a840"), "asset": "folk_scholar"},
@@ -3966,9 +3982,261 @@ const AREAS := {
 				"props": [["counter", Vector2i(73, 41), true], ["shelf", Vector2i(70, 43), true], ["shelf", Vector2i(77, 43), true], ["barrel", Vector2i(70, 40), true], ["rack", Vector2i(77, 40), true], ["lantern", Vector2i(74, 43), false]]},
 		],
 	},
+	# ---- the Sea Floor release (Part XLII): a seventh realm (atlas.gd STRATA "deeps"), the floor of the Eastern Sea,
+	# down the drain of the Returning Ruins where Ruo holds the water a hand's breadth open (LADDERS "sea_dive").
+	# "You are not a fish: how do you know the joy of fish?" (Zhuangzi, on the bridge over the Hao).  Four
+	# countries in a chain: Jiaoshi, the weaving-rooms of the Jiaoren of the open sea, with the town of
+	# Shuttlereef; Shanhu, the coral forest, with Redbranch of the kilns; Beiming, the Northern Dark, with
+	# Lampdeep of the salt-pans; and Weilu, the Tail-Gate, where the sea drains and is never less.  Every town
+	# has two works where things are made in the open by the people who make them (mills.gd), and the floor is
+	# full of places nobody has stood in since they sank (deeps.gd)
+	"jiaoshi": {
+		"n": "Jiaoshi, the Weaving-Rooms under the Sea", "w": 100, "h": 64, "seed": 711, "theme": "jiaoshi", "enemies": 20, "races": [], "layer": "deeps", "hill": 0.4,
+		"pool": [["silt_carp", 138, 138], ["loom_crab", 138, 138], ["tear_jelly", 138, 138]],
+		"portals": [
+			{"to": "shanhu", "pos": Vector2i(98, 32), "dest": Vector2i(4, 32), "open": "s_p42_sights1"},
+		],
+		"npcs": [
+			{"id": "loom_mother", "n": "Loom-Mother Jiao Zhu", "pos": Vector2i(38, 29), "col": Color("3a8a9a"), "asset": "folk_jiaoren"},
+			{"id": "retter_mu", "n": "Yard-Master Mu of the Retting-Yard", "pos": Vector2i(13, 30), "col": Color("5a7a5a"), "asset": "folk_porter"},
+			{"id": "loomer_sha", "n": "Shed-Mistress Sha of the Gauze-Looms", "pos": Vector2i(80, 30), "col": Color("6a9ab0"), "asset": "folk_jiaoren"},
+			{"id": "gauze_girl", "n": "Xiao Xiao, Who Has Not Wept Yet", "pos": Vector2i(37, 35), "col": Color("8ac8d0"), "asset": "folk_girl"},
+			{"id": "pearl_counter", "n": "Old Bei, Who Counts What Was Wept", "pos": Vector2i(66, 35), "col": Color("7a8a9a"), "asset": "folk_grandpa"},
+		],
+		"bosses": [],
+		"pickups": [
+			{"id": "cache_js1", "item": "stones", "n": 10000, "pos": Vector2i(50, 54), "always": true},
+			{"id": "sense_js1", "item": "stones", "n": 8600, "pos": Vector2i(26, 55), "always": true, "sense": true},
+			{"id": "p42_js1", "item": "buried_shuttle", "pos": Vector2i(66, 9), "vis": ["s_p42_shuttles", ""]},
+			{"id": "p42_js2", "item": "buried_shuttle", "pos": Vector2i(32, 9), "vis": ["s_p42_shuttles", ""]},
+			{"id": "p42_js3", "item": "buried_shuttle", "pos": Vector2i(88, 56), "vis": ["s_p42_shuttles", ""]},
+			{"id": "p42_js4", "item": "buried_shuttle", "pos": Vector2i(12, 46), "vis": ["s_p42_shuttles", ""]},
+		],
+		"pickup_vis": "",
+		"springs": [Vector2i(22, 44)],
+		"steles": [Vector2i(42, 33)],
+		"roads": [[Vector2i(2, 32), Vector2i(13, 32), Vector2i(24, 33), Vector2i(34, 32), Vector2i(44, 31), Vector2i(56, 32), Vector2i(70, 33), Vector2i(84, 32), Vector2i(97, 32)],
+			[Vector2i(34, 27), Vector2i(34, 32)], [Vector2i(48, 27), Vector2i(48, 31)], [Vector2i(62, 28), Vector2i(62, 32)], [Vector2i(32, 37), Vector2i(32, 33)], [Vector2i(44, 37), Vector2i(44, 32)], [Vector2i(57, 37), Vector2i(57, 33)], [Vector2i(70, 37), Vector2i(70, 33)], [Vector2i(16, 26), Vector2i(16, 32)], [Vector2i(83, 26), Vector2i(83, 32)]],
+		"lanes": [Rect2i(10, 27, 13, 4), Rect2i(77, 27, 13, 4)],
+		# the stations and the store of each works (mills.gd): what is made here is made in the open, where it can be watched
+		"mills": [
+			{"id": "mill:retting:0", "works": "retting", "k": 0, "pos": Vector2i(11, 28)},
+			{"id": "mill:retting:1", "works": "retting", "k": 1, "pos": Vector2i(15, 28)},
+			{"id": "mill:retting:2", "works": "retting", "k": 2, "pos": Vector2i(19, 28)},
+			{"id": "mill:retting:store", "works": "retting", "k": 3, "pos": Vector2i(21, 29)},
+			{"id": "mill:loomery:0", "works": "loomery", "k": 0, "pos": Vector2i(78, 28)},
+			{"id": "mill:loomery:1", "works": "loomery", "k": 1, "pos": Vector2i(82, 28)},
+			{"id": "mill:loomery:2", "works": "loomery", "k": 2, "pos": Vector2i(86, 28)},
+			{"id": "mill:loomery:store", "works": "loomery", "k": 3, "pos": Vector2i(88, 29)},
+		],
+		# places of the sea floor to be found (deeps.gd)
+		"sights": [
+			{"id": "sunk_junk", "pos": Vector2i(22, 8)},
+			{"id": "weeping_rock", "pos": Vector2i(50, 9)},
+			{"id": "kelp_cathedral", "pos": Vector2i(93, 12)},
+			{"id": "pearl_bed", "pos": Vector2i(8, 54)},
+			{"id": "drowned_stele", "pos": Vector2i(46, 57)},
+			{"id": "anchor_field", "pos": Vector2i(93, 50)},
+		],
+		"buildings": [
+			{"id": "shuttle_hall", "n": "The Hall of the Still Shuttle", "style": "hall", "rect": Rect2i(28, 18, 13, 9), "door": Vector2i(34, 26),
+				"props": [["desk", Vector2i(33, 20), true], ["bookshelf", Vector2i(29, 19), true], ["bookshelf", Vector2i(39, 19), true], ["scroll", Vector2i(31, 19), false], ["scroll", Vector2i(37, 19), false], ["cushion", Vector2i(31, 23), false], ["lantern", Vector2i(38, 24), false]]},
+			{"id": "dry_gauze_inn", "n": "The Inn of the Dry Gauze", "style": "inn", "rect": Rect2i(44, 19, 10, 8), "door": Vector2i(48, 26),
+				"props": [["table", Vector2i(46, 22), true], ["stool", Vector2i(47, 22), false], ["counter", Vector2i(51, 21), true], ["barrel", Vector2i(52, 24), true], ["stove", Vector2i(45, 20), true], ["lantern", Vector2i(45, 24), false]]},
+			{"id": "tear_cup_tea", "n": "The Tea-House of One Tear a Cup", "style": "teahouse", "rect": Rect2i(57, 20, 11, 8), "door": Vector2i(62, 27),
+				"props": [["table", Vector2i(59, 22), true], ["cushion", Vector2i(60, 23), false], ["table", Vector2i(65, 22), true], ["cushion", Vector2i(64, 23), false], ["stove", Vector2i(58, 21), true], ["scroll", Vector2i(62, 21), false], ["lantern", Vector2i(66, 25), false]]},
+			{"id": "weavers_house", "n": "The Weavers' House", "style": "seahouse", "rect": Rect2i(27, 38, 10, 7), "door": Vector2i(32, 38),
+				"props": [["bed", Vector2i(28, 43), true], ["table", Vector2i(31, 41), true], ["stool", Vector2i(32, 41), false], ["stove", Vector2i(35, 43), true], ["loom", Vector2i(35, 40), true], ["lantern", Vector2i(29, 40), false]]},
+			{"id": "counters_house", "n": "The Pearl-Counter's House", "style": "house", "rect": Rect2i(39, 38, 10, 7), "door": Vector2i(44, 38),
+				"props": [["bed", Vector2i(40, 43), true], ["cabinet", Vector2i(47, 43), true], ["table", Vector2i(43, 41), true], ["stool", Vector2i(44, 41), false], ["stove", Vector2i(47, 40), true], ["lantern", Vector2i(41, 40), false]]},
+			{"id": "reelers_dorm", "n": "The Reelers' Long House", "style": "dorm", "rect": Rect2i(51, 38, 12, 8), "door": Vector2i(57, 38),
+				"props": [["bed", Vector2i(52, 40), true], ["bed", Vector2i(52, 42), true], ["bed", Vector2i(52, 44), true], ["bed", Vector2i(61, 42), true], ["bed", Vector2i(61, 44), true], ["table", Vector2i(57, 42), true], ["stool", Vector2i(57, 43), false], ["lantern", Vector2i(55, 44), false]]},
+			{"id": "gauze_shop", "n": "The Shop of Gauze by the Ell", "style": "shop", "rect": Rect2i(65, 38, 10, 7), "door": Vector2i(70, 38),
+				"props": [["counter", Vector2i(69, 41), true], ["shelf", Vector2i(66, 43), true], ["shelf", Vector2i(73, 43), true], ["barrel", Vector2i(66, 40), true], ["rack", Vector2i(73, 40), true], ["lantern", Vector2i(70, 43), false]]},
+			{"id": "retting_house", "n": "The Counting-House of the Retting-Yard", "style": "smithy", "rect": Rect2i(12, 18, 9, 8), "door": Vector2i(16, 25), "fixed": true,
+				"props": [["desk", Vector2i(14, 20), true], ["shelf", Vector2i(19, 19), true], ["barrel", Vector2i(13, 23), true], ["rack", Vector2i(19, 22), true], ["lantern", Vector2i(16, 20), false]]},
+			{"id": "loom_house", "n": "The Counting-House of the Gauze-Looms", "style": "smithy", "rect": Rect2i(79, 18, 9, 8), "door": Vector2i(83, 25), "fixed": true,
+				"props": [["desk", Vector2i(81, 20), true], ["shelf", Vector2i(86, 19), true], ["barrel", Vector2i(80, 23), true], ["rack", Vector2i(86, 22), true], ["lantern", Vector2i(83, 20), false]]},
+		],
+	},
+	"shanhu": {
+		"n": "Shanhu, the Coral Forest", "w": 100, "h": 64, "seed": 721, "theme": "shanhu", "enemies": 20, "races": [], "layer": "deeps", "hill": 0.7,
+		"pool": [["net_ray", 139, 139], ["bleach_polyp", 139, 139], ["reef_eel", 139, 139]],
+		"portals": [
+			{"to": "jiaoshi", "pos": Vector2i(1, 32), "dest": Vector2i(95, 32), "open": "s_p42_sights1"},
+			{"to": "beiming", "pos": Vector2i(98, 32), "dest": Vector2i(4, 32), "open": "s_p42_sights2"},
+		],
+		"npcs": [
+			{"id": "kiln_hong", "n": "Kiln-Master Hong of Redbranch", "pos": Vector2i(44, 29), "col": Color("a84a3a"), "asset": "folk_founder"},
+			{"id": "limer_shi", "n": "Burner Shi of the Shell-Lime Kiln", "pos": Vector2i(13, 30), "col": Color("8a7a6a"), "asset": "folk_porter"},
+			{"id": "glazier_liuli", "n": "Mistress Liuli of the Glass-House", "pos": Vector2i(80, 30), "col": Color("6ab0c8"), "asset": "folk_shopwife"},
+			{"id": "net_hand", "n": "Tie, Who Lowers the Iron Net", "pos": Vector2i(43, 35), "col": Color("5a5a62"), "asset": "folk_fisher"},
+			{"id": "coral_child", "n": "The Boy Who Waters the Coral", "pos": Vector2i(72, 35), "col": Color("c86a5a"), "asset": "folk_boy"},
+		],
+		"bosses": [],
+		"pickups": [
+			{"id": "cache_sh1", "item": "stones", "n": 10200, "pos": Vector2i(50, 54), "always": true},
+			{"id": "sense_sh1", "item": "stones", "n": 8800, "pos": Vector2i(26, 55), "always": true, "sense": true},
+			{"id": "p42_sh1", "item": "net_link", "pos": Vector2i(66, 9), "vis": ["s_p42_nets", ""]},
+			{"id": "p42_sh2", "item": "net_link", "pos": Vector2i(32, 9), "vis": ["s_p42_nets", ""]},
+			{"id": "p42_sh3", "item": "net_link", "pos": Vector2i(88, 56), "vis": ["s_p42_nets", ""]},
+			{"id": "p42_sh4", "item": "net_link", "pos": Vector2i(12, 46), "vis": ["s_p42_nets", ""]},
+		],
+		"pickup_vis": "",
+		"springs": [Vector2i(20, 44)],
+		"steles": [Vector2i(48, 33)],
+		"roads": [[Vector2i(2, 32), Vector2i(13, 32), Vector2i(30, 33), Vector2i(40, 32), Vector2i(50, 31), Vector2i(62, 32), Vector2i(76, 33), Vector2i(84, 32), Vector2i(97, 32)],
+			[Vector2i(40, 27), Vector2i(40, 32)], [Vector2i(54, 27), Vector2i(54, 31)], [Vector2i(68, 28), Vector2i(68, 32)], [Vector2i(38, 37), Vector2i(38, 33)], [Vector2i(50, 37), Vector2i(50, 32)], [Vector2i(63, 37), Vector2i(63, 33)], [Vector2i(76, 37), Vector2i(76, 33)], [Vector2i(16, 26), Vector2i(16, 32)], [Vector2i(83, 26), Vector2i(83, 32)]],
+		"lanes": [Rect2i(10, 27, 13, 4), Rect2i(77, 27, 13, 4)],
+		# the stations and the store of each works (mills.gd): what is made here is made in the open, where it can be watched
+		"mills": [
+			{"id": "mill:kiln:0", "works": "kiln", "k": 0, "pos": Vector2i(11, 28)},
+			{"id": "mill:kiln:1", "works": "kiln", "k": 1, "pos": Vector2i(15, 28)},
+			{"id": "mill:kiln:2", "works": "kiln", "k": 2, "pos": Vector2i(19, 28)},
+			{"id": "mill:kiln:store", "works": "kiln", "k": 3, "pos": Vector2i(21, 29)},
+			{"id": "mill:glass:0", "works": "glass", "k": 0, "pos": Vector2i(78, 28)},
+			{"id": "mill:glass:1", "works": "glass", "k": 1, "pos": Vector2i(82, 28)},
+			{"id": "mill:glass:2", "works": "glass", "k": 2, "pos": Vector2i(86, 28)},
+			{"id": "mill:glass:store", "works": "glass", "k": 3, "pos": Vector2i(88, 29)},
+		],
+		# places of the sea floor to be found (deeps.gd)
+		"sights": [
+			{"id": "coral_arch", "pos": Vector2i(22, 8)},
+			{"id": "iron_net_wreck", "pos": Vector2i(50, 9)},
+			{"id": "giant_clam", "pos": Vector2i(93, 12)},
+			{"id": "white_grove", "pos": Vector2i(8, 54)},
+			{"id": "sunk_bell", "pos": Vector2i(46, 57)},
+			{"id": "crab_market", "pos": Vector2i(93, 50)},
+		],
+		"buildings": [
+			{"id": "branch_hall", "n": "The Hall of the Red Branch", "style": "hall", "rect": Rect2i(34, 18, 13, 9), "door": Vector2i(40, 26),
+				"props": [["desk", Vector2i(39, 20), true], ["bookshelf", Vector2i(35, 19), true], ["bookshelf", Vector2i(45, 19), true], ["scroll", Vector2i(37, 19), false], ["scroll", Vector2i(43, 19), false], ["cushion", Vector2i(37, 23), false], ["lantern", Vector2i(44, 24), false]]},
+			{"id": "nine_fathom_inn", "n": "The Inn at Nine Fathoms", "style": "inn", "rect": Rect2i(50, 19, 10, 8), "door": Vector2i(54, 26),
+				"props": [["table", Vector2i(52, 22), true], ["stool", Vector2i(53, 22), false], ["counter", Vector2i(57, 21), true], ["barrel", Vector2i(58, 24), true], ["stove", Vector2i(51, 20), true], ["lantern", Vector2i(51, 24), false]]},
+			{"id": "slow_growth_tea", "n": "The Tea-House of Slow Growth", "style": "teahouse", "rect": Rect2i(63, 20, 11, 8), "door": Vector2i(68, 27),
+				"props": [["table", Vector2i(65, 22), true], ["cushion", Vector2i(66, 23), false], ["table", Vector2i(71, 22), true], ["cushion", Vector2i(70, 23), false], ["stove", Vector2i(64, 21), true], ["scroll", Vector2i(68, 21), false], ["lantern", Vector2i(72, 25), false]]},
+			{"id": "net_hands_house", "n": "The Net-Hands' House", "style": "seahouse", "rect": Rect2i(33, 38, 10, 7), "door": Vector2i(38, 38),
+				"props": [["bed", Vector2i(34, 43), true], ["table", Vector2i(37, 41), true], ["stool", Vector2i(38, 41), false], ["stove", Vector2i(41, 43), true], ["loom", Vector2i(41, 40), true], ["lantern", Vector2i(35, 40), false]]},
+			{"id": "burners_house", "n": "The Burner's House", "style": "house", "rect": Rect2i(45, 38, 10, 7), "door": Vector2i(50, 38),
+				"props": [["bed", Vector2i(46, 43), true], ["cabinet", Vector2i(53, 43), true], ["table", Vector2i(49, 41), true], ["stool", Vector2i(50, 41), false], ["stove", Vector2i(53, 40), true], ["lantern", Vector2i(47, 40), false]]},
+			{"id": "stokers_dorm", "n": "The Stokers' Long House", "style": "dorm", "rect": Rect2i(57, 38, 12, 8), "door": Vector2i(63, 38),
+				"props": [["bed", Vector2i(58, 40), true], ["bed", Vector2i(58, 42), true], ["bed", Vector2i(58, 44), true], ["bed", Vector2i(67, 42), true], ["bed", Vector2i(67, 44), true], ["table", Vector2i(63, 42), true], ["stool", Vector2i(63, 43), false], ["lantern", Vector2i(61, 44), false]]},
+			{"id": "float_shop", "n": "The Shop of Floats and Beads", "style": "shop", "rect": Rect2i(71, 38, 10, 7), "door": Vector2i(76, 38),
+				"props": [["counter", Vector2i(75, 41), true], ["shelf", Vector2i(72, 43), true], ["shelf", Vector2i(79, 43), true], ["barrel", Vector2i(72, 40), true], ["rack", Vector2i(79, 40), true], ["lantern", Vector2i(76, 43), false]]},
+			{"id": "kiln_house", "n": "The Counting-House of the Shell-Lime Kiln", "style": "smithy", "rect": Rect2i(12, 18, 9, 8), "door": Vector2i(16, 25), "fixed": true,
+				"props": [["desk", Vector2i(14, 20), true], ["shelf", Vector2i(19, 19), true], ["barrel", Vector2i(13, 23), true], ["rack", Vector2i(19, 22), true], ["lantern", Vector2i(16, 20), false]]},
+			{"id": "glass_house", "n": "The Counting-House of the Glass-House", "style": "smithy", "rect": Rect2i(79, 18, 9, 8), "door": Vector2i(83, 25), "fixed": true,
+				"props": [["desk", Vector2i(81, 20), true], ["shelf", Vector2i(86, 19), true], ["barrel", Vector2i(80, 23), true], ["rack", Vector2i(86, 22), true], ["lantern", Vector2i(83, 20), false]]},
+		],
+	},
+	"beiming": {
+		"n": "Beiming, the Northern Dark", "w": 100, "h": 64, "seed": 731, "theme": "beiming", "enemies": 20, "races": [], "layer": "deeps", "hill": 0.55,
+		"pool": [["well_frog", 140, 140], ["summer_insect", 140, 140], ["cramped_scholar", 140, 140]],
+		"portals": [
+			{"to": "shanhu", "pos": Vector2i(1, 32), "dest": Vector2i(95, 32), "open": "s_p42_sights2"},
+			{"to": "weilu", "pos": Vector2i(98, 32), "dest": Vector2i(4, 32), "open": "s_p42_sights3"},
+		],
+		"npcs": [
+			{"id": "sea_turtle", "n": "Old Ao, the Turtle of the Eastern Sea", "pos": Vector2i(34, 29), "col": Color("4a6a5a"), "asset": "folk_grandpa"},
+			{"id": "salter_yan", "n": "Pan-Master Yan of the Brine-Pans", "pos": Vector2i(13, 30), "col": Color("b8b8c0"), "asset": "folk_farmer"},
+			{"id": "roe_wife", "n": "Mistress Zi of the Salting-House", "pos": Vector2i(80, 30), "col": Color("c88a6a"), "asset": "folk_farmwife"},
+			{"id": "lamp_boy", "n": "The Boy Who Trims the Deep Lamps", "pos": Vector2i(33, 35), "col": Color("c8c06a"), "asset": "folk_boy"},
+			{"id": "kun_watcher", "n": "Guan, Who Watches for the Kun", "pos": Vector2i(62, 35), "col": Color("5a6a8a"), "asset": "folk_scholar"},
+		],
+		"bosses": [],
+		"pickups": [
+			{"id": "cache_bm1", "item": "stones", "n": 10400, "pos": Vector2i(50, 54), "always": true},
+			{"id": "sense_bm1", "item": "stones", "n": 9000, "pos": Vector2i(26, 55), "always": true, "sense": true},
+			{"id": "p42_bm1", "item": "well_rope", "pos": Vector2i(66, 9), "vis": ["s_p42_lines", ""]},
+			{"id": "p42_bm2", "item": "well_rope", "pos": Vector2i(32, 9), "vis": ["s_p42_lines", ""]},
+			{"id": "p42_bm3", "item": "well_rope", "pos": Vector2i(88, 56), "vis": ["s_p42_lines", ""]},
+			{"id": "p42_bm4", "item": "well_rope", "pos": Vector2i(12, 46), "vis": ["s_p42_lines", ""]},
+		],
+		"pickup_vis": "",
+		"springs": [Vector2i(24, 46)],
+		"steles": [Vector2i(38, 33)],
+		"roads": [[Vector2i(2, 32), Vector2i(13, 32), Vector2i(20, 33), Vector2i(30, 32), Vector2i(40, 31), Vector2i(52, 32), Vector2i(66, 33), Vector2i(84, 32), Vector2i(97, 32)],
+			[Vector2i(30, 27), Vector2i(30, 32)], [Vector2i(44, 27), Vector2i(44, 31)], [Vector2i(58, 28), Vector2i(58, 32)], [Vector2i(28, 37), Vector2i(28, 33)], [Vector2i(40, 37), Vector2i(40, 32)], [Vector2i(53, 37), Vector2i(53, 33)], [Vector2i(66, 37), Vector2i(66, 33)], [Vector2i(16, 26), Vector2i(16, 32)], [Vector2i(83, 26), Vector2i(83, 32)]],
+		"lanes": [Rect2i(10, 27, 13, 4), Rect2i(77, 27, 13, 4)],
+		# the stations and the store of each works (mills.gd): what is made here is made in the open, where it can be watched
+		"mills": [
+			{"id": "mill:pans:0", "works": "pans", "k": 0, "pos": Vector2i(11, 28)},
+			{"id": "mill:pans:1", "works": "pans", "k": 1, "pos": Vector2i(15, 28)},
+			{"id": "mill:pans:2", "works": "pans", "k": 2, "pos": Vector2i(19, 28)},
+			{"id": "mill:pans:store", "works": "pans", "k": 3, "pos": Vector2i(21, 29)},
+			{"id": "mill:saltery:0", "works": "saltery", "k": 0, "pos": Vector2i(78, 28)},
+			{"id": "mill:saltery:1", "works": "saltery", "k": 1, "pos": Vector2i(82, 28)},
+			{"id": "mill:saltery:2", "works": "saltery", "k": 2, "pos": Vector2i(86, 28)},
+			{"id": "mill:saltery:store", "works": "saltery", "k": 3, "pos": Vector2i(88, 29)},
+		],
+		# places of the sea floor to be found (deeps.gd)
+		"sights": [
+			{"id": "kun_rib", "pos": Vector2i(22, 8)},
+			{"id": "black_smoker", "pos": Vector2i(50, 9)},
+			{"id": "ice_that_burns", "pos": Vector2i(93, 12)},
+			{"id": "lantern_fish_shoal", "pos": Vector2i(8, 54)},
+			{"id": "yu_statue", "pos": Vector2i(46, 57)},
+			{"id": "caved_well", "pos": Vector2i(93, 50)},
+		],
+		"buildings": [
+			{"id": "lamp_hall", "n": "The Hall of the Deep Lamp", "style": "hall", "rect": Rect2i(24, 18, 13, 9), "door": Vector2i(30, 26),
+				"props": [["desk", Vector2i(29, 20), true], ["bookshelf", Vector2i(25, 19), true], ["bookshelf", Vector2i(35, 19), true], ["scroll", Vector2i(27, 19), false], ["scroll", Vector2i(33, 19), false], ["cushion", Vector2i(27, 23), false], ["lantern", Vector2i(34, 24), false]]},
+			{"id": "no_morning_inn", "n": "The Inn Where It Is Never Morning", "style": "inn", "rect": Rect2i(40, 19, 10, 8), "door": Vector2i(44, 26),
+				"props": [["table", Vector2i(42, 22), true], ["stool", Vector2i(43, 22), false], ["counter", Vector2i(47, 21), true], ["barrel", Vector2i(48, 24), true], ["stove", Vector2i(41, 20), true], ["lantern", Vector2i(41, 24), false]]},
+			{"id": "warm_vent_tea", "n": "The Tea-House over the Warm Vent", "style": "teahouse", "rect": Rect2i(53, 20, 11, 8), "door": Vector2i(58, 27),
+				"props": [["table", Vector2i(55, 22), true], ["cushion", Vector2i(56, 23), false], ["table", Vector2i(61, 22), true], ["cushion", Vector2i(60, 23), false], ["stove", Vector2i(54, 21), true], ["scroll", Vector2i(58, 21), false], ["lantern", Vector2i(62, 25), false]]},
+			{"id": "watchers_house", "n": "The Watcher's House", "style": "huizhou", "rect": Rect2i(23, 38, 10, 7), "door": Vector2i(28, 38),
+				"props": [["bed", Vector2i(24, 43), true], ["table", Vector2i(27, 41), true], ["stool", Vector2i(28, 41), false], ["stove", Vector2i(31, 43), true], ["loom", Vector2i(31, 40), true], ["lantern", Vector2i(25, 40), false]]},
+			{"id": "trimmers_house", "n": "The Lamp-Trimmers' House", "style": "house", "rect": Rect2i(35, 38, 10, 7), "door": Vector2i(40, 38),
+				"props": [["bed", Vector2i(36, 43), true], ["cabinet", Vector2i(43, 43), true], ["table", Vector2i(39, 41), true], ["stool", Vector2i(40, 41), false], ["stove", Vector2i(43, 40), true], ["lantern", Vector2i(37, 40), false]]},
+			{"id": "rakers_dorm", "n": "The Rakers' Long House", "style": "dorm", "rect": Rect2i(47, 38, 12, 8), "door": Vector2i(53, 38),
+				"props": [["bed", Vector2i(48, 40), true], ["bed", Vector2i(48, 42), true], ["bed", Vector2i(48, 44), true], ["bed", Vector2i(57, 42), true], ["bed", Vector2i(57, 44), true], ["table", Vector2i(53, 42), true], ["stool", Vector2i(53, 43), false], ["lantern", Vector2i(51, 44), false]]},
+			{"id": "salt_shop", "n": "The Shop of Salt by the Cake", "style": "shop", "rect": Rect2i(61, 38, 10, 7), "door": Vector2i(66, 38),
+				"props": [["counter", Vector2i(65, 41), true], ["shelf", Vector2i(62, 43), true], ["shelf", Vector2i(69, 43), true], ["barrel", Vector2i(62, 40), true], ["rack", Vector2i(69, 40), true], ["lantern", Vector2i(66, 43), false]]},
+			{"id": "pans_house", "n": "The Counting-House of the Brine-Pans", "style": "smithy", "rect": Rect2i(12, 18, 9, 8), "door": Vector2i(16, 25), "fixed": true,
+				"props": [["desk", Vector2i(14, 20), true], ["shelf", Vector2i(19, 19), true], ["barrel", Vector2i(13, 23), true], ["rack", Vector2i(19, 22), true], ["lantern", Vector2i(16, 20), false]]},
+			{"id": "saltery_house", "n": "The Counting-House of the Salting-House", "style": "smithy", "rect": Rect2i(79, 18, 9, 8), "door": Vector2i(83, 25), "fixed": true,
+				"props": [["desk", Vector2i(81, 20), true], ["shelf", Vector2i(86, 19), true], ["barrel", Vector2i(80, 23), true], ["rack", Vector2i(86, 22), true], ["lantern", Vector2i(83, 20), false]]},
+		],
+	},
+	"weilu": {
+		"n": "Weilu, the Tail-Gate of the Sea", "w": 100, "h": 64, "seed": 741, "theme": "weilu", "enemies": 20, "races": [], "layer": "deeps", "hill": 0.9,
+		"pool": [["silt_golem", 140, 141], ["drain_wraith", 140, 141], ["proud_flood", 141, 141]],
+		"portals": [
+			{"to": "beiming", "pos": Vector2i(1, 32), "dest": Vector2i(95, 32), "open": "s_p42_sights3"},
+		],
+		"npcs": [
+			{"id": "frog_wa", "n": "Wa, the Frog of the Caved-In Well", "pos": Vector2i(40, 30), "col": Color("6a8a4a"), "asset": "folk_youth"},
+			{"id": "silt_sweeper", "n": "Granny Ni, Who Sweeps the Sea Floor", "pos": Vector2i(56, 35), "col": Color("8a7a5a"), "asset": "folk_grandma"},
+		],
+		"bosses": [],
+		"pickups": [
+			{"id": "cache_wl1", "item": "stones", "n": 10600, "pos": Vector2i(50, 54), "always": true},
+			{"id": "sense_wl1", "item": "stones", "n": 9200, "pos": Vector2i(26, 55), "always": true, "sense": true},
+			{"id": "p42_wl1", "item": "xirang_clod", "pos": Vector2i(66, 9), "vis": ["s_p42_clods", ""]},
+			{"id": "p42_wl2", "item": "xirang_clod", "pos": Vector2i(32, 9), "vis": ["s_p42_clods", ""]},
+			{"id": "p42_wl3", "item": "xirang_clod", "pos": Vector2i(88, 56), "vis": ["s_p42_clods", ""]},
+			{"id": "p42_wl4", "item": "xirang_clod", "pos": Vector2i(12, 46), "vis": ["s_p42_clods", ""]},
+		],
+		"pickup_vis": "",
+		"springs": [Vector2i(20, 46)],
+		"steles": [Vector2i(44, 34)],
+		"roads": [[Vector2i(2, 32), Vector2i(16, 33), Vector2i(30, 31), Vector2i(46, 32), Vector2i(60, 33), Vector2i(74, 32), Vector2i(88, 32)]],
+		# places of the sea floor to be found (deeps.gd)
+		"sights": [
+			{"id": "tail_gate", "pos": Vector2i(22, 8)},
+			{"id": "silt_fan", "pos": Vector2i(50, 9)},
+			{"id": "river_mouths", "pos": Vector2i(93, 12)},
+			{"id": "guns_wall", "pos": Vector2i(8, 54)},
+			{"id": "last_cauldron", "pos": Vector2i(46, 57)},
+			{"id": "whale_fall", "pos": Vector2i(93, 50)},
+		],
+		"buildings": [
+		],
+	},
 }
 
-const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden", "dunes", "fungal", "aurora", "chaos", "maple", "karst", "springs", "wheel", "village", "terraces", "silk", "loom", "starferry", "magpie", "starpalace", "jasper", "yanggu", "millet", "fusang", "guanghan", "longmen", "drowned", "tushan", "buzhou", "juntian", "changhe", "ninesprings", "youdu", "penglai", "fangzhang", "yingzhou", "guixu", "huaxu", "zhongbei", "gumang", "fuluo", "yunmeng", "hanshan", "heishui", "langya"]
+const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden", "dunes", "fungal", "aurora", "chaos", "maple", "karst", "springs", "wheel", "village", "terraces", "silk", "loom", "starferry", "magpie", "starpalace", "jasper", "yanggu", "millet", "fusang", "guanghan", "longmen", "drowned", "tushan", "buzhou", "juntian", "changhe", "ninesprings", "youdu", "penglai", "fangzhang", "yingzhou", "guixu", "huaxu", "zhongbei", "gumang", "fuluo", "yunmeng", "hanshan", "heishui", "langya", "jiaoshi", "shanhu", "beiming", "weilu"]
 
 ## The towns of the Unbroken Land, marked on the world map: the area they stand in, a tile of that
 ## area's own map at their heart, and what they are.
@@ -4009,6 +4277,13 @@ const TOWNS := [
 		"lore": "The market on the Black Water where everything is for sale that is for sale nowhere else, and nobody is asked a name. The Black Water Gate keeps the ledger: every debt in the Rivers and Lakes is written in it, and is collected. The lanterns are red, the water does not reflect them, and the fortune-teller is always right."},
 	{"id": "knifegate", "n": "Knifegate", "area": "langya", "pos": Vector2i(45, 32),
 		"lore": "The stronghold in the Wolf-Tooth Pass, built across the only road east, where the Wolf Banner prices every traveller and takes its toll in whatever he has. Whoever is strongest is right until somebody stronger comes through the gate. It is, the riders say, the only honest town in the world."},
+	# ---- the Sea Floor release: the three towns under the Eastern Sea, each with two works (mills.gd)
+	{"id": "shuttlereef", "n": "Shuttlereef", "area": "jiaoshi", "pos": Vector2i(41, 32),
+		"lore": "The town of the Jiaoren of the open sea, cousins of Tearwater who never went down to the Nine Springs. Kelp is retted in the west yard and woven in the east into a gauze that water runs off, and the shuttles have not stopped, it is said, since the sea was fresh. A child's first tear is kept. Nobody here has ever been asked whether they like it."},
+	{"id": "redbranch", "n": "Redbranch", "area": "shanhu", "pos": Vector2i(47, 32),
+		"lore": "The town in the coral forest. An iron net is lowered over a young branch and raised in three years with a tree in it; what breaks is burnt for lime in the west yard, and the lime goes into glass in the east. The Kiln-Master holds that nothing should be hurried that is alive, and that everything else should be."},
+	{"id": "lampdeep", "n": "Lampdeep", "area": "beiming", "pos": Vector2i(37, 32),
+		"lore": "The town in the Northern Dark, where no light comes down and every house keeps a glass float with something glowing in it. Brine is boiled to salt over the warm vents and roe is laid down in it. An old man who calls himself a turtle keeps the hall, and tells every traveller how big the sea is, since one of them once needed telling."},
 ]
 
 ## What the land remembers of each region: shown beside the world map, and kept in the Annals once
@@ -4073,6 +4348,10 @@ const REGION_LORE := {
 	"hanshan": "Hanshan, the Cold Mountain. \"People ask the way to Cold Mountain: no road goes through. The ice does not melt in summer; the sun comes up into fog.\" A madman in a birch-bark hat wrote three hundred poems on its rocks and walked into a cleft that shut behind him. His friend Shide swept the kitchen below, and sweeps it still.",
 	"heishui": "Heishui, the Black Water, which the Classic of Mountains and Seas says runs out of the north-west and will not float a goose feather. Nothing is reflected in it. The Gate that takes its name keeps every debt of the Rivers and Lakes in one ledger, and holds that a debt is the only promise anybody has ever been known to keep.",
 	"langya": "Langya, the Wolf-Tooth Pass: two ridges of broken rock like the two jaws of a wolf, and between them the only road east. The Wolf Banner has held it for nine generations by the plain rule that the strongest takes first. Travellers are priced at the toll-rope, by weight, bearing and the look in the eye.",
+	"jiaoshi": "Jiaoshi, the weaving-rooms. In the southern sea, says the Record of Wide Things, live the Jiaoren, who dwell in water like fish and never leave off weaving, and whose eyes when they weep give pearls. These are the ones who stayed in the open sea. Their gauze goes into water and comes out dry. The floor here is fine pale sand, and this autumn a brown silt over it a hand deep.",
+	"shanhu": "Shanhu, the coral forest. The old books say coral grows on the rocks of the sea floor, white at first like a mushroom, yellow in a year and red in three; an iron net is sunk over it and it grows up through the mesh, and is hauled out whole. It will not be hurried. Under silt it goes white again, from the tips, and does not come back.",
+	"beiming": "Beiming, the Northern Dark. In the Northern Dark there is a fish, and its name is Kun, and nobody knows how many thousand li it measures. No light has ever come down here. The turtle of the Eastern Sea told a frog of this place once: a thousand li do not measure its breadth nor a thousand fathoms its depth, and nine floods in ten years did not raise it.",
+	"weilu": "Weilu, the Tail-Gate. Of all the waters under heaven none is greater than the sea, says Ruo: the ten thousand rivers run into it without cease and it is never full; at the Tail-Gate it drains away without stopping and it is never empty. This is the Tail-Gate, from underneath. This autumn a hundred rivers' silt lies across it like a hand across a mouth.",
 }
 
 ## The ways between the realms (Part XI): each joins a tile of one region to a tile of another in a
@@ -4092,9 +4371,14 @@ const LADDERS := [
 	# ground near the tile written here, so that nothing of any older map moves for it
 	{"id": "river_boat", "a": ["longmen", Vector2i(30, 42), Vector2i(0, -1)], "b": ["yunmeng", Vector2i(12, 32), Vector2i(1, 0)],
 		"na": "Take the river-boat down to the Rivers and Lakes", "nb": "Take the river-boat home to Longmen", "open": "s_p41_roads", "style": "sail", "late": "a"},
+	# the Sea Floor release (Part XLII): the way down, at the Returning Ruins, where every water goes.  Its end among
+	# the isles is "late" (stood by Atlas last of all, so nothing of Guixu moves); it comes out on the sand
+	# west of Shuttlereef
+	{"id": "sea_dive", "a": ["guixu", Vector2i(84, 38), Vector2i(-1, 0)], "b": ["jiaoshi", Vector2i(6, 28), Vector2i(1, 0)],
+		"na": "Go down with the water to the floor of the sea", "nb": "Go up with the tide to the Returning Ruins", "open": "s_p42_river", "style": "dive", "late": "a"},
 ]
 
-## The realm a region lies in: "surface" (the Unbroken Land), "heaven", "under", "sea", "far" or "lakes".
+## The realm a region lies in: "surface" (the Unbroken Land), "heaven", "under", "sea", "far", "lakes" or "deeps".
 static func layer_of(id: String) -> String:
 	return str(AREAS[id].get("layer", "surface")) if AREAS.has(id) else "surface"
 
@@ -4520,13 +4804,13 @@ const STEPS := [
 	{"id": "s_jt_feilian", "kind": "kill", "boss": "feilian", "area": "juntian", "t": "Catch Feilian, Earl of the Wind, and take back his bag of winds"},
 	{"id": "s_jt_kui", "kind": "kill", "boss": "kui", "area": "juntian", "t": "Quiet Kui, the One-Legged Thunder Ox"},
 	{"id": "s_jt_jiufeng", "kind": "kill", "boss": "jiufeng", "area": "juntian", "t": "Settle the nine quarrelling heads of Jiufeng"},
-	{"id": "s_jt_leigong", "kind": "kill", "boss": "leigong", "area": "juntian", "t": "Face Leigong, Duke of Thunder, who strikes at everything now", "stones": 17800},
+	{"id": "s_jt_leigong", "kind": "kill", "boss": "leigong", "area": "juntian", "t": "Face Lei Gong, Duke of Thunder, who strikes at everything now", "stones": 17800},
 	{"id": "s_cg_intro", "kind": "talk", "npc": "hu_qingyi", "area": "changhe", "t": "Cross to Changhe, the Gate of Heaven, and find the Ninth-Tail Matron on the moon terrace of her pavilion"},
 	{"id": "s_cg_collect", "kind": "collect", "item": "gate_key", "n": 4, "area": "changhe", "t": "Find the 4 Keys of the Gate the foxes hid as a joke"},
 	{"id": "s_cg_hunt", "kind": "hunt", "area": "changhe", "n": 50, "t": "Clear the islands before the Gate of Heaven"},
 	{"id": "s_cg_return", "kind": "talk", "npc": "hu_qingyi", "area": "changhe", "t": "Bring the four keys up to Hu Qingyi on the moon terrace"},
 	{"id": "s_cg_pixiu", "kind": "kill", "boss": "pixiu", "area": "changhe", "t": "Make Pixiu give back the gold of the Gate"},
-	{"id": "s_cg_shentu", "kind": "kill", "boss": "shentu", "area": "changhe", "t": "Get past Shentu, the door god under the peach tree"},
+	{"id": "s_cg_shentu", "kind": "kill", "boss": "shentu", "area": "changhe", "t": "Get past Shenshu, the door god under the peach tree"},
 	{"id": "s_cg_yulei", "kind": "kill", "boss": "yulei", "area": "changhe", "t": "Get past Yulei and his rope of reeds"},
 	{"id": "s_cg_chong", "kind": "kill", "boss": "chong", "area": "changhe", "t": "Face Chong, who has held heaven up since the ladder was cut", "stones": 18200},
 	{"id": "s_ns_intro", "kind": "talk", "npc": "shui_lian", "area": "ninesprings", "t": "Go down the roots of the Jianmu into the Nine Springs and find the Pearl-Weavers of Tearwater"},
@@ -5686,6 +5970,40 @@ const STEPS := [
 	{"id": "s_p41_stands", "kind": "marks", "n": 1, "new": true, "t": "Something has been stood in the marsh for what was answered. Go and look at 1 thing that stands (Esc > Crossroads)", "stones": 109200},
 	{"id": "s_p41_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The river-boat goes home on the evening water. The spring under the pine wants looking at. Go to Elder Qing Xuan", "stones": 109400},
 	{"id": "s_break46", "kind": "breakthrough", "to": 138, "t": "Better to forget one another in the rivers and lakes: Forgotten in the Lakes"},
+	# ---- Part XLII: The Joy of Fish (the Sea Floor release).  The water came back, and took a dry year's dust
+	# down the river with it in a month; the autumn flood has laid it on the floor of the Eastern Sea, on the
+	# looms of the Jiaoren, the coral and the salt-pans.  A seventh realm (atlas.gd STRATA "deeps"), three towns
+	# whose works can be watched and carried for (mills.gd), places nobody has stood in since they sank
+	# (deeps.gd), the Dao of Leading Water, by which the ground rises and falls under his hand (terra.gd), and
+	# one question: whether somebody who is not a fish may say what a fish enjoys
+	{"id": "s_p42_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "A letter has come up the mountain on a strip of gauze that will not dry, and the river below is the colour of a clay pot. Speak to Elder Qing Xuan", "stones": 109600},
+	{"id": "s_p42_river", "kind": "talk", "npc": "zhi_sou", "area": "longmen", "t": "A year of dust went down the river in a month. Ask at Longmen where it has gone. Speak to Zhi Sou, the Wise Old Man of the River Bend", "stones": 109800},
+	{"id": "s_p42_dive", "kind": "talk", "npc": "loom_mother", "area": "jiaoshi", "t": "Every water goes to the Returning Ruins. Sail to the isles, go down with the water at Guixu, and speak to Loom-Mother Jiao Zhu", "stones": 110000},
+	{"id": "s_p42_shoals", "kind": "hunt", "area": "jiaoshi", "n": 36, "of": ["silt_carp", "loom_crab", "tear_jelly"], "t": "The carp cannot see, the crabs are cutting the warp for want of anything else, and something is drifting that was meant to be wept. Clear 36 packs from Jiaoshi", "stones": 110200},
+	{"id": "s_p42_shuttles", "kind": "collect", "item": "buried_shuttle", "n": 4, "area": "jiaoshi", "t": "A shuttle is not set down until its weaver dies. Four are under the silt, and their weavers are not dead. Find the 4 Shuttles Laid Down Unfinished in Jiaoshi", "stones": 110400},
+	{"id": "s_p42_works", "kind": "supply", "n": 1, "area": "jiaoshi", "t": "\"You have looked at us. Now look at what we do.\" Carry 1 crate from one works to another that wants it (ask at the Retting-Yard, west of Shuttlereef)", "stones": 110600},
+	{"id": "s_p42_sights1", "kind": "sights", "n": 3, "area": "jiaoshi", "t": "Nobody has stood in most of this country since it sank. Find 3 places of the sea floor in Jiaoshi (Esc > The Sea Floor)", "stones": 110800},
+	{"id": "s_p42_coral", "kind": "talk", "npc": "kiln_hong", "area": "shanhu", "t": "East of the looms the floor stands up in branches. The forest is going white from the tips. Speak to Kiln-Master Hong at Redbranch", "stones": 111000},
+	{"id": "s_p42_reef", "kind": "hunt", "area": "shanhu", "n": 36, "of": ["net_ray", "bleach_polyp", "reef_eel"], "t": "What the iron nets held has slipped them, and the white coral has begun to walk. Clear 36 packs from the Coral Forest", "stones": 111200},
+	{"id": "s_p42_nets", "kind": "collect", "item": "net_link", "n": 4, "area": "shanhu", "t": "A net that is raised a year early kills the tree in it. Somebody has been raising them. Find the 4 Links of an Iron Net in the Coral Forest", "stones": 111400},
+	{"id": "s_p42_lime", "kind": "supply", "n": 2, "area": "shanhu", "t": "The kiln burns what the silt has killed, and has never had so much to burn. Carry 2 crates between the works of the sea floor", "stones": 111600},
+	{"id": "s_p42_sights2", "kind": "sights", "n": 3, "area": "shanhu", "t": "\"You will not know what is being lost until you have walked in it.\" Find 3 places of the sea floor in the Coral Forest", "stones": 111800},
+	{"id": "s_p42_turtle", "kind": "talk", "npc": "sea_turtle", "area": "beiming", "t": "North and east no light comes down at all. An old man keeps a hall there who calls himself a turtle. Speak to Old Ao at Lampdeep", "stones": 112000},
+	{"id": "s_p42_dark", "kind": "hunt", "area": "beiming", "n": 36, "of": ["well_frog", "summer_insect", "cramped_scholar"], "t": "Everything that was ever sure it had seen the whole of the world has come down here to be sure of it. Clear 36 packs from the Northern Dark", "stones": 112200},
+	{"id": "s_p42_lines", "kind": "collect", "item": "well_rope", "n": 4, "area": "beiming", "t": "A frog let a line down into the sea to measure it, and then another. Find the 4 Well-Ropes Let Down into the Sea", "stones": 112400},
+	{"id": "s_p42_learn", "kind": "talk", "npc": "sea_turtle", "area": "beiming", "t": "\"Gun built walls. His son went and asked the water where it wished to go.\" Go back to Old Ao, and be taught what Yu was taught", "stones": 112600},
+	{"id": "s_p42_shape", "kind": "terra", "n": 4, "area": "beiming", "t": "The Dao of Leading Water: the ground under his hand will rise or fall. Shape the open ground 4 times in the Northern Dark (Y, facing open ground)", "stones": 112800},
+	{"id": "s_p42_salt", "kind": "supply", "n": 2, "area": "beiming", "t": "Lampdeep boils its salt over the warm vents, and the pans are silting. Carry 2 crates between the works of the sea floor", "stones": 113000},
+	{"id": "s_p42_sights3", "kind": "sights", "n": 3, "area": "beiming", "t": "It is said the Kun passed this way, and that Yu did. Find 3 places of the sea floor in the Northern Dark", "stones": 113200},
+	{"id": "s_p42_frog", "kind": "talk", "npc": "frog_wa", "area": "weilu", "t": "East again the floor tilts toward a sound like a held breath. Somebody is sitting at its edge. Speak to Wa, the Frog of the Caved-In Well", "stones": 113400},
+	{"id": "s_p42_gate", "kind": "hunt", "area": "weilu", "n": 36, "of": ["silt_golem", "drain_wraith", "proud_flood"], "t": "A hundred rivers' silt has stood up, and a flood that thinks it is the sea, and what the drain would not take. Clear 36 packs from the Tail-Gate", "stones": 113600},
+	{"id": "s_p42_clods", "kind": "collect", "item": "xirang_clod", "n": 4, "area": "weilu", "t": "Gun's stolen earth, that grows of itself, came down the river with the rest. Find the 4 Clods of Swelling Soil at the Tail-Gate", "stones": 113800},
+	{"id": "s_p42_channel", "kind": "terra", "n": 6, "area": "weilu", "shape": "lower", "t": "The silt lies across the Tail-Gate like a hand across a mouth. Do not wall it. Lower the ground 6 times at the Tail-Gate, and let the sea find its drain", "stones": 114000},
+	{"id": "s_p42_sights4", "kind": "sights", "n": 3, "area": "weilu", "t": "\"You have opened it. Now go and see what it is that you opened.\" Find 3 places of the sea floor at the Tail-Gate", "stones": 114200},
+	{"id": "s_p42_moot", "kind": "talk", "npc": "loom_mother", "area": "jiaoshi", "t": "The last clod of the Swelling Soil is in his sleeve, and three towns have come to Shuttlereef to ask what he will make of their floor. Go to Loom-Mother Jiao Zhu", "stones": 114400},
+	{"id": "s_p42_stands", "kind": "marks", "n": 1, "new": true, "t": "Something has been stood on the sand at Jiaoshi for what was answered. Go and look at 1 thing that stands (Esc > Crossroads)", "stones": 114600},
+	{"id": "s_p42_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The tide goes up to the Returning Ruins at dusk. The river under the mountain is running clear. Go to Elder Qing Xuan", "stones": 114800},
+	{"id": "s_break47", "kind": "breakthrough", "to": 141, "t": "You are not a fish. From up here, on the bridge: Knows the Joy of Fish"},
 ]
 
 ## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
@@ -5936,6 +6254,17 @@ const ITEMS := {
 	"token_cold": {"n": "A Chipped Gruel Bowl", "desc": "The bowl with a chip in it from the kitchen of Cold Mountain, which is his now, and was the madman's before. There is a line of a poem scratched under the foot. Keepsake of the Hermitage: it weighs nothing"},
 	"token_black": {"n": "A Blank Black Slip", "desc": "A slip of the Black Ledger with a thumbprint that is his own and no sum written on it. A partner's slip: whatever he writes there, the Gate will honour. He has not written anything. Keepsake of the Gate: it weighs nothing"},
 	"token_wolf": {"n": "A Wolf's Tooth on a Thong", "desc": "A tooth as long as a finger, on a leather thong, given without a word by somebody who did not look at him while he gave it. Riders of the Banner step aside for it. Keepsake of the Wolf Banner: it weighs nothing"},
+	# ---- Part XLII (the Sea Floor release): what is found on the floor of the sea, and what its six works make
+	"buried_shuttle": {"n": "Shuttle Laid Down Unfinished", "desc": "A shuttle of black coral worn to the shape of one hand, with a length of sea-hemp still on the quill. A Jiaoren weaver does not set hers down until she dies. This one was set down in a hurry, with silt coming in at the door, by somebody who is alive and has not woven since"},
+	"net_link": {"n": "Link of an Iron Net", "desc": "A link of the net that is sunk over young coral, bright where it was cut. The nets of Redbranch are raised in the third year. This one came up in the second, at night, with a tree in it that was still yellow, and the tree was sold"},
+	"well_rope": {"n": "Well-Rope Let Down into the Sea", "desc": "Forty fathoms of well-rope with a knot at every fathom and a stone on the end. Somebody let it down into the Northern Dark to find out how deep the sea was. It did not touch. There is a second rope tied to the end of it, and a third"},
+	"xirang_clod": {"n": "Clod of Swelling Soil", "desc": "Xirang, the earth that grows of itself, which Gun stole from the storehouse of heaven to wall the floods in. It is warm, and a little heavier each time it is picked up. This one came down the river with the silt. It would like to be a wall. It weighs nothing yet"},
+	"mill_hemp": {"n": "Hank of Sea-Hemp", "desc": "Kelp retted in lime-water, beaten and combed to a pale fibre as long as an arm, twisted into a hank. Made at the Retting-Yard of Shuttlereef, in the open, by three people who would rather be asked than watched. It weighs nothing to speak of"},
+	"mill_gauze": {"n": "Bolt of Shark-Gauze", "desc": "The gauze of the Jiaoren, that goes into water and comes out dry: an ell of it will pass through a ring. Made at the Gauze-Looms of Shuttlereef. Worn against the skin it turns a blow of water (from the Items page: restores 60% of health)"},
+	"mill_lime": {"n": "Sack of Shell-Lime", "desc": "Dead coral and oyster shell burnt white in the kiln at Redbranch and slaked. It rets kelp, clears glass and sweetens a salt-pan, and the town burns nothing that was alive that morning. It weighs nothing to speak of"},
+	"mill_float": {"n": "Glass Float of Redbranch", "desc": "A globe of green glass the size of two fists, blown at the Glass-House of Redbranch, with something small and luminous sealed inside that does not seem to mind. Every house in Lampdeep hangs one. Held, it steadies the breath (from the Items page: restores 60% of qi)"},
+	"mill_salt": {"n": "Cake of Deep Salt", "desc": "Salt boiled out of brine over the warm vents of the Northern Dark, pressed into a cake and stamped with a lamp. It is grey, and tastes of nothing but salt, which the rakers say is the whole of the art. It weighs nothing to speak of"},
+	"mill_roe": {"n": "Jar of Salted Roe", "desc": "Roe laid down in deep salt in a jar of Redbranch glass, at the Salting-House of Lampdeep. It keeps for a year, and a spoonful of it is a meal for somebody who has been cold (from the Items page: restores 40% of health and 30% of qi)"},
 	"fork_stone": {"n": "Stone from a Fork", "desc": "A flat river stone of the kind a traveller sets at a parting of the ways to say: I went left. This one was set at a fork where another just like it sat on the right. Whoever it was is presumably still deciding"},
 	"leaf_du_outer": {"n": "Hall Master Du's Earth Nine", "desc": "A ninth leaf of earth, painted in the ochre the sect's rice ledgers are ruled with, a little crooked. Painted leaf: it takes the place of the least leaf he is dealt (Esc > Leaves)"},
 	"leaf_zhen_lantern": {"n": "Auntie Zhen's Fire Nine", "desc": "A ninth leaf of fire, painted by lantern before dawn, so that the red is a shade towards orange by day. Painted leaf: it takes the place of the least leaf he is dealt (Esc > Leaves)"},
@@ -6582,7 +6911,7 @@ const CHAT := {
 	"little_haibao": ["Are you from the mainland? Is it true the mainland does not move? How do you know where you are?", "Teacher Qin says I am descended from a boy called Haibao who was nine when he landed. I am nine too! We are basically the same person.", "I found a crab with a coin stuck to its back. I named it Emperor."],
 	# ---- the Cloud Keel release: the people of the Far Countries
 	"ark_master_yun": ["An ark has no keel in the water because there is no water. She sits on what you would call intention. Do not lean on the rail and doubt.", "We stopped coming when your sea began to run out at the Ruins. The air ran after it, and a keel of cloud cannot hold a course in a draught. It has stopped. So: here we are.", "I carry anybody who can stand the deck. Above the weather the air is thin and the qi is not; a body that cannot hold the one drowns in the other.", "Every ark-master is asked whether it is flying. It is not flying. Birds fly. This is sailing, done properly at last."],
-	"master_lie": ["I rode the wind for fifteen days once and came back pleased with myself. My teacher said: you still needed the wind. I have been thinking about that for some time.", "Nine years I studied. After three I dared not think of right and wrong. After nine I could not tell whether the wind rode me or I the wind. That was when it lifted.", "The Yellow Emperor reached this country asleep. Your ark-masters reach it awake, which is harder and much less restful.", "They will tell you no boat can come here. Quite so. That is not a boat. Ask it."],
+	"master_lie": ["My master rode the wind for fifteen days once and came back pleased with himself. His own teacher said: you still needed the wind. I have been thinking about that for some time.", "Nine years he studied. After three he dared not think of right and wrong. After nine he could not tell whether the wind rode him or he the wind. That was when it lifted.", "The Yellow Emperor reached this country asleep. Your ark-masters reach it awake, which is harder and much less restful.", "They will tell you no boat can come here. Quite so. That is not a boat. Ask it."],
 	"shipwright_mu": ["Spirit-wood for the keel, cut from a tree that fell on a windless day. Otherwise she remembers falling, and you do not want a ship that remembers falling.", "No nails. A nail is an argument with the plank. We persuade them.", "Somebody asked my grandmother whether a ship could go where there was no water. She said she did not know, and started that afternoon. This is the forty-first.", "The junks of your coast are good ships. I have seen one. It was very brave of it, all that sea."],
 	"weigher_su": ["Wind by the measure, cordage by the fathom, and advice for nothing, which is what it is worth.", "A south wind weighs less than a north one. Everybody knows it; I am the only one who has the scales.", "Nobody here haggles. They ask what a thing costs and then they think about whether they want it. It is very slow. I do well."],
 	"dreaming_guest": ["I am asleep, you understand, in a house a very long way from here, and they will wake me presently for something tedious. Do not let me keep you.", "I have governed for fifteen years and enjoyed none of it. Here nobody governs and the roofs are mended all the same. I am taking notes. I shall forget them at the door.", "When I wake I shall remember this as three months. They will tell me I slept an afternoon. Both of us will be right."],
@@ -6895,7 +7224,7 @@ const DIALOGUE := {
 	],
 	"post:siren_queen": [
 		["Siren Queen", "He promised us the sun... the Emperor promised us the sun..."],
-		["Lin Feng", "The Emperor again. Whoever he is, he has been whispering to everyone."],
+		["Lin Feng", "An Emperor. Somebody promised them the sun. Whoever he is, he has been whispering to a great many people."],
 	],
 	"pre:dragon_king": [
 		["Azure Dragon King", "Who disturbs the tide? Ah... a mortal in my halls. The envoy's prophecy walks on two legs."],
@@ -8574,7 +8903,7 @@ const DIALOGUE := {
 		["Rain-Minister Ao Run", "So I do not rain. Rain without a signature is not rain, it is only water falling about. And with no rain to carry, Feilian lets the winds out of his bag for fun, and the thunder has nothing to follow, so Kui and the Duke strike whatever they please."],
 		["Lin Feng", "Then sign it yourself."],
 		["Rain-Minister Ao Run", "...Myself. A dragon, signing his own rain, with no ledger to answer to. ...Ao Qing, fetch me a brush. No, a big one."],
-		["Rain-Minister Ao Run", "But catch the winds first, or the rain will only blow sideways. Feilian keeps his bag of winds on the southern islands, Kui stamps in the east, Jiufeng's nine heads cannot agree which way the wind is blowing, and Leigong, Duke of Thunder, sits at the eastern edge of Juntian striking at everything."],
+		["Rain-Minister Ao Run", "But catch the winds first, or the rain will only blow sideways. Feilian keeps his bag of winds on the southern islands, Kui stamps in the east, Jiufeng's nine heads cannot agree which way the wind is blowing, and Lei Gong, Duke of Thunder, sits at the eastern edge of Juntian striking at everything."],
 	],
 	"pre:feilian": [
 		["Narrator", "On the southern islands a creature with a deer's body, a bird's head and a snake's tail lounges on a bulging leather bag, letting out little gusts that knock the cloud-kites over."],
@@ -8597,14 +8926,14 @@ const DIALOGUE := {
 	"post:jiufeng": [["Narrator", "Out of breath, the nine heads fall silent one by one, until only the smallest says, quite calmly, that the wind is blowing from the west now, and it smells of rain. The other eight look at it, and for the first time in a long while, they agree."]],
 	"pre:leigong": [
 		["Narrator", "At the eastern edge of the Level Heaven, on a ring of drums, sits a blue-skinned god with a bird's face and wings, a chisel in one hand and a mallet in the other. Every few heartbeats he strikes a drum, and lightning splits a cloud somewhere far below."],
-		["Leigong, Duke of Thunder", "The Court gave me a list: the wicked, the oath-breakers, the ones who wasted rice. I struck whoever was on the list. Then the list stopped coming. So now I strike everybody, to be fair."],
+		["Lei Gong, Duke of Thunder", "The Court gave me a list: the wicked, the oath-breakers, the ones who wasted rice. I struck whoever was on the list. Then the list stopped coming. So now I strike everybody, to be fair."],
 		["Lin Feng", "That is not fair. That is just loud."],
-		["Leigong, Duke of Thunder", "Then you write me a list."],
+		["Lei Gong, Duke of Thunder", "Then you write me a list."],
 	],
 	"post:leigong": [
-		["Leigong, Duke of Thunder", "...No list. Nobody to strike. What is a thunder god for, with nobody to strike?"],
+		["Lei Gong, Duke of Thunder", "...No list. Nobody to strike. What is a thunder god for, with nobody to strike?"],
 		["Rain-Minister Ao Run", "For rain, Duke. Rain needs thunder ahead of it, to tell the farmers to bring in the washing. I have signed my first page. Will you come and drum for it?"],
-		["Narrator", "Leigong lowers his mallet. Then he strikes one drum, gently, and far below over the Unbroken Land the first rain of the new heaven begins to fall, signed by nobody but the dragon who decided it. In Featherfall, between the thunder and the bells, a whole cellar of eggs begins to hatch."],
+		["Narrator", "Lei Gong lowers his mallet. Then he strikes one drum, gently, and far below over the Unbroken Land the first rain of the new heaven begins to fall, signed by nobody but the dragon who decided it. In Featherfall, between the thunder and the bells, a whole cellar of eggs begins to hatch."],
 	],
 	"s_cg_intro": [
 		["Hu Qingyi, the Ninth-Tail Matron", "Oh, look, a hero. On our terrace. With his sword out. Put it away, darling; nobody up here will fight you before tea. Probably."],
@@ -8627,13 +8956,13 @@ const DIALOGUE := {
 	"post:pixiu": [["Narrator", "Pixiu lies down on the bare roof beams looking sorry for itself. It cannot give the gold back, it explains; it never could. But it will guard what is left, if somebody scratches it behind the horn now and then. Old Hu the Gate-Fox says he will see to it."]],
 	"pre:shentu": [
 		["Narrator", "Under a peach tree before the Gate of Heaven stands a red-faced giant in armour, a rope of reeds coiled at his belt and a tiger crouched at his feet."],
-		["Shentu, Door God of the Peach Tree", "I am Shentu. With my brother Yulei I stand under the peach tree and bind every evil spirit that tries to pass, and feed it to the tiger. Are you an evil spirit?"],
+		["Shenshu, Door God of the Peach Tree", "I am Shenshu. With my brother Yulei I stand under the peach tree and bind every evil spirit that tries to pass, and feed it to the tiger. Are you an evil spirit?"],
 		["Lin Feng", "I am a sweeper."],
-		["Shentu, Door God of the Peach Tree", "That is exactly what an evil spirit would say."],
+		["Shenshu, Door God of the Peach Tree", "That is exactly what an evil spirit would say."],
 	],
-	"post:shentu": [["Narrator", "Shentu looks at Lin Feng for a long moment, then at the tiger, which has gone to sleep. Not evil, he says. Only stubborn. He steps aside, and goes to tell his brother."]],
+	"post:shentu": [["Narrator", "Shenshu looks at Lin Feng for a long moment, then at the tiger, which has gone to sleep. Not evil, he says. Only stubborn. He steps aside, and goes to tell his brother."]],
 	"pre:yulei": [
-		["Narrator", "On the far side of the peach tree stands Shentu's brother, green-faced, holding the other end of the rope of reeds."],
+		["Narrator", "On the far side of the peach tree stands Shenshu's brother, green-faced, holding the other end of the rope of reeds."],
 		["Yulei, Door God of the Reed Rope", "My brother is too soft. Every door needs two keepers, one to open it and one to shut it. I am the one who shuts."],
 		["Yue Ling", "Doors are meant to open sometimes."],
 	],
@@ -9039,7 +9368,7 @@ const DIALOGUE := {
 	"post:s_break17": [
 		["Narrator", "Lin Feng lets every water in the world pass through him into the Ruins, holding nothing back and keeping nothing, and in the dark at the bottom of the world the water remembers, and rises: as cloud over the Eastern Sea, as springs under the Jianmu, as the Silver River across the night."],
 		["Narrator", "He becomes the first cultivator of Ten Thousand Waters Return: a realm in which everything that goes away can come home."],
-		["Narrator", "The tide comes back into Fusang at dawn. Mazu stands on her cliff with her red lantern and two sheepish generals, calling the boats home by name. Wu Zixu rides the bore up every river on the east coast. Rain-Minister Ao Run signs his first page with real sea in it, and Leigong drums for it."],
+		["Narrator", "The tide comes back into Fusang at dawn. Mazu stands on her cliff with her red lantern and two sheepish generals, calling the boats home by name. Wu Zixu rides the bore up every river on the east coast. Rain-Minister Ao Run signs his first page with real sea in it, and Lei Gong drums for it."],
 		["Narrator", "On Penglai, Xu Fu teaches the children of Landfall to sail, slowly, because he is old now and in no hurry. Under the isles two turtles out of every three are asleep, and Jingwei goes on dropping her stones: not to fill the sea, but to hold."],
 		["Jingwei, the Flame Emperor's Daughter", "Jingwei. Jingwei. It means: I am still here."],
 		["Narrator", "And on Azure Cloud Mountain, in the cool of the evening, Lin Feng sweeps the steps of the sect and the first hundred steps of the Standing Tree, and then goes down to the spring to fill the water jars, because somebody should, and the water comes up out of the ground to meet him."],
@@ -9199,7 +9528,7 @@ const DIALOGUE := {
 		["Narrator", "The first Conclave goes on for nine days, and on the tenth everybody goes home. The sect is very quiet. Lin Feng sweeps the steps in the evening, and the broom keeps catching on something that is not there."],
 		["Narrator", "It is a thread. Then a dozen of them: fine as spider silk and warm, running from his wrists out over the edge of the mountain in every direction, and every one of them pulling, very gently, south-west."],
 		["Yue Ling", "Lin Feng, your hands. There is something tied to them.", "shock"],
-		["Lin Feng", "To both of us. Look at yours."],
+		["Lin Feng", "Only to mine. Look: there is nothing on yours."],
 	],
 	"s_p14_home": [
 		["Elder Qing Xuan", "Cause and effect. Every cultivator who climbs far enough meets them at last: everything you set moving on the road comes home, the good and the bad, and asks to be settled."],
@@ -9425,11 +9754,11 @@ const DIALOGUE := {
 	"s_p16_doorgods": [
 		["Narrator", "Under the greatest peach tree in the Garden of Immortal Peaches, where its roots grip a gate of old black stone, two armoured giants sit on a bench eating peaches. One has a face as red as a lacquer box, the other one as dark as an inkstone. Their portraits are on half the doors in the land."],
 		["Shenshu, Door God of the Peach Tree", "The sweeper. We wondered when you would come. Every New Year for three thousand years we have stood on people's doors, and every New Year the people pasted us up fresh. This year nobody did. We were bored. We came home."],
-		["Yulei, Door God of the Peach Tree", "Under this tree is the gate the ghosts go in and out of. We judge them at dawn: any that did harm in the night we tie up with reeds and feed to the tiger. Peach wood frightens everything that comes out of the dark. That is why people hung boards of it on their doors, with our names on."],
+		["Yulei, Door God of the Reed Rope", "Under this tree is the gate the ghosts go in and out of. We judge them at dawn: any that did harm in the night we tie up with reeds and feed to the tiger. Peach wood frightens everything that comes out of the dark. That is why people hung boards of it on their doors, with our names on."],
 		["Yue Ling", "That is where the red couplets came from. The first ones were boards of peach wood."],
 		["Shenshu, Door God of the Peach Tree", "She knows. Good girl. Then take these: cut from the old wood and carved with our names. Nail one up where Xi wants to get through, and see what Xi thinks of it."],
 		["Narrator", "Yulei hands Lin Feng two boards of red peach wood, carved with their two names and still smelling of the fruit."],
-		["Yulei, Door God of the Peach Tree", "And paste us up again when you get home. It is very dull, being a god nobody puts on a door."],
+		["Yulei, Door God of the Reed Rope", "And paste us up again when you get home. It is very dull, being a god nobody puts on a door."],
 	],
 	"s_p16_end": [
 		["Elder Qing Xuan", "A good new year, Lin Feng. A good new year, Yue Ling. Every door in the sect is red, the Kitchen God has gone up the chimney at last with sugar on his lips, and I am told Auntie Zhou has not stopped cooking since yesterday."],
@@ -10909,7 +11238,7 @@ const DIALOGUE := {
 	],
 	"s_p31_late": [
 		["Narrator", "Below the first height, where the river keeps every hour that ever was, a man is sitting on the ground with his knees drawn up, and his knees are higher than Lin Feng's head. Grey beard, a lord's topknot, dried flood-mud on his hem to the height of a house door."],
-		["Fangfeng", "You. The small one who said I might be late. I lay on that hill nine years and was late for nothing, and it was very fine. Then I thought: the roll at Kuaiji still has a line through me. I have come to where the hours are kept, to see the one I missed."],
+		["Fangfeng", "You. The small one who said I might be late. I lay on that hill some years and was late for nothing, and it was very fine. Then I thought: the roll at Kuaiji still has a line through me. I have come to where the hours are kept, to see the one I missed."],
 		["Lin Feng", "You stood in a burst dyke a day and a night. A village is dry because of it. Did you never tell them?"],
 		["Fangfeng", "Nobody at Kuaiji asked. That is the whole of it, small one; I find I mind that more than the axe. It is up there still, the hour I was not there, with the roll in its hand. Quiet the drums. Then go and ask it what I was doing.", "point"],
 	],
@@ -10947,7 +11276,7 @@ const DIALOGUE := {
 	],
 	"s_p31_runner": [
 		["Narrator", "The peach-wood staff he planted by the black lake has become a wood, and it is in flower. Below the first height its owner is not looking at it. He is bent over with his hands on his knees, getting his breath, burnt the colour of a roof-tile, with his face to the west."],
-		["Kuafu", "It went over that ridge. Did you see? I had my hand out. It is winter at home, small brother; the nights are long as a week, and the old ones go in the dark, and the very young. I sat by this lake nine years, not thirsty, and then I remembered why I ran."],
+		["Kuafu", "It went over that ridge. Did you see? I had my hand out. It is winter at home, small brother; the nights are long as a week, and the old ones go in the dark, and the very young. I sat by this lake some years, not thirsty, and then I remembered why I ran."],
 		["Lin Feng", "You meant to tie it over their mountain. Kuafu, what would you tie it with?"],
 		["Kuafu", "With... I had not got so far. Nobody of ours ever finishes a thing; my mother says so. Clear me the glare off this shore. I cannot see where it went, and it is slower in the evening.", "laugh"],
 	],
@@ -11964,7 +12293,7 @@ const DIALOGUE := {
 		["Lin Feng", "He won it every year. Nobody else was down here."],
 	],
 	"done:s_p39_tallies": [
-		["Narrator", "Four halves of bamboo, each with a name burnt in. Lin Feng turns the last one over. The name on it is his own, in Hall Master Du's square hand, and the burn is nine years old."],
+		["Narrator", "Four halves of bamboo, each with a name burnt in. Lin Feng turns the last one over. The name on it is his own, in Hall Master Du's square hand, and the burn is twelve years old."],
 		["Yue Ling", "He cut yours the week you came up the mountain. He told me. He said he cuts one for every child who climbs the steps, and most of them he burns in the stove."],
 	],
 	"bout:list_meng": [
@@ -12247,6 +12576,157 @@ const DIALOGUE := {
 		["Narrator", "The tribulation falls as rain falls on a lake, everywhere at once and on nothing in particular. When it is over nobody in the yard can say which bolt was the last. Lin Feng is standing in the spring to his ankles: Forgotten in the Lakes."],
 		["Yue Ling", "Forty-seven. I think. I lost count in the middle, and found I had stopped being afraid for you, and those two things happened at the same time."],
 		["Lin Feng", "Good. Forget the number. I should like to be somebody you do not have to count."],
+	],
+	# ---------------------------------------------------------------- Part XLII: The Joy of Fish
+	"recall40": [
+		["Narrator", "The Lotus Seal sets Lin Feng down by the spring under the pine. It is full to the lip again, and brown. He has never seen it brown. Below the mountain the river is the colour of a clay pot, and is carrying whole trees."],
+		["Yue Ling", "It came back all at once. A year of dust was lying in every dry bed between here and the last gorge, and the water has picked up all of it and gone east. Bao says the ferry at Longmen has stopped."],
+		["Elder Qing Xuan", "Child. Come and look at this. It was brought up the steps this morning by a heron, which then stood on my roof for an hour as if it expected a reply. Do not wring it out. I have tried."],
+	],
+	"s_p42_home": [
+		["Narrator", "It is a strip of gauze a hand wide, pale as the inside of a shell, written on in a thin brown ink. It has been lying in the sun on the Elder's table since dawn. Water still runs off it when it is lifted. The table under it is dry."],
+		["Elder Qing Xuan", "Shark-gauze. The Jiaoren weave it. Not Shui Lian's people at Tearwater: their cousins, who stayed in the open sea when the others went down to the Nine Springs. I had thought them a thing sailors say.", "think"],
+		["Yue Ling", "\"To whoever dug out the cleft. Your water has come home, and thank you for it. It has brought your hills with it. They are on our looms.\" That is all. There is a small pearl sewn in the corner, where one would sign."],
+		["Lin Feng", "I dug out a spring and buried a town I had never heard of. I did not know the sea had a floor that anybody lived on."],
+		["Elder Qing Xuan", "Nor did the river. Go and ask at Longmen where it has put a year of dust. Then go down and look. Tie that across your mouth when you do: water runs off it, and I am told breath does not. And child. Look before you mend. They did not ask you to mend."],
+	],
+	"s_p42_river": [
+		["Narrator", "The ferry stage at Longmen is under a foot of brown water. Zhi Sou is sitting above it on a pile with his feet drawn up, watching the river go by with the expression of a man reading a long letter from somebody he has never liked."],
+		["Zhi Sou, the Wise Old Man of the River Bend", "Seventy autumns I have watched this river come down, and I have told the Foolish Old Man every one of them that he could not move a mountain. Well. Somebody has moved several. They went past here on Tuesday."],
+		["Lin Feng", "Where does it put them?"],
+		["Zhi Sou, the Wise Old Man of the River Bend", "Where every water goes. The Returning Ruins. The sea pours over the lip there and is never less, they say, and whatever it carries goes over with it. He Bo is beside himself. He says it is the first flood in his life that he did not send.", "point"],
+		["Yue Ling", "Ruo will remember us. She held the sea still once to hear about a river. She might hold it open for long enough to go down."],
+		["Zhi Sou, the Wise Old Man of the River Bend", "Down! Nobody goes down. You will drown, and I shall have been right, and it will give me no pleasure at all. Take Mazu's boat from Fusang. The lip is at the east end of the last isle. Mind the step."],
+	],
+	"s_p42_dive": [
+		["Narrator", "At the lip of the Returning Ruins the sea stands open a hand's breadth, like a door held with a foot, and Ruo does not say a word about it. The way down is a long time and no distance. The gauze over his mouth stays dry. Then there is sand, and a town."],
+		["Narrator", "Shuttlereef is built of shell and black coral, and every roof has a hand of brown silt on it. In the west yard people are forking kelp into vats; in the east a row of looms is going, slowly. A woman with scaled wrists watches Lin Feng come up the street."],
+		["Loom-Mother Jiao Zhu", "So you are who dug it out. You are smaller than the flood. I am Jiao Zhu. I wrote to thank you, and to tell you what your water carried, since I thought you were somebody who would want to be told."],
+		["Lin Feng", "I have come to put it right."],
+		["Loom-Mother Jiao Zhu", "Have you. You have been on our floor for as long as it takes to walk up a street. You do not know what right is here. Nor do I, any longer: it has never been wrong before. Clear the shoals first. The blind carp are in among the children.", "think"],
+	],
+	"done:s_p42_shoals": [
+		["Narrator", "Thirty-six packs. The carp cannot see for silt and go at anything that moves the water. The crabs have cut every line of kelp between the yard and the reef, for want of anything else to cut. The jellies only drift, heavy, like something meant to have been let go."],
+		["Yue Ling", "A Jiaoren weeps a pearl. I asked a child what happens when one of them cannot weep. She pointed at the jellies, and went on forking kelp."],
+	],
+	"done:s_p42_shuttles": [
+		["Narrator", "Four shuttles of black coral, each worn to the shape of one hand. Loom-Mother Jiao Zhu lays them in a row and does not touch them again. Four women come and stand behind her. None of them picks hers up."],
+		["Loom-Mother Jiao Zhu", "A weaver sets her shuttle down when she dies. These were set down with silt coming in at the door. They think it is bad luck to take them up. I think it is worse luck to leave them. We shall see who is right. Go and look at the yards.", "bow"],
+	],
+	"done:s_p42_works": [
+		["Narrator", "One crate of sea-hemp, from the yard where it is retted to the shed where it is woven: two hundred paces, with the whole town watching to see whether somebody heaven has struck forty-seven times can carry a box without dropping it."],
+		["Lin Feng", "It goes into a vat as weed and comes out of a loom as something I can read through. Six people touch it on the way. I counted. I have carried things all my life and never once asked who made them."],
+	],
+	"done:s_p42_sights1": [
+		["Narrator", "Three places nobody has stood in since they sank. The sand keeps a footprint here for a long time. His are the only ones, going in, and coming out again a good deal more slowly."],
+		["Yue Ling", "You stopped talking in the second one. I liked it. You were not thinking about what to do with it. You were only looking. East is open now: the floor stands up in branches there, and they are going white."],
+	],
+	"s_p42_coral": [
+		["Narrator", "Redbranch stands in a forest that is red at the root, yellow above and, this autumn, white at every tip. A broad man is standing at the edge of the kiln yard with a dead branch in each hand, weighing one against the other as if it mattered which he burnt first."],
+		["Kiln-Master Hong of Redbranch", "Hong. I burn what dies. In a good year that is a basket a day and I am idle by noon. I have not been idle since your river came. Do you know how long that branch took? I do. I lowered the net over it the year my daughter was born."],
+		["Lin Feng", "I can clear the silt off it."],
+		["Kiln-Master Hong of Redbranch", "It is coral. It is alive. You clear silt off it the way you would brush dust off an eye. Nothing here can be hurried, and you have the look of somebody who has never had to wait for anything in his life. Clear the reef of what has got loose. That, you can hurry.", "shrug"],
+	],
+	"done:s_p42_reef": [
+		["Narrator", "Thirty-six packs. The rays went through the iron nets where the silt had rotted the cords. The polyps that went white have come off their rock and walk about, slowly, looking for it. The eels live in the dead branches and do not come out so much as arrive."],
+		["Yue Ling", "The white ones do not attack. They walk up and stand very close. I think they are trying to grow on us."],
+	],
+	"done:s_p42_nets": [
+		["Narrator", "Four links of an iron net, cut bright. Kiln-Master Hong fits them together on his palm without looking. He knows the net. He knows the year it went down, and that it should not have come up until the year after next."],
+		["Kiln-Master Hong of Redbranch", "My own stokers. They raised it early, at night, and sold a yellow tree for red. They thought the forest was finished and that they might as well. I cannot even be angry. I had thought so too, on Tuesday. Carry for the kiln a while. I want to think.", "think"],
+	],
+	"done:s_p42_lime": [
+		["Narrator", "Two crates. What the kiln burns white goes west to the vats and across the yard to the glass. Mistress Liuli blows a float while he waits, turns it once against the light, and puts something small and luminous into it that does not seem to mind."],
+		["Lin Feng", "Every town down here needs what the next one makes. I spent a month among four sects who had ignored one another for three hundred years. Nobody here has ever had that to spare."],
+	],
+	"done:s_p42_sights2": [
+		["Narrator", "Three more places of the sea floor. In one of them a bell is lying on its side, and a current goes through it, and it has been saying one note too low to hear for longer than there has been a sect on Azure Cloud Mountain."],
+		["Kiln-Master Hong of Redbranch", "You walked in it. Good. Now you know what a thing looks like that took nine hundred years, and you will be a little afraid of your own hands. Go north. There is an old fool in the dark who has been waiting for somebody to tell about the sea.", "nod"],
+	],
+	"s_p42_turtle": [
+		["Narrator", "No light comes down to Lampdeep. Every door has a glass float hung by it with something glowing inside, and by that light an old man with a very long neck is sitting on the steps of the hall, perfectly still, as though he had been set down there and not yet picked up."],
+		["Old Ao, the Turtle of the Eastern Sea", "Ah. A frog. No: forgive me. A habit. A frog of a caved-in well once told me how fine it was to have a whole well to oneself. I put one foot in, and my knee stuck. So I stepped back, and told him about the sea."],
+		["Old Ao, the Turtle of the Eastern Sea", "A thousand li does not measure its breadth, I said, nor a thousand fathoms its depth. In Yu's time there were nine floods in ten years, and it did not rise. In Tang's, seven droughts in eight, and it did not fall. He was very quiet afterwards. Then he came down here to check.", "think"],
+		["Lin Feng", "And my river has done what nine floods did not."],
+		["Old Ao, the Turtle of the Eastern Sea", "Your river! Listen to him. It has put a little dust on a very large floor, child. It matters to the people under the dust, and not otherwise. Hold both of those. Now go and clear my dark of everything that has come down to be sure it has seen it all."],
+	],
+	"done:s_p42_dark": [
+		["Narrator", "Thirty-six packs. The frogs have measured the sea and are furious at the answer. The summer insects have been told of ice. The scholars each hold one corner of something and are certain it is the whole, and cannot be argued with, having only the one corner to stand on."],
+		["Yue Ling", "One of the scholars proved to me that the sea was shallow. It was a very good proof. He was standing in the only shallow part."],
+	],
+	"done:s_p42_lines": [
+		["Narrator", "Four well-ropes, knotted at every fathom, each tied to the end of the last. Laid out along the street of Lampdeep they reach from the hall to the pans and round the corner. They did not touch bottom. Old Ao looks at them for some time."],
+		["Old Ao, the Turtle of the Eastern Sea", "He did not believe me, you see. That is to his credit. He let down a rope. And when the rope was not enough he did not say the sea was a lie. He tied on another. I have known immortals who could not have done that. Come back when you have washed. I have something of Yu's.", "nod"],
+	],
+	"s_p42_learn": [
+		["Old Ao, the Turtle of the Eastern Sea", "Gun was given the floods to stop. He stole the Swelling Soil from heaven and built walls, and the water stood behind them and thought, and after nine years it came over the top. They executed him for it. His son was given the same floods."],
+		["Old Ao, the Turtle of the Eastern Sea", "Yu did not build one wall. He walked the whole land with a plumb-line and asked the water where it wished to go. Where it wished to go, he lowered the ground. Where it must not, he raised it a little. Thirteen years. He passed his own door three times and did not go in.", "point"],
+		["Narrator", "The old man puts his palm flat on the sand between them and leans, not hard. The sand goes down under it like a breath let out. He turns the hand over, and it comes up again, higher than it was. Then he takes Lin Feng's wrist and sets the hand where his own had been."],
+		["Lin Feng", "It moved. I did not push it. I asked, and it moved."],
+		["Old Ao, the Turtle of the Eastern Sea", "That is the Dao of Leading Water. It is the only art I know that is harder the stronger you are. You could raise a mountain here by noon. Do not. Shape my poor silted yard a little, four times, and stop when the ground has had enough.", "bow"],
+	],
+	"done:s_p42_shape": [
+		["Narrator", "Four times the ground under his hand rises or falls, and stays where it is put. The silt runs off the raised places into the lowered ones and lies there, out of the way. A raker from the pans comes and looks at it and says nothing, and goes to fetch the others."],
+		["Yue Ling", "You were frightened the whole time. I could see it in your shoulders. Good. I should not like to stand next to somebody who did that easily."],
+	],
+	"done:s_p42_salt": [
+		["Narrator", "Two crates. Grey cakes of salt stamped with a lamp go across the yard to the Salting-House, and green glass comes up the road from Redbranch to be filled. Mistress Zi packs roe with two fingers and does not look at what her hands are doing."],
+		["Lin Feng", "I asked her whether she liked it. She said nobody had asked her that in forty years and she would need a day to think. I am going to come back tomorrow and find out."],
+	],
+	"done:s_p42_sights3": [
+		["Narrator", "Three places of the Northern Dark. At one of them a rib stands out of the sand, taller than the pagoda at home, and he walks its whole length before he understands that it is one rib and the rest is further on."],
+		["Old Ao, the Turtle of the Eastern Sea", "East of here the floor tilts, and you will hear it before you see it. That is the Tail-Gate. Your dust is lying across it. And the frog is there. He has been sitting at the edge for a month. Be kind to him. He was right to check.", "point"],
+	],
+	"s_p42_frog": [
+		["Narrator", "The floor tilts toward a sound like a breath held. At the edge of it a thin youth is sitting on a coil of rope with his arms round his knees, looking down into the place where the sea goes, which this autumn is a slope of brown mud."],
+		["Wa, the Frog of the Caved-In Well", "I had a well. I could hop along the rail, and rest in a gap in the bricks, and the mud came up to my ankles and no further. I was master of it. I told a turtle so. I have thought about that conversation every day for nine hundred years."],
+		["Lin Feng", "You came all the way down here to measure it."],
+		["Wa, the Frog of the Caved-In Well", "I ran out of rope. Do you know, that was the happiest day of my life? And now look at it. Stopped up. With mud. Like a well. I came to the one thing in the world too big to be mine, and somebody has put a lid on it.", "grieve"],
+		["Wa, the Frog of the Caved-In Well", "There are things standing up out of that mud that think they are the sea. I know the look. I had it. Would you? I cannot. I am only a frog."],
+	],
+	"done:s_p42_gate": [
+		["Narrator", "Thirty-six packs. The silt has stood up in the shape of whatever it buried. The flood that thinks it is the sea coils and roars and is, when it is put down, about a bucketful. What the drain sent back has no shape, and wants one badly."],
+		["Yue Ling", "The flood said it was the greatest water under heaven. Ruo was right overhead. I could feel her not laughing."],
+	],
+	"done:s_p42_clods": [
+		["Narrator", "Four clods of Xirang, the earth that grows of itself, warm, each a little heavier than when he picked it up. In his sleeve they lean toward one another. Left a night on the sand they would be a bank; left a year, the wall Gun meant."],
+		["Wa, the Frog of the Caved-In Well", "You could stop the Tail-Gate with that for good. A wall across it. No more mud coming down on anybody. I should have liked that once. A sea with a rim, that one could hop along."],
+		["Lin Feng", "I know what a wall across water does. I had one on Cold Mountain a month ago, and it was only a rock. I shall lower the ground and let it go where it was going."],
+	],
+	"done:s_p42_channel": [
+		["Narrator", "Six times he sets his palm to the mud and asks, and six times it goes down. On the sixth the Tail-Gate takes a breath. The brown slope begins to move, all of it, slowly and then not slowly, over the lip and down into wherever the sea keeps what it is given."],
+		["Wa, the Frog of the Caved-In Well", "Oh. Oh, there it is. It goes down further than my rope. It goes down further than I can think. I am going to sit here a while. No. I am going to fetch more rope.", "laugh"],
+	],
+	"done:s_p42_sights4": [
+		["Narrator", "Three places of the Tail-Gate. From the lip he can see the mouths of every river in the world, small and bright and very far up, like stars seen from a well. One of them is his own. It is running clear."],
+		["Yue Ling", "There is one clod left in your sleeve. I can hear it. And there are people coming along the floor from three towns, with their good gauze on. They want to ask you something, and I do not think it is the thing you want to be asked."],
+	],
+	"s_p42_moot": [
+		["Narrator", "They are all in the street at Shuttlereef: the weavers, Hong with lime to the elbow, Old Ao carried on a litter and complaining of it, the frog with a new coil of rope. Four shuttles lie on the table still. Beside them the Loom-Mother has set a bowl of clean sand."],
+		["Loom-Mother Jiao Zhu", "The mud is going. You led it away and did not wall it, and I thank you. Now. You have a Dao that makes the ground do as it is asked, and a clod in your sleeve that grows. Old Ao says you could give us any floor you chose."],
+		["Kiln-Master Hong of Redbranch", "Terraces for my coral, out of the current. A deep cold bed for her kelp. Warm flats for the pans. I have drawn it. It is a better floor than the one we have. I am not too proud to say so."],
+		["Loom-Mother Jiao Zhu", "And I say: he is not a fish. He has been among us one autumn. How does he know what we enjoy? But I am an old woman who has not picked up her shuttle. I will not pretend that I know either. So. I ask him.", "think"],
+		["Lin Feng", "I do not know what you enjoy. I know what I saw. I shall tell you what I think, and you may do as you like with it. I find I should prefer it that way."],
+	],
+	"done:s_p42_stands": [
+		["Narrator", "It stands on the sand a little way from the town, where the children pass on their way to the yard. They do not stop to look at it. That, he supposes, is how one knows a thing belongs to a place."],
+		["Yue Ling", "The Loom-Mother has picked up her shuttle. I watched. She did not make anything of it. She only sat down and went on from where the thread was. The tide goes up at dusk."],
+	],
+	"s_p42_end": [
+		["Narrator", "The spring under the pine is clear to the bottom. The Elder is sitting beside it with the strip of gauze laid over his knee, dry, and a second strip, which is wet, and which he has not let anybody else read."],
+		["Elder Qing Xuan", "She writes that the floor is as it is, and that it is theirs. She writes that you were asked a thing you could not know, and that you said so first and answered second. She has underlined first. Twice. I have never had a letter underlined to me before."],
+		["Lin Feng", "There was a man on a bridge once who said the fish were happy. His friend said: you are not a fish. I always took the friend's side. I have been down there now, and I still do not know what they enjoy. But I do not think the first man was wrong."],
+		["Yue Ling", "He knew it standing on the bridge. That was what he said. Not from inside the fish. From where he was, looking, with his friend beside him arguing. I think that is the only place anybody knows anything from."],
+		["Elder Qing Xuan", "Then I shall tell you what I know, from this step. The water is clear. Two people came up nine hundred and ninety-nine stairs this evening and did not notice them. And somebody has shaped the ground by my spring so that it drains. Thank you, child. Sit down.", "nod"],
+	],
+	"pre:s_break47": [
+		["Narrator", "The cloud that comes has a floor. Everybody in the yard sees it: flat and pale underneath, with ripples on it, as the sea is seen from below. It does not come down. For the first time in forty-seven tribulations, the thing overhead seems to be waiting to be asked."],
+		["Lin Feng", "Come where you wish to go. I shall not wall it, and I shall not tell you that I know what it is like to be you. I am only here, underneath, looking up."],
+	],
+	"post:s_break47": [
+		["Narrator", "The bolts come down like water finding a channel that was already there. Each goes into the ground where the ground was lowest, and the yard, when it is over, is not even scorched. Lin Feng is standing with one palm flat on the flagstones, as if he had asked them something."],
+		["Yue Ling", "Forty-eight. I did count, this time. I wanted to know. You led all of it away. There is a little pool by the gate that was not there this morning, and it is perfectly round."],
+		["Lin Feng", "I did not make that. I only lowered the ground, and it came. I think that may be all I have ever done that was any good."],
 	],
 	"pre:s_break44": [
 		["Narrator", "The cloud that gathers over the peak has no colour to speak of. It is not black, or gold, or the violet of the last one. The disciples in the yard look up and cannot agree what to call it, and are still arguing when it begins."],

@@ -160,6 +160,15 @@ const ECO := {
 		"ground": [["spiderlily", 0.8], ["deadbush", 0.6]], "land": 0.4, "rocks": ["slab", "boulder"], "rock_p": 0.06, "grass": 0.25, "cover": 0.06},
 	"langya": {"canopy": [["pine", 2], ["dead", 2], ["acacia", 1], ["cypress", 1]], "under": [["deadbush", 3], ["agave", 1]],
 		"ground": [["deadbush", 1], ["agave", 0.5]], "land": 0.4, "rocks": ["boulder", "spire", "scree"], "rock_p": 0.14, "grass": 0.25, "cover": 0.05},
+	# the Sea Floor release: kelp and nothing that needs air
+	"jiaoshi": {"canopy": [["kelp", 3]], "under": [["kelp", 3]], "ground": [["kelp", 1]],
+		"land": 0.5, "rocks": ["boulder", "scree"], "rock_p": 0.05, "grass": 0.0, "cover": 0.1},
+	"shanhu": {"canopy": [["kelp", 1]], "under": [["kelp", 2]], "ground": [["kelp", 0.6]],
+		"land": 0.45, "rocks": ["boulder", "spire"], "rock_p": 0.1, "grass": 0.0, "cover": 0.08},
+	"beiming": {"canopy": [["kelp", 1]], "under": [["glowshroom", 2], ["kelp", 1]], "ground": [["glowshroom", 0.6]],
+		"land": 0.4, "rocks": ["slab", "spire", "boulder"], "rock_p": 0.1, "grass": 0.0, "cover": 0.06},
+	"weilu": {"canopy": [["kelp", 1], ["dead", 1]], "under": [["kelp", 1], ["deadbush", 1]], "ground": [["kelp", 0.4]],
+		"land": 0.35, "rocks": ["boulder", "slab", "scree"], "rock_p": 0.14, "grass": 0.0, "cover": 0.04},
 }
 
 static var _grass := {}

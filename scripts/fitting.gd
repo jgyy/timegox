@@ -288,7 +288,11 @@ static func set_down(g, wd: Dictionary, e: Dictionary, tid: String) -> Dictionar
 		return {"who": who, "line": str(THINGS[tid].bad[str(e.furn)]), "v": -1, "stones": 0}
 	if not w.is_empty() and str(w.spot) == spot and str(w.thing) == tid and not is_fitted(g, hk):
 		g.fitted[hk] = int(g.day)
-		g.step_fit += 1
+		# (the Sea Floor release: a step that asks for houses of one region counts the houses of that region;
+		# three houses of Qingshi used to finish a step set in Yanggu)
+		var fs: Dictionary = g.cur_step()
+		if fs.is_empty() or str(fs.get("kind", "")) != "fit" or not fs.has("area") or str(fs.area) == hk.get_slice(":", 0):
+			g.step_fit += 1
 		# (the Unpicked Road release: the thing that put a house to rights stays in it; one lamp used to be
 		# taken up again and put every house of a town to rights in turn)
 		g.placed[spot] = "%s|fit" % tid
