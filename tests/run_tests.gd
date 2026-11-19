@@ -11938,7 +11938,7 @@ func _unblunted_knife() -> void:
 	check(msrc.count("offer_tame(") == 3 and msrc.contains("if not ctx.has(\"raid\"):\n\t\t\t\t\toffer_tame(e2, fought)"), "one of a pack beaten or scattered may stay; never a raider")
 	check(bsrc.count("world.tame_want = ") == 2 and bsrc.count("Pets.send(") == 1 and msrc.contains("if world.tame_want:") and not bsrc.contains("Pets.tame(") and not bsrc.contains("Pets.feed("), "the bot holds out its hand only inside a step that asks for a beast, and sends one only inside a step that asks")
 	var pm: Node3D = Pets.model({"foe": "bamboo_wolf"})
-	check(pm.get_child_count() == 1 and is_equal_approx((pm.get_child(0) as Node3D).scale.x, Pets.SCALE), "a beast at his heel is drawn in the body it had, half the size")
+	check(pm.get_child_count() == 1 and is_equal_approx((pm.get_child(0) as Node3D).scale.x, Pets.SCALE), "a beast at his heel is drawn in the body it had, smaller")
 	pm.free()
 
 	print("== places of peace (retreats.gd) ==")

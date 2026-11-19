@@ -5399,7 +5399,7 @@ func make(id: String) -> bool:
 	move_dir = Vector2i.ZERO
 	return true
 
-## pets.gd: the beast at his heel, drawn half a pace behind him on the side Yue Ling is not (drawn only: with
+## pets.gd: the beast at his heel, drawn a pace ahead of him on the side Yue Ling is not (drawn only: with
 ## no window there is none).
 ## what the bot means when one of a pack stays (a player is asked)
 var tame_want := false
@@ -5425,7 +5425,8 @@ func _pet_tick(d: float) -> void:
 		return
 	pet_node.visible = trip.is_empty() and glide.is_empty() and player.visible
 	var fw := Vector3(facing.x, 0.0, facing.y)
-	var want := player.position - fw * 1.0 - Vector3(-fw.z, 0.0, fw.x) * 1.1
+	# (a pace ahead of him, on the side Yue Ling is not: behind him she would hide it)
+	var want := player.position + fw * 0.9 - Vector3(-fw.z, 0.0, fw.x) * 1.2
 	var gap := Vector3(want.x - pet_pos.x, 0.0, want.z - pet_pos.z)
 	if gap.length() > 12.0:
 		pet_pos = want

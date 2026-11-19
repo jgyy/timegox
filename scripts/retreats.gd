@@ -160,5 +160,5 @@ static func text(g) -> String:
 	for id in g.retreats:
 		var k := "deep" if str(id).begins_with("deep:") else ("pavilion" if str(id).begins_with("pav:") else "summit")
 		by[k] = int(by[k]) + 1
-	return "He has sat and forgotten %d time%s, in %d place%s (%d summits, %d caves, %d pavilions), and slept out %d night%s." % [int(g.sittings), "" if int(g.sittings) == 1 else "s", g.retreats.size(),
+	return "He has sat and forgotten %d time%s, in %d place%s (summits %d, caves %d, pavilions %d), and slept out %d night%s." % [int(g.sittings), "" if int(g.sittings) == 1 else "s", g.retreats.size(),
 		"" if g.retreats.size() == 1 else "s", int(by.summit), int(by.deep), int(by.pavilion), int(g.slept), "" if int(g.slept) == 1 else "s"]

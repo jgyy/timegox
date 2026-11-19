@@ -8357,9 +8357,11 @@ func _knife_shots(which: String = "1") -> void:
 		for th in ["plain_guard", "peach_beads", "ward_slip", "herb_paste", "river_stone", "straw_sandals"]:
 			quiet.call()
 			if w.make(th):
-				await _wait(3.2)
+				await _wait(3.0)
 				await _shot("make_" + Crafts.craft_of(th))
-				await _wait(4.5)
+				w._use_finish()
+				w._use_clear()
+				await _wait(0.3)
 			quiet.call()
 	if want.call("peace"):
 		Clock.set_hour(Game, 7.0)
@@ -8377,9 +8379,11 @@ func _knife_shots(which: String = "1") -> void:
 		main.set_stack(["world"])
 		quiet.call()
 		if w.sit("sit"):
-			await _wait(3.5)
+			await _wait(3.0)
 			await _shot("peace_sit_summit")
-			await _wait(4.5)
+			w._use_finish()
+			w._use_clear()
+			await _wait(0.3)
 		quiet.call()
 		var fid := Caves.fid("fusang", -1)
 		var cw: Dictionary = surf.floors[fid]
@@ -8394,9 +8398,11 @@ func _knife_shots(which: String = "1") -> void:
 		quiet.call()
 		await _wait(1.5)
 		if w.sit("sit"):
-			await _wait(3.5)
+			await _wait(3.0)
 			await _shot("peace_sit_cave")
-			await _wait(4.5)
+			w._use_finish()
+			w._use_clear()
+			await _wait(0.3)
 		Game.defeated = {}
 		quiet.call()
 		for e3 in surf.ents:
@@ -8444,9 +8450,9 @@ func _knife_shots(which: String = "1") -> void:
 		Game.pets[0]["bond"] = 62.0
 		quiet.call()
 		w.move_dir = Vector2i(0, 1)
-		await _wait(1.4)
+		await _wait(1.0)
 		w.move_dir = Vector2i.ZERO
-		await _wait(1.2)
+		await _wait(1.0)
 		quiet.call()
 		await _shot("beast_at_heel")
 		main.offer_beasts()
@@ -8457,6 +8463,26 @@ func _knife_shots(which: String = "1") -> void:
 			await _wait(0.3)
 			await _shot("beasts_kept")
 		main.set_stack(["world"])
+	if want.call("heel"):
+		# on the flagstones of the sect, where the grass does not hide it
+		Clock.set_hour(Game, 9.0)
+		Game.pets = []
+		Game.pet = -1
+		Game.pets_n = 0
+		Game.inv["carp"] = 2
+		Pets.tame(Game, "bamboo_wolf")
+		Game.pets[0]["bond"] = 62.0
+		main.set_stack(["world"])
+		w.teleport(_nearest_free(Atlas.to_world("sect", Vector2i(20, 12))), "surface")
+		quiet.call()
+		await _wait(0.8)
+		w.move_dir = Vector2i(-1, 0)
+		await _wait(0.8)
+		w.move_dir = Vector2i.ZERO
+		await _wait(1.8)
+		quiet.call()
+		w.banner_t = 0.0
+		await _shot("beast_at_heel")
 	if want.call("hands"):
 		Game.kept = {"forge": {"id": "folded_collar", "q": 2}, "carve": {"id": "peach_beads", "q": 1}, "refine": {"id": "herb_paste", "q": 1}}
 		Game.craft_xp = {"forge": 17, "carve": 4, "refine": 2}

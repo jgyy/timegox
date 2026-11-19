@@ -57,8 +57,8 @@ const ROOM_MAX := 4
 const GATHER_HOURS := 4.0
 ## what the beast at his heel strikes with: a share of his own attack (`fang` times this, by trust)
 const BLOW := [0.3, 0.4, 0.5, 0.6, 0.7]
-## how big a beast is drawn at his heel (of the size its kind is drawn in the land)
-const SCALE := 0.5
+## how big a beast is drawn at his heel (of the size its kind is drawn in the land: something over half)
+const SCALE := 0.62
 const ASK := "The beasts he keeps"
 
 static func room(g) -> int:
@@ -293,7 +293,7 @@ static func text(g, pet: Dictionary) -> String:
 	parts.append(str(k.word))
 	return " ".join(parts)
 
-## The beast as it is drawn at his heel: the body and colours of what it was, half the size.
+## The beast as it is drawn at his heel: the body and colours of what it was, smaller.
 static func model(pet: Dictionary) -> Node3D:
 	var d: Dictionary = Data.ENEMIES[str(pet.foe)]
 	var m := Models.monster(str(d.shape), d.col, false, str(pet.foe))
