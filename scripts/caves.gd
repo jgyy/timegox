@@ -130,6 +130,11 @@ const LATE := {
 	"fusang": {-1: {"pool": [["dropped_ball", 141, 141], ["counted_wing", 141, 141], ["trembling_pole", 141, 141]], "n": 10, "vis": "s_p43_home"}},
 	"garden": {-1: {"pool": [["crossed_grain", 142, 142], ["hurried_chisel", 142, 142], ["gold_archer", 142, 142]], "n": 10, "vis": "s_p43_home"}},
 	"mirror": {-1: {"pool": [["crowing_cock", 143, 143], ["glaring_cock", 143, 143], ["hollow_swagger", 143, 143]], "n": 10, "vis": "s_p43_home"}},
+	# Part XLIV (the Turned Face release): what is thought of somebody, gone down into three caves of the Rivers and
+	# Lakes no chapter had used, west to east as the owl flew
+	"yunmeng": {-1: {"pool": [["thiefs_gait", 144, 144], ["suspecting_eye", 144, 144], ["wall_croak", 144, 144]], "n": 10, "vis": "s_p44_home"}},
+	"hanshan": {-1: {"pool": [["running_bark", 145, 145], ["black_coat", 145, 145], ["puffed_pride", 145, 145]], "n": 10, "vis": "s_p44_home"}},
+	"langya": {-1: {"pool": [["eastward_owl", 146, 146], ["same_cry", 146, 146], ["hundred_tongues", 146, 146]], "n": 10, "vis": "s_p44_home"}},
 }
 
 ## the things to do in a cave (props.gd), in the order a cave takes them; a cave has `PER_CAVE` of them

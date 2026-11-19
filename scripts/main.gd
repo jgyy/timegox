@@ -993,6 +993,9 @@ func talk_folk(e: Dictionary) -> void:
 		lines = [[str(fp.n), Crime.line(Game, str(fp.town), int(fp.seed) + wn0).replace("%s", Game.address())]]
 	elif Game.prologue == "" and Folk.is_camp(str(fp.town)) and wn0 % 2 == 0 and Wilds.line(Game, str(fp.area), int(fp.seed) + wn0) != "":
 		lines = [[str(fp.n), Wilds.line(Game, str(fp.area), int(fp.seed) + wn0).replace("%s", Game.address())]]
+	# (the Turned Face release, repute.gd: somebody the land has turned from is told so, every other first word)
+	elif Game.prologue == "" and wn0 % 2 == 0 and Repute.line(Game, int(fp.seed) + wn0) != "" and not bool(fp.get("kid", false)):
+		lines = [[str(fp.n), Repute.line(Game, int(fp.seed) + wn0).replace("%s", Game.address())]]
 	# (the Answering Land release, weal.gd: every other word is about how their town stands, and why)
 	var wn := int(Game.folk_talk.get(str(fp.id), 0))
 	if wn % 2 == 1 and Game.prologue == "" and not Folk.new_year(Game):
@@ -1122,6 +1125,7 @@ func offer_plight(fp: Dictionary, id: String) -> void:
 		var lines: Array = Plights.act(Game, fp, id, pick)
 		Feats.poll(Game)
 		Creed.poll(Game)
+		Repute.poll(Game)
 		say(lines)
 	)
 
@@ -3382,7 +3386,7 @@ const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "reca
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
 	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
-	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31", "s_break38": "recall32", "s_break39": "recall33", "s_break40": "recall34", "s_break41": "recall35", "s_break42": "recall36", "s_break43": "recall37", "s_break44": "recall38", "s_break45": "recall39", "s_break46": "recall40", "s_break47": "recall41"}
+	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31", "s_break38": "recall32", "s_break39": "recall33", "s_break40": "recall34", "s_break41": "recall35", "s_break42": "recall36", "s_break43": "recall37", "s_break44": "recall38", "s_break45": "recall39", "s_break46": "recall40", "s_break47": "recall41", "s_break48": "recall42"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,

@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 144
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole", "Practised Hand", "Sleeves of Wind", "Uncarved Block", "Light Hand", "Five in One Hand", "Low as the Sea", "Hidden and Nameless", "Walking Two Roads", "Forgotten in the Lakes", "Knows the Joy of Fish", "Masters Life"]
+const MAX_LEVEL := 147
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole", "Practised Hand", "Sleeves of Wind", "Uncarved Block", "Light Hand", "Five in One Hand", "Low as the Sea", "Hidden and Nameless", "Walking Two Roads", "Forgotten in the Lakes", "Knows the Joy of Fish", "Masters Life", "Changes Its Cry"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000, 900000, 940000, 980000, 940000, 980000, 1020000, 980000, 1020000, 1060000, 1020000, 1060000, 1100000, 1060000, 1100000, 1140000, 1100000, 1140000, 1180000, 1140000, 1180000, 1220000, 1180000, 1220000, 1260000, 1220000, 1260000, 1300000, 1260000, 1300000, 1340000, 1300000, 1340000, 1380000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700, 52400, 53100, 53800, 54500, 55200, 55900, 56600, 57300, 58000, 58700, 59400, 60100, 60800, 61500, 62200, 62900, 63600, 64300, 65000, 65700, 66400, 67100, 67800, 68500, 69200, 69900, 70600, 71300, 72000, 72700, 73400, 74100, 74800]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000, 900000, 940000, 980000, 940000, 980000, 1020000, 980000, 1020000, 1060000, 1020000, 1060000, 1100000, 1060000, 1100000, 1140000, 1100000, 1140000, 1180000, 1140000, 1180000, 1220000, 1180000, 1220000, 1260000, 1220000, 1260000, 1300000, 1260000, 1300000, 1340000, 1300000, 1340000, 1380000, 1340000, 1380000, 1420000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700, 52400, 53100, 53800, 54500, 55200, 55900, 56600, 57300, 58000, 58700, 59400, 60100, 60800, 61500, 62200, 62900, 63600, 64300, 65000, 65700, 66400, 67100, 67800, 68500, 69200, 69900, 70600, 71300, 72000, 72700, 73400, 74100, 74800, 75500, 76200, 76900]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -119,6 +119,8 @@ const REALM_INFO := [
 	{"life": 0, "title": "Who Knows the Joy of Fish", "note": "Two men stood on the bridge over the Hao. One said: the minnows swim out so easily, that is the joy of fish. The other said: you are not a fish, how do you know? The first said: you asked me how I knew, so you knew already that I knew. I knew it from up here, on the bridge. A cultivator of this realm has been down among the fish and come up again, and still says only: from here."},
 	# Part XLIII (the Unblunted Knife release): the woodworker who was asked what art he had
 	{"life": 0, "title": "Who Masters Life", "note": "A woodworker carved a bell-stand, and those who saw it thought it the work of spirits. Asked what art he had, he said: none. I fast until I have forgotten praise and blame, and then that I have four limbs and a body. Then I go into the forest and look, and if I see the bell-stand there I put my hand to it; if not, I let it go. A cultivator of this realm has skill, and is no longer the one using it."},
+	# Part XLIV (the Turned Face release): the owl that was moving east, and the dove it met on the road
+	{"life": 0, "title": "Who Changes Its Cry", "note": "The owl was moving east, because the people of the west hated its cry. A dove said: if you can change your cry, stay; if you cannot, the people of the east will hate it too. A cultivator of this realm has stopped looking for a village that will like the sound, and has begun to listen to it."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -1149,6 +1151,17 @@ const ENEMIES := {
 	"gold_archer": {"n": "Archer Shooting for Gold", "elem": "fire", "weak": "water", "col": Color("c8a040"), "shape": "humanoid", "pal": {"sec": Color("6a5420"), "acc": Color("f8e8a0")}},
 	"crowing_cock": {"n": "Cock That Still Crows", "elem": "fire", "weak": "water", "col": Color("c85a3a"), "shape": "bird", "pal": {"sec": Color("6a2e20"), "acc": Color("f0c050")}, "bright": true},
 	"glaring_cock": {"n": "Cock That Glares at Shadows", "elem": "thunder", "weak": "earth", "col": Color("5a5a7a"), "shape": "bird", "pal": {"sec": Color("2e2e44"), "acc": Color("e8e0a0")}},
+	# ---- Part XLIV: The Owl Moves East (the Turned Face release): what is thought of somebody, gone down into three caves no
+	# chapter had used, on three bodies sculpted for it (the toad, the centipede and the owl: art/monsters)
+	"thiefs_gait": {"n": "Walk of an Axe-Thief", "elem": "earth", "weak": "wood", "col": Color("6a5a3a"), "shape": "centipede", "pal": {"sec": Color("3a2e1e"), "acc": Color("d8b060")}},
+	"suspecting_eye": {"n": "Eye That Saw a Thief", "elem": "dark", "weak": "thunder", "col": Color("5a5468"), "shape": "owl", "pal": {"sec": Color("2a2634"), "acc": Color("f0c040")}},
+	"wall_croak": {"n": "Croak Over the Garden Wall", "elem": "water", "weak": "earth", "col": Color("5a7a4a"), "shape": "toad", "pal": {"sec": Color("2e4426"), "acc": Color("e8d070")}},
+	"running_bark": {"n": "Bark That Runs Ahead", "elem": "thunder", "weak": "earth", "col": Color("8a6a3a"), "shape": "centipede", "pal": {"sec": Color("4a3418"), "acc": Color("f0e060")}},
+	"black_coat": {"n": "Coat the Rain Turned Black", "elem": "water", "weak": "thunder", "col": Color("3a3a44"), "shape": "owl", "pal": {"sec": Color("1a1a22"), "acc": Color("c8d8f0")}},
+	"puffed_pride": {"n": "Toad That Swells When Doubted", "elem": "earth", "weak": "wood", "col": Color("8a7a4a"), "shape": "toad", "pal": {"sec": Color("4a3e22"), "acc": Color("e8a040")}},
+	"eastward_owl": {"n": "Owl That Moved East", "elem": "dark", "weak": "thunder", "col": Color("6a6070"), "shape": "owl", "pal": {"sec": Color("34303c"), "acc": Color("f0a030")}},
+	"same_cry": {"n": "Same Cry in a New Village", "elem": "fire", "weak": "water", "col": Color("9a6a3a"), "shape": "toad", "pal": {"sec": Color("5a3a1a"), "acc": Color("ffd060")}},
+	"hundred_tongues": {"n": "Hundred Tongues of the Village", "elem": "fire", "weak": "water", "col": Color("8a2a1a"), "shape": "centipede", "pal": {"sec": Color("e8a030"), "acc": Color("f8e8a0")}},
 	"hollow_swagger": {"n": "Swagger with Nothing Behind It", "elem": "water", "weak": "thunder", "col": Color("7a8aa8"), "shape": "wraith", "pal": {"sec": Color("3e485e"), "acc": Color("e8e8f0")}},
 	"list_meng": {"n": "Brother Meng Zhi", "elem": "fire", "weak": "water", "col": Color("a85a3a"), "shape": "person:folk_youth"},
 	"list_bai_lu": {"n": "Senior Sister Bai Lu", "elem": "water", "weak": "thunder", "col": Color("7a9ab8"), "shape": "person:folk_maiden"},
@@ -3851,6 +3864,8 @@ const AREAS := {
 			{"id": "net_wife_shui", "n": "Mistress Shui of the Drying Nets", "pos": Vector2i(66, 35), "col": Color("5a8a9a"), "asset": "folk_shopwife"},
 			{"id": "deaf_oarsman", "n": "Oarsman Long, Who Hears by the Oar", "pos": Vector2i(52, 35), "col": Color("4a6a6a"), "asset": "folk_fisher"},
 			{"id": "reed_girl", "n": "Xiao Di, the Youngest Piper", "pos": Vector2i(37, 35), "col": Color("9ab86a"), "asset": "folk_maiden"},
+			# Part XLIV (the Turned Face release): the neighbour's son the whole village saw a thief in
+			{"id": "ah_shun", "n": "Ah Shun", "pos": Vector2i.ZERO, "col": Color("7a8a6a"), "asset": "folk_youth", "vis": ["s_p44_home", ""], "late": true, "after": true, "cave": -1, "stand": "near"},
 		],
 		"bosses": [],
 		"pickups": [
@@ -3860,6 +3875,11 @@ const AREAS := {
 			{"id": "p41_flute2", "item": "reed_flute", "pos": Vector2i(16, 12), "vis": ["s_p41_flutes", ""]},
 			{"id": "p41_flute3", "item": "reed_flute", "pos": Vector2i(86, 52), "vis": ["s_p41_flutes", ""]},
 			{"id": "p41_flute4", "item": "reed_flute", "pos": Vector2i(10, 46), "vis": ["s_p41_flutes", ""]},
+			# Part XLIV (the Turned Face release)
+			{"id": "p44_slip1", "item": "rumour_slip", "pos": Vector2i.ZERO, "vis": ["s_p44_axe", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p44_slip2", "item": "rumour_slip", "pos": Vector2i.ZERO, "vis": ["s_p44_axe", ""], "late": true, "after": true, "cave": -1, "stand": "mid"},
+			{"id": "p44_slip3", "item": "rumour_slip", "pos": Vector2i.ZERO, "vis": ["s_p44_axe", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p44_slip4", "item": "rumour_slip", "pos": Vector2i.ZERO, "vis": ["s_p44_axe", ""], "late": true, "after": true, "cave": -1, "stand": "deep"},
 		],
 		"pickup_vis": "",
 		"springs": [Vector2i(22, 44)],
@@ -3897,6 +3917,8 @@ const AREAS := {
 			{"id": "gruel_nun", "n": "Sister Jing of the Gruel Pot", "pos": Vector2i(72, 35), "col": Color("9a9a8a"), "asset": "folk_grandma"},
 			{"id": "copyist_bo", "n": "Copyist Bo, Who Reads the Rocks", "pos": Vector2i(58, 35), "col": Color("6a7a8a"), "asset": "folk_youth"},
 			{"id": "bell_boy", "n": "The Novice Who Rings Late", "pos": Vector2i(43, 35), "col": Color("a89a6a"), "asset": "folk_boy"},
+			# Part XLIV (the Turned Face release): the man his own dog barked at
+			{"id": "yang_bu", "n": "Yang Bu", "pos": Vector2i.ZERO, "col": Color("2a2a34"), "asset": "folk_scholar", "vis": ["s_p44_home", ""], "late": true, "after": true, "cave": -1, "stand": "near"},
 		],
 		"bosses": [],
 		"pickups": [
@@ -3906,6 +3928,11 @@ const AREAS := {
 			{"id": "p41_poem2", "item": "rock_poem", "pos": Vector2i(14, 14), "vis": ["s_p41_poems", ""]},
 			{"id": "p41_poem3", "item": "rock_poem", "pos": Vector2i(88, 50), "vis": ["s_p41_poems", ""]},
 			{"id": "p41_poem4", "item": "rock_poem", "pos": Vector2i(12, 48), "vis": ["s_p41_poems", ""]},
+			# Part XLIV (the Turned Face release)
+			{"id": "p44_hem1", "item": "bitten_hem", "pos": Vector2i.ZERO, "vis": ["s_p44_bark", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p44_hem2", "item": "bitten_hem", "pos": Vector2i.ZERO, "vis": ["s_p44_bark", ""], "late": true, "after": true, "cave": -1, "stand": "mid"},
+			{"id": "p44_hem3", "item": "bitten_hem", "pos": Vector2i.ZERO, "vis": ["s_p44_bark", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p44_hem4", "item": "bitten_hem", "pos": Vector2i.ZERO, "vis": ["s_p44_bark", ""], "late": true, "after": true, "cave": -1, "stand": "deep"},
 		],
 		"pickup_vis": "",
 		"springs": [Vector2i(20, 44)],
@@ -3988,11 +4015,18 @@ const AREAS := {
 			{"id": "ransom_clerk", "n": "Clerk Shu, Who Prices Travellers", "pos": Vector2i(70, 35), "col": Color("5a5a6a"), "asset": "folk_scholar"},
 			{"id": "deserter_qi", "n": "Qi, Who Left the Banner", "pos": Vector2i(56, 35), "col": Color("6a6a4a"), "asset": "folk_farmer"},
 			{"id": "toll_boy", "n": "The Boy at the Toll-Rope", "pos": Vector2i(41, 35), "col": Color("9a7a5a"), "asset": "folk_boy"},
+			# Part XLIV (the Turned Face release): the keeper of the doves that tell the owl the same thing every time
+			{"id": "granny_jiu", "n": "Granny Jiu", "pos": Vector2i.ZERO, "col": Color("b8b0a0"), "asset": "folk_grandma", "vis": ["s_p44_home", ""], "late": true, "after": true, "cave": -1, "stand": "near"},
 		],
 		"bosses": [],
 		"pickups": [
 			{"id": "cache_ly1", "item": "stones", "n": 9800, "pos": Vector2i(78, 14), "always": true},
 			{"id": "sense_ly1", "item": "stones", "n": 8400, "pos": Vector2i(14, 52), "always": true, "sense": true},
+			# Part XLIV (the Turned Face release)
+			{"id": "p44_feather1", "item": "east_feather", "pos": Vector2i.ZERO, "vis": ["s_p44_east", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p44_feather2", "item": "east_feather", "pos": Vector2i.ZERO, "vis": ["s_p44_east", ""], "late": true, "after": true, "cave": -1, "stand": "mid"},
+			{"id": "p44_feather3", "item": "east_feather", "pos": Vector2i.ZERO, "vis": ["s_p44_east", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p44_feather4", "item": "east_feather", "pos": Vector2i.ZERO, "vis": ["s_p44_east", ""], "late": true, "after": true, "cave": -1, "stand": "deep"},
 		],
 		"pickup_vis": "",
 		"springs": [Vector2i(22, 46)],
@@ -6071,6 +6105,30 @@ const STEPS := [
 	{"id": "s_p43_stands", "kind": "marks", "n": 1, "new": true, "t": "Something has been stood on the mountain for what was answered. Go and look at 1 thing that stands (Esc > Crossroads)", "stones": 119400},
 	{"id": "s_p43_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The steps are swept, and the broom is leaning on the gate, and the Elder is not holding it. Go to Elder Qing Xuan", "stones": 119600},
 	{"id": "s_break48", "kind": "breakthrough", "to": 144, "t": "Forgot that he had four limbs and a body: Masters Life"},
+	# ---- Part XLIV: The Owl Moves East (the Turned Face release).  A farmer of Yunmeng writes that a disciple of Azure
+	# Cloud stole his axe, and describes Lin Feng's walk.  Three people who were seen as something they were not:
+	# the neighbour's son of the Liezi, Yang Bu whose own dog barked at him, and the dove-keeper who has told the
+	# owl the same thing every time.  No lord: its foes are in three caves of the Rivers and Lakes no chapter had
+	# used, on three bodies sculpted for it.  What the land thinks of him is weighed now (repute.gd).
+	{"id": "s_p44_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "A letter has come up the river from Yunmeng, folded small, about an axe. Speak to Elder Qing Xuan", "stones": 119800},
+	{"id": "s_p44_axe", "kind": "hunt", "area": "yunmeng", "cave": -1, "n": 52, "of": ["thiefs_gait", "suspecting_eye", "wall_croak"], "t": "What a whole village thought of one boy for a year has gone down under the marsh. Clear 52 packs of it from the cave under Yunmeng", "stones": 120000},
+	{"id": "s_p44_slips", "kind": "collect", "item": "rumour_slip", "n": 4, "area": "yunmeng", "cave": -1, "t": "Four hands wrote the same wish, on four days, and none of them signed it. Find the 4 Slips of Something Said in the cave under Yunmeng", "stones": 120200},
+	{"id": "s_p44_shun", "kind": "talk", "npc": "ah_shun", "area": "yunmeng", "cave": -1, "t": "A youth is sitting inside the cave mouth with his hands where anybody can see them. Speak to Ah Shun, the neighbour's son", "stones": 120400},
+	{"id": "s_p44_gait", "kind": "hunt", "area": "yunmeng", "cave": -1, "n": 26, "of": ["thiefs_gait", "suspecting_eye"], "t": "\"Everything they saw in me is in here, walking about.\" Clear 26 walks of an axe-thief and eyes that saw one from the cave", "stones": 120500},
+	{"id": "s_p44_lost", "kind": "restore", "n": 2, "area": "yunmeng", "t": "Hands nobody need look for a thief in. Carry 2 things dropped in the roads of Reedhaven to whose they are (Enter, then their door)", "stones": 120700},
+	{"id": "s_p44_sit", "kind": "retreat", "n": 1, "where": "summit", "t": "\"Go up high, and listen to what the valley says about you, and see if you can pick it out.\" Sit and forget on the top of any peak (M, on the summit)", "stones": 120900},
+	{"id": "s_p44_bark", "kind": "hunt", "area": "hanshan", "cave": -1, "n": 52, "of": ["running_bark", "black_coat", "puffed_pride"], "t": "Under the Cold Mountain the dark has a coat on, and it is the wrong colour. Clear 52 packs of what barks in the cave under Hanshan", "stones": 121100},
+	{"id": "s_p44_hems", "kind": "collect", "item": "bitten_hem", "n": 4, "area": "hanshan", "cave": -1, "t": "White once, black with rain, torn off at a gate. Find the 4 Hems with a Dog's Teeth in Them in the cave under Hanshan", "stones": 121300},
+	{"id": "s_p44_yangbu", "kind": "talk", "npc": "yang_bu", "area": "hanshan", "cave": -1, "t": "A man in a black coat is standing at the cave mouth with a stick in his hand, not using it. Speak to Yang Bu", "stones": 121500},
+	{"id": "s_p44_coat", "kind": "hunt", "area": "hanshan", "cave": -1, "n": 26, "of": ["running_bark", "black_coat"], "t": "\"Do not beat them. Take the coat off, or wear it long enough that they learn it.\" Clear 26 barks that run ahead and coats the rain turned black", "stones": 121600},
+	{"id": "s_p44_east", "kind": "hunt", "area": "langya", "cave": -1, "n": 52, "of": ["eastward_owl", "same_cry", "hundred_tongues"], "t": "At the eastern end of everything the cave is full of birds that have just arrived, crying as they cried in the west. Clear 52 packs from the cave under Langya", "stones": 121800},
+	{"id": "s_p44_feathers", "kind": "collect", "item": "east_feather", "n": 4, "area": "langya", "cave": -1, "t": "The only part of the owl that ever stayed anywhere. Find the 4 Feathers Dropped Going East in the cave under Langya", "stones": 122000},
+	{"id": "s_p44_jiu", "kind": "talk", "npc": "granny_jiu", "area": "langya", "cave": -1, "t": "An old woman with a basket of doves on her back is feeding one from her own mouth at the cave mouth. Speak to Granny Jiu", "stones": 122200},
+	{"id": "s_p44_cry", "kind": "hunt", "area": "langya", "cave": -1, "n": 26, "of": ["eastward_owl", "same_cry"], "t": "\"They are still crying in there as if nobody had told them.\" Clear 26 owls that moved east and cries the same in a new village", "stones": 122300},
+	{"id": "s_p44_moot", "kind": "talk", "npc": "elder", "area": "sect", "t": "Letters from twelve towns are stacked on the Elder's table, some kind, some about an axe. Go to Elder Qing Xuan", "stones": 122500},
+	{"id": "s_p44_stands", "kind": "marks", "n": 1, "new": true, "t": "Something has been stood on the mountain for what was answered. Go and look at 1 thing that stands (Esc > Crossroads)", "stones": 122700},
+	{"id": "s_p44_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The letters have been sorted into three piles, and one very old one has no name on it. Go to Elder Qing Xuan", "stones": 122900},
+	{"id": "s_break49", "kind": "breakthrough", "to": 147, "t": "Stopped looking for a village that would like the sound: Changes Its Cry"},
 ]
 
 ## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
@@ -6329,6 +6387,10 @@ const ITEMS := {
 	# ---- Part XLIII (the Unblunted Knife release): what is found in the three caves
 	"pole_ball": {"n": "Ball from the Pole", "desc": "A clay ball the size of a plum, worn smooth on one side. An old man balanced two on the end of a cicada-pole for five months, then three, then five. This is one of the ones that fell. It does not look as if it had minded"},
 	"bell_billet": {"n": "Billet That Was Not the Bell-Stand", "desc": "A short billet of mountain timber with one cut in it, perfectly made, and nothing more. Whoever began it looked again, saw that the bell-stand was not in this tree, and put the chisel down. Most men would have gone on"},
+	# ---- Part XLIV (the Turned Face release): what is found in the three caves of the Rivers and Lakes
+	"rumour_slip": {"n": "Slip of Something Said", "desc": "A strip of shrine paper with a wish on it, tied to nothing. The wish is that the neighbour's son be found out. Four hands wrote it, on four days, and none of them signed it, since everybody already knew"},
+	"bitten_hem": {"n": "Hem with a Dog's Teeth in It", "desc": "The hem of a good coat, white once, black now with rain, torn off at a gate. The teeth went in the way a dog's do when it is not sure: gently, to ask"},
+	"east_feather": {"n": "Feather Dropped Going East", "desc": "A grey owl's feather, soft as smoke at the edge so that the bird can fly without a sound. It can do nothing about the other sound. It was dropped at a village on the road east: the only thing of the owl that ever stayed"},
 	"cock_spur": {"n": "Spur Taken Off Too Soon", "desc": "A steel spur of the kind tied to a fighting cock's leg, still bright. It was fitted on the tenth day, when the bird was all swagger, and taken off again by a man who said only: not yet"},
 	"mill_hemp": {"n": "Hank of Sea-Hemp", "desc": "Kelp retted in lime-water, beaten and combed to a pale fibre as long as an arm, twisted into a hank. Made at the Retting-Yard of Shuttlereef, in the open, by three people who would rather be asked than watched. It weighs nothing to speak of"},
 	"mill_gauze": {"n": "Bolt of Shark-Gauze", "desc": "The gauze of the Jiaoren, that goes into water and comes out dry: an ell of it will pass through a ring. Made at the Gauze-Looms of Shuttlereef. Worn against the skin it turns a blow of water (from the Items page: restores 60% of health)"},
@@ -12790,6 +12852,110 @@ const DIALOGUE := {
 		["Narrator", "The bolts fall where they fall. Afterwards nobody in the yard can say what he did. He did not seem to do anything. The disciples who were watching for a technique are disappointed, and one girl of the outer court says, quite quietly: oh. Like that."],
 		["Yue Ling", "Forty-nine. The wolf slept through it. I should like that written down somewhere: that the heavens opened over Azure Cloud and one of us did not think it worth an ear."],
 		["Lin Feng", "It has the right of it. I was there the whole time, and I could not tell you how it was done."],
+	],
+	# ---------------------------------------------------------------- Part XLIV: The Owl Moves East (the Turned Face release)
+	"recall42": [
+		["Narrator", "A letter is waiting on the Elder's table when Lin Feng comes down from the forty-ninth tribulation. It has come up the river from Yunmeng, and it is folded very small, the way people fold a thing they are a little ashamed to have written."],
+		["Yue Ling", "It is about you. I have not opened it. I can tell from the way the Elder is not looking at it."],
+	],
+	"s_p44_home": [
+		["Elder Qing Xuan", "A farmer of Yunmeng has lost his axe, child. He writes that a disciple of Azure Cloud took it: a young cultivator in a blue robe, who walks like an axe-thief, looks like an axe-thief, and spoke to him exactly as an axe-thief speaks.", "shrug"],
+		["Lin Feng", "I was in Yunmeng in the spring. I bought a flute and a bowl of eels. I did not see an axe."],
+		["Elder Qing Xuan", "I know. That is what interests me. He describes your walk very well. I have watched you walk for forty-nine realms, and I could not have done it better."],
+		["Yue Ling", "The street has been saying things about you for a while. Not this. Other things, some of them true. A name runs ahead of a person, and gets to the next town first, and is sitting at the table when you arrive."],
+		["Elder Qing Xuan", "There is a boy in Yunmeng the whole village looked at in the same way, last year, over the same axe. He went down into the cave under the marsh and has not come up. Go and find out what it is that people see, child. Go by the river: it is good for the temper."],
+	],
+	"done:s_p44_axe": [
+		["Narrator", "The cave under the marsh is full of what a village thought of one boy for a year. It has a gait, and eyes, and it croaks over every wall. None of it is the boy. All of it is shaped like him."],
+		["Lin Feng", "I recognise the walk. It is mine, more or less. It is anybody's, if you are looking for a thief in it."],
+	],
+	"done:s_p44_slips": [
+		["Narrator", "Four slips of shrine paper, the kind a village ties up with a wish on it. On each, in four different hands, the same wish: that the neighbour's son be found out."],
+		["Yue Ling", "Nobody signed them. Nobody needs to sign a thing everybody already knows."],
+	],
+	"s_p44_shun": [
+		["Narrator", "A youth is sitting on a rock just inside the cave mouth, very still, with his hands on his knees where anybody can see them. He has learned to sit like that."],
+		["Ah Shun", "You are the one from the mountain. They said you took it too. I am glad. I mean, I am sorry. I mean it is something, not being the only one.", "shrug"],
+		["Lin Feng", "I did not take it. I think you did not either."],
+		["Ah Shun", "Nobody took it. Old Gao found it last month in his own furrow, when he was digging. He had dropped it himself. And the next morning I walked past his gate, and he looked at me, and I was just a boy walking past a gate. That is the worst part: that he could stop."],
+		["Ah Shun", "I came down here to get away from how I looked. It followed me down. Everything they saw in me is in here, walking about. I am afraid to go up and find there is nothing left of me but what they said."],
+		["Lin Feng", "Then I will clear it. Not because it is yours. Because I keep seeing myself in it."],
+	],
+	"done:s_p44_gait": [
+		["Narrator", "The last of the eyes that saw a thief goes dark. The cave is very quiet. Somewhere at the back of it water drips into water, and nobody thinks anything of it at all."],
+		["Ah Shun", "I can hear myself walk. I had forgotten what I sound like when nobody is listening for a thief."],
+	],
+	"done:s_p44_lost": [
+		["Narrator", "Two things dropped in the roads of Reedhaven are carried to whose they were. One of the doors he knocks at is Old Gao's. The farmer takes back what he dropped and looks at the cultivator from the mountain for a long time."],
+		["Lin Feng", "He was looking for the thief in me. I watched him not find it. It took about as long as it takes to find an axe in a furrow."],
+	],
+	"done:s_p44_sit": [
+		["Narrator", "From a height everything said in the valleys comes up small and all together, like the noise of a market. Lin Feng sits in it for two hours. Some of it is about him. It does not sound any different from the rest."],
+		["Lin Feng", "I listened for my name. I could not pick it out. I think that is what it sounds like from a height: one noise among the noise."],
+	],
+	"done:s_p44_bark": [
+		["Narrator", "Under the Cold Mountain the dark has a coat on, and it is the wrong colour. Things bark at it from every side passage, and swell, and run on ahead of it shouting."],
+		["Yue Ling", "A dog barked at you in Clearbell this morning, and you stopped. I have never seen you stop for a dog."],
+	],
+	"done:s_p44_hems": [
+		["Narrator", "Four hems torn off four coats, white once, black now, each with a dog's teeth in it. None of the teeth went in far."],
+		["Lin Feng", "It was not trying to hurt anybody. It was trying to find out who was in the coat."],
+	],
+	"s_p44_yangbu": [
+		["Narrator", "A man in a black coat is standing at the cave mouth with a stick in his hand, not using it. At his feet a yellow dog lies with its chin on its paws and one eye open."],
+		["Yang Bu", "Yang Bu. My brother is the philosopher. I am the one who went out in white and came home in black, because it rained and I borrowed a coat, and was barked at by my own dog at my own gate.", "nod"],
+		["Yang Bu", "I picked up this stick. My brother said: do not beat it. You would do the same. If it went out white and came back black, would you not wonder? So I did not beat it. I have been holding the stick ever since."],
+		["Lin Feng", "People I have helped bark at me now, in towns I have stood in. I have done things in some coat or other, and they remember the coat."],
+		["Yang Bu", "Then do not beat them. Take the coat off, or wear it long enough that they learn it. It is the same thing, as far as a dog is concerned. Go in and clear what barks in there; it has kept this one awake for a month."],
+	],
+	"done:s_p44_coat": [
+		["Narrator", "When the last bark has stopped echoing, the yellow dog gets up, walks over to Lin Feng, smells his hand for a long time, and lies down again across his feet."],
+		["Yang Bu", "There. It only wanted to know. It did not need you to be anything. It needed you to hold still long enough to be smelled."],
+	],
+	"done:s_p44_east": [
+		["Narrator", "Under the Wolf-Tooth Pass, at the eastern end of everything, the cave is full of birds that have just arrived. They have flown all the way from the west, and every one of them cries exactly as it cried there."],
+		["Lin Feng", "It is the same noise. It was the same noise at Yunmeng. They have come all this way and brought it with them."],
+	],
+	"done:s_p44_feathers": [
+		["Narrator", "Four grey feathers, dropped one at each village on the road east. They are the only part of the owl that ever stayed anywhere."],
+		["Yue Ling", "They are beautiful. I wonder whether anybody in those villages ever looked at one."],
+	],
+	"s_p44_jiu": [
+		["Narrator", "An old woman with a basket of doves on her back is sitting at the cave mouth, feeding one of them from her own mouth, which is how it is done with doves."],
+		["Granny Jiu", "You have come about the owl. Everybody does in the end. It came through here a month ago, going east, very tired. One of mine asked it where it was going."],
+		["Granny Jiu", "It said: the people of the west hate my cry, so I am moving east. And my dove said: if you can change your cry, stay. If you cannot, the people of the east will hate it too. My doves tell every owl that. Not one has ever listened.", "shrug"],
+		["Lin Feng", "It is not the village. It is the cry. I think I have been moving east for a long time, in one way and another."],
+		["Granny Jiu", "Everybody who comes here has. Go in and quiet them: they are still crying in there as if nobody had told them. Then go home and think about your cry. Not about the villages. They are all the same village."],
+	],
+	"done:s_p44_cry": [
+		["Narrator", "The last of the birds that moved east settles, and does not cry, and after a while puts its head under its wing. One of Granny Jiu's doves walks over and stands beside it, the way doves do."],
+		["Yue Ling", "I have liked your cry, you know, all the way. I never needed you to change it. I needed you to know it was yours."],
+	],
+	"s_p44_moot": [
+		["Narrator", "The outer court has heard where he has been, and has opinions about it, and has written them down. There is a stack of letters on the Elder's table from twelve towns. Some are kind. Some are about an axe."],
+		["Elder Qing Xuan", "Azure Cloud has a name too, child, and it has been running ahead of us for a thousand years. Some of it is yours now. Hall Master Shen wants heralds sent down every road with our side of it. Hall Master Du would hang a drum at the gate and let anybody with a grievance beat it."],
+		["Lin Feng", "And you, Elder?"],
+		["Elder Qing Xuan", "I am too old to change my cry. That is why I am asking you.", "shrug"],
+	],
+	"done:s_p44_stands": [
+		["Narrator", "It stands where the path comes up to the gate. Disciples on their way down the mountain look at it, and some of them stop, and straighten their robes, and go on a little more slowly."],
+	],
+	"s_p44_end": [
+		["Narrator", "The letters on the Elder's table have been sorted into three piles: the kind ones, the unkind ones, and one very old one with no name on it, which says only: the owl is back, and it is singing."],
+		["Elder Qing Xuan", "That last one is from the dove-keeper at Knifegate. I have no idea what it means. I have decided it is a compliment."],
+		["Lin Feng", "I went to find out why people saw a thief in me. I found a boy who had been looked at, a dog that only wanted to smell a coat, and an owl that flew to the end of the world with its own voice. None of them was me. All of them were."],
+		["Yue Ling", "And did you change your cry?"],
+		["Lin Feng", "I listened to it. It was the first time. I do not know yet whether that is the same thing."],
+		["Elder Qing Xuan", "It is the beginning of the same thing, child. Go and sit down. The sky is gathering again, and it does not care in the least what anybody says about you."],
+	],
+	"pre:s_break49": [
+		["Narrator", "The fiftieth cloud comes over Azure Cloud in the evening, when the towns below are lighting their lamps. From the top step the lamps go all the way to the sea: town after town, and in every one of them somebody saying something."],
+		["Lin Feng", "Let them. I know what I sound like now."],
+	],
+	"post:s_break49": [
+		["Narrator", "The bolts come down and are met, plainly, by somebody who does not look round to see who is watching. Far below in Yunmeng a farmer hears the thunder and says to his neighbour's son: that will be the one from the mountain. The boy says: yes. Neither of them thinks any more of it."],
+		["Yue Ling", "Fifty. Nobody in the yard cheered. I think they have stopped expecting you to want them to."],
+		["Lin Feng", "Good. I have stopped expecting it myself."],
 	],
 	# ---------------------------------------------------------------- Part XLII: The Joy of Fish
 	"recall40": [

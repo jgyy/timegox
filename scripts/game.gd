@@ -318,6 +318,9 @@ var _poll_day := 0
 ## (creed.gd): what was done that the Way he walks is weighed by ("<deed>" -> times)
 var creed := {}
 var creed_told := ""
+## (repute.gd, the Turned Face release): the stage of what the land thinks of him last told, and every stage ever reached
+var repute_told := 0
+var repute_seen := {}
 ## (fitting.gd): what has been set down where ("<spot>" -> thing), which houses have been put to rights
 ## (house -> day), and how many since the step in hand began
 var placed := {}
@@ -498,6 +501,8 @@ func _process(d: float) -> void:
 				# (the Open Net release, wilds.gd: what the days have mended in the countries he hunted)
 				Wilds.poll_all(self)
 			Creed.poll(self)
+			# (the Turned Face release, repute.gd: what the land thinks of him, told when it changes)
+			Repute.poll(self)
 			# (needs.gd: the body follows the land's clock; the night wears comfort faster)
 			if survival and prologue == "":
 				Needs.tick(self, 1.6 if Clock.is_night(Clock.hour(self)) else 1.0)
@@ -706,6 +711,8 @@ func reset() -> void:
 	_poll_day = 0
 	creed = {}
 	creed_told = ""
+	repute_told = 0
+	repute_seen = {}
 	placed = {}
 	fitted = {}
 	misplaced = 0

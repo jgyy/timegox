@@ -259,6 +259,8 @@ const PICKUP_COLORS := {
 	"reed_flute": Color("b8c878"), "rock_poem": Color("e8e4d8"), "debt_slip": Color("8a2a30"),
 	# Part XLII (the Sea Floor release)
 	"buried_shuttle": Color("3a3a48"), "net_link": Color("9a9aa8"), "well_rope": Color("c8b078"), "xirang_clod": Color("c89a4a"),
+	# Part XLIV (the Turned Face release)
+	"rumour_slip": Color("e8dcc0"), "bitten_hem": Color("2a2a34"), "east_feather": Color("9a9490"),
 	# Part XLIII (the Unblunted Knife release)
 	"pole_ball": Color("c8a868"), "bell_billet": Color("b88a5a"), "cock_spur": Color("c8ccd8"),
 	# Part XXXVIII (the Higher Sky release)

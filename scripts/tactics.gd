@@ -34,7 +34,25 @@ const WIT := {
 	"phoenix": CUNNING, "qilin": CUNNING, "bifang": CUNNING, "kaiming": CUNNING, "frost_maiden": CUNNING,
 	"humanoid": TACTICIAN, "warden": TACTICIAN, "queen": TACTICIAN, "oxhead": TACTICIAN, "horseface": TACTICIAN,
 	"crowmarshal": TACTICIAN,
+	# (the Turned Face release: a toad and a centipede strike at what moves; an owl picks the weakest out of the dark)
+	"toad": INSTINCT, "centipede": INSTINCT, "owl": CUNNING,
 }
+## The Turned Face release: the arts of three kinds of body sculpted for it.  A foe that is not a lord, of one of
+## these shapes, uses its art on every third turn of its own (its third, sixth, ...: nothing is thrown for it)
+## instead of a plain blow: `to` "one" (whoever its wits would have struck) or "all", at `mult` of a blow, with
+## an effect of its own (`fx`: Fx3D.coins, venom, screech) and the cast clip; `said` names it in the log.
+const ARTS := {
+	"toad": {"n": "Gold Tongue", "to": "one", "mult": 1.35, "fx": "coins", "said": "%s spits a fountain of cash at %s: the Gold Tongue!"},
+	"centipede": {"n": "Hundred Steps of Venom", "to": "all", "mult": 0.7, "fx": "venom", "said": "%s rears and every leg strikes at once: the Hundred Steps of Venom!"},
+	"owl": {"n": "Screech in the Dark", "to": "all", "mult": 0.6, "fx": "screech", "said": "%s mantles and screeches: a cry nobody in the land can bear!"},
+}
+
+## The art a foe uses on this turn of its own ({} for a plain blow): a lord never, and only every third turn.
+static func art_of(f: Dictionary) -> Dictionary:
+	if bool(f.get("boss", false)) or not ARTS.has(str(f.get("shape", ""))):
+		return {}
+	return ARTS[str(f.shape)] if int(f.get("turns", 0)) % 3 == 0 and int(f.get("turns", 0)) > 0 else {}
+
 ## how often (of r2) a foe of each wit does the clever thing when it is there to be done
 const FINISH := [0.0, 0.0, 0.8, 1.0]
 const MENDER := [0.0, 0.0, 0.5, 0.6]

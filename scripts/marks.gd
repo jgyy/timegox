@@ -314,6 +314,15 @@ const MARKS := {
 		"show": {"area": "mountain", "m": ["form", "show"], "k": 3, "n": "The Benches Under the Open Sky", "desc": "A workbench carried out of doors and left where the path passes: a billet in the vice with a few cuts in it, a chisel, shavings underfoot. Somebody was here an hour ago and somebody will be here in an hour. Whoever passes slows down to see how far it has got.",
 			"who": ["Tang Xi, Who Watches the Second Bench", "folk_maiden", Color("d8a070"), "I do not work at it yet. I watch. Hall Master Du is carving a duck. Yesterday I said: less. I do not know why I said it. He took less off, and it was a duck.", "Nobody teaches here. I asked the one at the next bench how she set the chisel and she said: I do not know, look. So I looked.", "I asked how the first form was done, and you came out and did a bead instead, badly, where I could see. I understood the form the week after. I cannot explain that."]},
 	},
+	# Part XLIV (the Turned Face release): what Azure Cloud does about its own name in the land
+	"the_owls_cry": {
+		"drum": {"area": "mountain", "m": ["owl", "drum"], "k": 3, "n": "The Drum of Grievances", "desc": "A barrel drum hung in a frame of black posts at the foot of the steps, its head worn pale in the middle, with a beater on a cord beside it. Anybody may beat it. A board under it says, in the Elder's hand: somebody will come.",
+			"who": ["Old Gao, Who Beat It First", "folk_grandpa", Color("8a7a5a"), "I beat it first. About my axe, that I found in my own furrow. I was halfway through when I heard myself, and stopped. The old man came down anyway and sat with me.", "Everybody wants to beat it once. Most of them have nothing to say when somebody comes down. They say it anyway, and it is listened to.", "The boy next door to me carries the beater up in the morning. He says it is the only thing anybody ever trusted him to carry."]},
+		"herald": {"area": "mountain", "m": ["owl", "herald"], "k": 3, "n": "The Heralds' Posts", "desc": "A tall post at a turn of the path with a board on it, and on the board the sect's printed account, pasted over last month's, pasted over the month's before, so thick at the edges now that it has begun to look like bark.",
+			"who": ["Herald Fan, Who Reads It Aloud", "folk_scholar", Color("5a6a8a"), "I read the account in nine markets this month. Clear voice, slow, every word. They are very good about it. They listen to the end.", "Then they go on saying what they said before. Shen says that is because it has not been read often enough. I have read it two hundred times.", "A child in Ashmarket asked me who wrote it. I said the sect. She said: but who is the sect? And I had nothing on the paper to read her."]},
+		"cry": {"area": "mountain", "m": ["owl", "cry"], "k": 3, "n": "The Chests of Folded Robes", "desc": "A long cedar chest under the eaves where the path leaves the mountain, the lid propped open, full of blue robes folded small, each with a slip in its fold with a name on it. Whoever goes down leaves one. Whoever comes back takes it, or does not.",
+			"who": ["Ma Ying, Who Did Not Come Back for Hers", "folk_maiden", Color("6a8aa8"), "My robe is in there, third from the top. I left it to go down to the lakes and was taken on at a ferry. I have not been back for it.", "Nobody on the river knew I was anybody. So I had to be somebody, every day, at the ferry. It is much harder. It is the best thing that has happened to me.", "A woman said I must be from the mountain, because I paid for the bowl I broke. I have been wondering ever since who taught us to pay for bowls."]},
+	},
 	# Part XXXVIII (the Higher Sky release): what the sect teaches about those above it
 	"the_higher_sky": {
 		"gall": {"area": "mountain", "m": ["sky", "gall"], "k": 3, "n": "The Galls of the Outer Court", "desc": "A post as high as a seated man's head with a crossbar, and on the crossbar a dried gall on a loop of hemp, at exactly the height of a mouth. A board under it has three names on it, and room left for more.",
@@ -479,7 +488,7 @@ static func who_stands(g, e: Dictionary) -> bool:
 ## The crossroads of a later release whose marks are stood after the late bands of an older one
 ## (`"warband5"`, `"warband6"`), in a second pass (`after_bands`): a mark stood before them would take
 ## ground a band of an older map stood on, and the band would move.
-const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round", "the_higher_sky", "the_red_seal", "the_two_roads", "the_first_form"]
+const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round", "the_higher_sky", "the_red_seal", "the_two_roads", "the_first_form", "the_owls_cry"]
 
 static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, ids: Array, ents: Array, layer: String, reach: Dictionary, peaks: Array, camps: Dictionary, after_bands: bool = false) -> void:
 	var near := {}
@@ -678,6 +687,43 @@ static func model(sp: Dictionary, i: int = 0) -> Node3D:
 	var st := MB.tag(STONE, MB.STONE)
 	var h := Terrain3D.hash2(i, 13 + a.size(), 3.0)
 	match str(a[0]):
+		"owl":
+			# Part XLIV: a drum of grievances in a frame of black posts; a herald's post papered thick; a cedar chest of
+			# folded robes
+			match str(a[1]):
+				"drum":
+					var blk := MB.tag(Color("2a2420"), MB.WOOD)
+					for px in [-0.55, 0.55]:
+						b.box(Vector3(px, 0.9, 0), Vector3(0.1, 1.8, 0.1), blk)
+					b.box(Vector3(0, 1.78, 0), Vector3(1.32, 0.1, 0.14), blk)
+					b.box(Vector3(0, 0.25, 0), Vector3(1.2, 0.06, 0.1), blk)
+					# the drum on its side, its heads facing the path, studded round the rim
+					b.cyl(Vector3(0, 1.0, 0), 0.4, 0.5, MB.tag(Color("8a2a20"), MB.WOOD), Vector3(PI / 2, 0, 0), 16)
+					for hd2 in [-1.0, 1.0]:
+						b.cyl(Vector3(0, 1.0, 0.26 * hd2), 0.37, 0.02, MB.tag(Color("e0d0b0") if hd2 > 0 else Color("c8b898"), MB.CLOTH), Vector3(PI / 2, 0, 0), 16)
+					for stud in 10:
+						var aa := TAU * float(stud) / 10.0
+						b.box(Vector3(cos(aa) * 0.4, 1.0 + sin(aa) * 0.4, 0.24), Vector3(0.03, 0.03, 0.03), MB.tag(Color("c8a050"), MB.METAL))
+					# the beater on its cord, and the board under it
+					b.cyl(Vector3(0.42, 0.62, 0.3), 0.025, 0.42, w, Vector3(0, 0, 0.25), 6)
+					b.box(Vector3(0, 0.45, 0.06), Vector3(0.7, 0.26, 0.03), MB.tag(Color("e8dcc0"), MB.WOOD))
+				"herald":
+					b.box(Vector3(0, 1.05, 0), Vector3(0.12, 2.1, 0.12), wd)
+					b.box(Vector3(0, 1.45, 0.08), Vector3(0.8, 0.95, 0.06), w)
+					b.box(Vector3(0, 1.98, 0.02), Vector3(0.95, 0.07, 0.2), wd)
+					# the sheets pasted over each other, ragged at the edges
+					for shp in 5:
+						var dx := (Terrain3D.hash2(shp, i + 3, 5.0) - 0.5) * 0.08
+						b.box(Vector3(dx, 1.45 - 0.01 * float(shp), 0.115 + 0.006 * float(shp)), Vector3(0.66 - 0.04 * float(shp), 0.8 - 0.05 * float(shp), 0.004), MB.tag(Color("e8e0c8").darkened(0.08 * float(4 - shp)), MB.CLOTH))
+					b.box(Vector3(0, 1.72, 0.14), Vector3(0.4, 0.06, 0.005), MB.tag(Color("b03028"), MB.CLOTH))
+				_:
+					b.box(Vector3(0, 0.3, 0), Vector3(1.1, 0.5, 0.5), MB.tag(Color("8a5a3a"), MB.WOOD))
+					b.box(Vector3(0, 0.62, -0.32), Vector3(1.1, 0.04, 0.5), MB.tag(Color("7a4a2e"), MB.WOOD), Vector3(-0.9, 0, 0))
+					for fold in 4:
+						b.box(Vector3(-0.38 + 0.25 * float(fold), 0.57, 0.0), Vector3(0.22, 0.06 + 0.02 * float(fold % 2), 0.36), MB.tag(Color("4a6a9a").lightened(0.06 * float(fold)), MB.CLOTH))
+						b.box(Vector3(-0.38 + 0.25 * float(fold), 0.61 + 0.01 * float(fold % 2), 0.1), Vector3(0.05, 0.005, 0.12), MB.tag(Color("e8dcc0"), MB.CLOTH))
+					for px3 in [-0.5, 0.5]:
+						b.box(Vector3(px3, 0.03, 0), Vector3(0.08, 0.06, 0.52), MB.tag(Color("3a2a1e"), MB.WOOD))
 		"form":
 			# Part XLIII: a board of slips on two posts; a stone, an upturned bowl and a notched peg; a workbench
 			# with a billet in the vice

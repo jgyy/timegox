@@ -427,7 +427,8 @@ static func mod(g, area: String, key: String) -> float:
 	# (the Open Net release, crime.gd: a wanted man is served dearer where his bill hangs)
 	# (the Higher Sky release, betters.gd: and somebody who was put down by a better in sight of a town)
 	# (the Rivers and Lakes release: and a town is what its sect is, sides.gd; a guest of the sect pays less, sects.gd)
-	return float(STATES[state(g, tid)].get(key, 1.0)) * Crime.mod(g, tid, key) * Betters.mod(g, key) * Sides.mod(g, tid, key) * (Sects.price(g, tid) if key == "price" else 1.0)
+	# (the Turned Face release, repute.gd: and somebody the land thinks ill of is asked more everywhere)
+	return float(STATES[state(g, tid)].get(key, 1.0)) * Crime.mod(g, tid, key) * Betters.mod(g, key) * Sides.mod(g, tid, key) * (Sects.price(g, tid) if key == "price" else 1.0) * (Repute.mod(g, "price") if key == "price" else 1.0)
 
 ## A price asked at a counter in region `area`.
 static func price(g, area: String, base: int) -> int:
@@ -627,6 +628,10 @@ const FATES := [
 	{"npc": "deserter_qi", "when": ["the_covenant", ["dig"]], "tag": "whom nobody has sent for", "line": "The water is back, and nobody needs a rider who left his banner. Nobody is hunting one either. I have a hut above the pass and a goat. I had not known a man could be let alone. It is large."},
 	{"npc": "deserter_qi", "when": ["the_covenant", ["toll"]], "tag": "who holds a rope for the Banner he left", "line": "I left the Banner because it had gone soft. Now it holds every road down here and I hold a rope for it at half pay, as a deserter should. The Banner-Lord nodded to me. Once. I am not over it."},
 	# Part XLII (the Sea Floor release)
+	# Part XLIV (the Turned Face release)
+	{"npc": "ah_shun", "when": ["the_owls_cry", ["drum"]], "tag": "who carries the beater for the drum", "line": "I carry the beater up to the drum in the morning and down at night. Old Gao beat it first. He says I may beat it next, if anybody ever looks at me like that again. Nobody has. I keep the beater ready anyway."},
+	{"npc": "yang_bu", "when": ["the_owls_cry", ["herald"]], "tag": "who has heard the account read twice", "line": "Your herald read the account in Clearbell twice. My dog barked at him both times. I told my brother. He said: the dog has not heard anything new. I am not sure whether he meant the herald, or me."},
+	{"npc": "granny_jiu", "when": ["the_owls_cry", ["cry"]], "tag": "whose doves know people by their hands", "line": "One of yours came through in a farmer's coat. My doves went to her hands at once: they know what somebody has been doing by their hands. I did not say anything. I sold her a dove's egg, and she paid for it."},
 	{"npc": "woodworker_qing", "when": ["the_first_form", ["course"]], "tag": "who is part twenty-three of forty", "line": "They came down from your mountain and wrote me out. Fast three days, five, seven: it is all there, in part twenty-three. A boy recited me to myself last week. He had it perfectly. He had not eaten breakfast, so that he might understand it."},
 	{"npc": "woodworker_qing", "when": ["the_first_form", ["fast"]], "tag": "whose fast a whole hall has kept", "line": "Forty days, I hear. I take seven, and I have a bell-stand to make at the end of them. I asked the one who told me what your hall made, when the door opened. She said: nothing. I have been thinking about that. It may be better than a bell-stand."},
 	{"npc": "woodworker_qing", "when": ["the_first_form", ["show"]], "tag": "whom a yard of benches came to watch", "line": "Two of yours walked here to watch me. I said I have no art. They said: we know, we only want to look. They sat seven days and never asked a thing. On the eighth one of them said: that tree. She was right. I had not seen it."},

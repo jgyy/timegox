@@ -54,6 +54,8 @@ const BY_SHAPE := {
 	"mammoth": "day", "magpie": "day", "sun_crow": "day", "tortoise": "day", "mantis": "dusk", "ray": "day",
 	"wraith": "night", "moth": "night", "spider": "night", "fox": "night", "jiangshi": "night", "demon": "night",
 	"jade_rabbit": "night", "jelly": "night",
+	# (the Turned Face release: a toad and a centipede come out after dark, and an owl hunts in it)
+	"toad": "night", "centipede": "night", "owl": "night",
 	"beast": "dusk", "tiger": "dusk", "serpent": "dusk", "scorpion": "dusk", "crab": "dusk", "dragon": "dusk",
 	"golem": "tide", "blob": "tide", "humanoid": "tide", "storm": "tide", "tome": "tide", "hundun": "tide", "wisp": "tide",
 	"warden": "tide", "queen": "tide", "oxhead": "night", "horseface": "night", "bifang": "day", "kaiming": "day", "ox": "day",
