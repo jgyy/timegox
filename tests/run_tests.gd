@@ -12632,7 +12632,7 @@ func _turned_face_chapter() -> void:
 			check(int(s4.n) < Trifles.LOST_N and str(s4.area) == "yunmeng", "%s asks for fewer lost things than a town drops in a day" % s4.id)
 		if str(s4.kind) == "retreat":
 			check(int(s4.n) <= 2 and Retreats.KINDS.has(str(s4.where)), "%s names a kind of place there is" % s4.id)
-	check(n44 == 19 and hunted == 234 and int(kinds.get("hunt", 0)) == 6 and int(kinds.get("collect", 0)) == 3 and int(kinds.get("talk", 0)) == 6, "the chapter is nineteen steps: six hunts, three searches, six conversations, a sitting, a road and no lord (%d, %d)" % [n44, hunted])
+	check(n44 == 19 and hunted == 282 and int(kinds.get("hunt", 0)) == 6 and int(kinds.get("collect", 0)) == 3 and int(kinds.get("talk", 0)) == 6, "the chapter is nineteen steps: six hunts, three searches, six conversations, a sitting, a road and no lord (%d, %d)" % [n44, hunted])
 	var surf: Dictionary = Atlas.world_of("lakes")
 	for a44 in CAVES44:
 		var lt: Dictionary = Caves.LATE[a44][-1]
