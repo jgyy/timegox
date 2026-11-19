@@ -1224,7 +1224,7 @@ func _init() -> void:
 			if st8.has("cave"):
 				band8 = Caves.spec(str(st8.area), int(st8.cave)).get("foes", {})
 				# (the Small Fish release: or for a band a later chapter stood in it last of all)
-				if Caves.LATE.get(str(st8.area), {}).has(int(st8.cave)) and (str(st8.id).begins_with("s_p36_") or str(st8.id).begins_with("s_p37_") or str(st8.id).begins_with("s_p38_") or str(st8.id).begins_with("s_p39_") or str(st8.id).begins_with("s_p40_") or str(st8.id).begins_with("s_p43_")):
+				if Caves.LATE.get(str(st8.area), {}).has(int(st8.cave)) and (str(st8.id).begins_with("s_p36_") or str(st8.id).begins_with("s_p37_") or str(st8.id).begins_with("s_p38_") or str(st8.id).begins_with("s_p39_") or str(st8.id).begins_with("s_p40_") or str(st8.id).begins_with("s_p43_") or str(st8.id).begins_with("s_p44_")):
 					band8 = Caves.LATE[str(st8.area)][int(st8.cave)]
 			var marching8 := {}
 			for pe8 in band8.get("pool", []):
@@ -5275,7 +5275,7 @@ func _thundering_pots() -> void:
 		check(Feats.need(f.test) >= 1.0 and Feats.value(MG, f.test) >= 0.0 and (str(f.test[0]) != "step" or Data.step_index(str(f.test[1])) >= 0), "feat %s measures something that can be counted" % fid)
 	check(Feats.FEATS.size() >= 75 and kinds_f.size() == Feats.KIND_ORDER.size() and Feats.order().size() == Feats.FEATS.size(), "%d feats of nine kinds" % Feats.FEATS.size())
 	# what a feat asks for is there to be done
-	check(Feats.need(Feats.FEATS.masters_life.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_sight.test) == Deeps.ORDER.size() and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
+	check(Feats.need(Feats.FEATS.changes_its_cry.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_sight.test) == Deeps.ORDER.size() and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
 		and Feats.need(Feats.FEATS.every_thread.test) == Fashion.OUTFIT_ORDER.size() and Feats.need(Feats.FEATS.her_dresses.test) <= Fashion.YUE_ORDER.size() and Feats.need(Feats.FEATS.egg_all.test) == Eggs.ORDER.size()
 		and Feats.need(Feats.FEATS.war_all.test) == War.BATTLE_ORDER.size() and Feats.need(Feats.FEATS.heard_all.test) <= Music.count() and Feats.need(Feats.FEATS.host_full.test) <= War.ORDER.size()
 		and Feats.need(Feats.FEATS.airs_six.test) == Music.AIRS.size() and Feats.need(Feats.FEATS.works_twelve.test) < Works.ORDER.size() and Feats.need(Feats.FEATS.arms_eight.test) == Arms.ORDER.size()
@@ -8130,7 +8130,7 @@ func _open_net() -> void:
 	check(Crime.is_child({"kind": "npc", "id": "li_bai", "n": "Li Bai", "asset": "li_bai"}), "nobody draws on a schoolboy")
 	for fid33 in ["practised_hand", "same_length", "by_the_door", "told_true", "parted_whole"]:
 		check(Feats.FEATS.has(fid33), "the feat %s is kept" % fid33)
-	check(not str(Feats.FEATS.joy_of_fish.desc).contains("last realm") and not str(Feats.FEATS.parted_whole.desc).contains("last realm") and not str(Feats.FEATS.practised_hand.desc).contains("last realm") and not str(Feats.FEATS.sleeves_of_wind.desc).contains("last realm") and not str(Feats.FEATS.uncarved_block.desc).contains("last realm") and not str(Feats.FEATS.light_hand.desc).contains("last realm") and not str(Feats.FEATS.five_in_one.desc).contains("last realm") and not str(Feats.FEATS.low_as_sea.desc).contains("last realm") and not str(Feats.FEATS.no_name.desc).contains("last realm") and not str(Feats.FEATS.two_roads.desc).contains("last realm") and not str(Feats.FEATS.in_the_lakes.desc).contains("last realm") and str(Feats.FEATS.masters_life.desc).contains("last realm"), "only the last realm is called the last")
+	check(not str(Feats.FEATS.joy_of_fish.desc).contains("last realm") and not str(Feats.FEATS.parted_whole.desc).contains("last realm") and not str(Feats.FEATS.practised_hand.desc).contains("last realm") and not str(Feats.FEATS.sleeves_of_wind.desc).contains("last realm") and not str(Feats.FEATS.uncarved_block.desc).contains("last realm") and not str(Feats.FEATS.light_hand.desc).contains("last realm") and not str(Feats.FEATS.five_in_one.desc).contains("last realm") and not str(Feats.FEATS.low_as_sea.desc).contains("last realm") and not str(Feats.FEATS.no_name.desc).contains("last realm") and not str(Feats.FEATS.two_roads.desc).contains("last realm") and not str(Feats.FEATS.in_the_lakes.desc).contains("last realm") and not str(Feats.FEATS.masters_life.desc).contains("last realm") and str(Feats.FEATS.changes_its_cry.desc).contains("last realm"), "only the last realm is called the last")
 	for src33 in ["Fangyu Shenglan", "Miscellaneous Records of the Western Capital", "Ouyang Xiu", "Book of Jin"]:
 		check(FileAccess.get_file_as_string("res://scripts/lore.gd").contains(src33), "the chapter's tales are told from where they are written: %s" % src33)
 
@@ -8386,7 +8386,7 @@ func _open_net() -> void:
 	check(Trials.need_met(["rites", 2], TN35) and not Trials.need_met(["rites", 3], TN35) and Trials.KINDS.has("rite") and Trials.need_text(["rites", 2], TN35).contains("2"), "trials can be passed by the rite")
 	TN35.free()
 	var c35: Dictionary = Echoes.CROSSROADS.get("the_stone", {})
-	check(not c35.is_empty() and str(c35.step) == "s_p35_gate" and str(c35.part) == "XXXV" and Echoes.ORDER[Echoes.ORDER.size() - 9] == "the_stone" and fits.call(str(c35.ask)), "what the stone is for is asked last of its chapter")
+	check(not c35.is_empty() and str(c35.step) == "s_p35_gate" and str(c35.part) == "XXXV" and Echoes.ORDER[Echoes.ORDER.size() - 10] == "the_stone" and fits.call(str(c35.ask)), "what the stone is for is asked last of its chapter")
 	check((c35.options as Array).size() == 3 and c35.after.size() == 3 and c35.end.size() == 3 and c35.echo.has("s_p35_end") and c35.echo.s_p35_end.size() == 3 and Data.step_index("s_p35_end") > Data.step_index("s_p35_gate"), "the_stone: three answers, each answered, echoed and told at the end")
 	var scales35 := {}
 	for o35 in c35.options:
@@ -8559,7 +8559,7 @@ func _open_net() -> void:
 	check(Trials.need_met(["cooked", 2], TN36) and not Trials.need_met(["cooked", 3], TN36) and Trials.need_met(["light", 3], TN36) and not Trials.need_met(["light", 4], TN36) and Trials.KINDS.has("pot") and Trials.KINDS.has("light") and Trials.need_text(["cooked", 2], TN36).contains("2"), "trials can be passed by the pot and by the light hand")
 	TN36.free()
 	var c36: Dictionary = Echoes.CROSSROADS.get("the_ladle", {})
-	check(not c36.is_empty() and str(c36.step) == "s_p36_table" and str(c36.part) == "XXXVI" and Echoes.ORDER[Echoes.ORDER.size() - 8] == "the_ladle" and fits.call(str(c36.ask)), "what a strong hand is for is asked last of its chapter")
+	check(not c36.is_empty() and str(c36.step) == "s_p36_table" and str(c36.part) == "XXXVI" and Echoes.ORDER[Echoes.ORDER.size() - 9] == "the_ladle" and fits.call(str(c36.ask)), "what a strong hand is for is asked last of its chapter")
 	check((c36.options as Array).size() == 3 and c36.after.size() == 3 and c36.end.size() == 3 and c36.echo.has("s_p36_end") and c36.echo.s_p36_end.size() == 3 and Data.step_index("s_p36_end") > Data.step_index("s_p36_table"), "the_ladle: three answers, each answered, echoed and told at the end")
 	var scales36 := {}
 	for o36 in c36.options:
@@ -8729,7 +8729,7 @@ func _open_net() -> void:
 		and Trials.need_text(["phases", 3], TNq7).contains("3") and Trials.need_text(["quelled", 2], TNq7).contains("2"), "trials can be passed by the round and by the measure")
 	TNq7.free()
 	var cq7: Dictionary = Echoes.CROSSROADS.get("the_round", {})
-	check(not cq7.is_empty() and str(cq7.step) == "s_p37_council" and str(cq7.part) == "XXXVII" and Echoes.ORDER[Echoes.ORDER.size() - 7] == "the_round" and fits.call(str(cq7.ask)), "what is done before the next dry wind is asked last of its chapter")
+	check(not cq7.is_empty() and str(cq7.step) == "s_p37_council" and str(cq7.part) == "XXXVII" and Echoes.ORDER[Echoes.ORDER.size() - 8] == "the_round" and fits.call(str(cq7.ask)), "what is done before the next dry wind is asked last of its chapter")
 	check((cq7.options as Array).size() == 3 and cq7.after.size() == 3 and cq7.end.size() == 3 and cq7.echo.has("s_p37_end") and cq7.echo.s_p37_end.size() == 3 and Data.step_index("s_p37_end") > Data.step_index("s_p37_council"), "the_round: three answers, each answered, echoed and told at the end")
 	var scalesq7 := {}
 	for oq7 in cq7.options:
@@ -9602,6 +9602,7 @@ func _open_net() -> void:
 	_rivers_and_lakes()
 	_sea_floor()
 	_unblunted_knife()
+	_turned_face()
 
 ## The Cloud Keel release: the spirit arks and the Far Countries (arks.gd), a storey divided into apartments
 ## with somebody living in each (rooms.gd), and what the audit of shared ground learned to see (clash.gd).
@@ -10204,7 +10205,7 @@ func _higher_sky() -> void:
 		for sp in Memoir.lines(null, pid):
 			check(str(sp[0]) in ["Lin Feng", "Yue Ling", "Elder Qing Xuan"], "%s is said by its writer, under the name they stand by" % pid)
 	check(by.size() == 3 and int(by.lin) >= 15 and int(by.yue) >= 12 and int(by.elder) >= 9, "the three people the story is about each write (%s)" % str(by))
-	check(parts.size() == 43, "every part of the story has a page (%d)" % parts.size())
+	check(parts.size() == 44, "every part of the story has a page (%d)" % parts.size())
 	G = new_game.call()
 	G.step = Data.step_index("s_break1") + 1
 	check(Memoir.written(G) == 1 and G.pages.has("p01_broom") and G.page_due == ["p01_broom"] and Memoir.written(G) == 0 and Memoir.book(G) == ["p01_broom"], "a page is written when its step is done, once")
@@ -10336,7 +10337,7 @@ func _higher_sky() -> void:
 	check((tr.paths as Array).size() == 4 and open_n >= 2 and fits.call(str(tr.why)) and Data.step_index("s_p38_slips") < Data.step_index("s_p38_maling"), "Pang Juan under the tree has four ways through, two of them open to a wanted man")
 	# the crossroads
 	var c8: Dictionary = Echoes.CROSSROADS.get("the_higher_sky", {})
-	check(not c8.is_empty() and str(c8.step) == "s_p38_low" and str(c8.part) == "XXXVIII" and Echoes.ORDER[Echoes.ORDER.size() - 6] == "the_higher_sky" and fits.call(str(c8.ask)) and Marks.AFTER_BANDS.has("the_higher_sky"), "what a sect teaches about those above it is asked last of all")
+	check(not c8.is_empty() and str(c8.step) == "s_p38_low" and str(c8.part) == "XXXVIII" and Echoes.ORDER[Echoes.ORDER.size() - 7] == "the_higher_sky" and fits.call(str(c8.ask)) and Marks.AFTER_BANDS.has("the_higher_sky"), "what a sect teaches about those above it is asked last of all")
 	check((c8.options as Array).size() == 3 and c8.after.size() == 3 and c8.end.size() == 3 and c8.echo.has("s_p38_end") and c8.echo.s_p38_end.size() == 3 and Data.step_index("s_p38_end") > Data.step_index("s_p38_low") and bsrc.contains("\"the_higher_sky\": [\"ditch\"]"), "the_higher_sky: three answers, each answered, echoed and told at the end, and the bot has one")
 	var scales := {}
 	for o8 in c8.options:
@@ -11068,7 +11069,7 @@ func _red_seal() -> void:
 		check(Data.DIALOGUE.has(k40b), "%s is said" % k40b)
 	check(firsts40 >= 14, "he speaks for himself in his own chapter (%d lines in the first person)" % firsts40)
 	var c0: Dictionary = Echoes.CROSSROADS.get("the_two_roads", {})
-	check(not c0.is_empty() and str(c0.step) == "s_p40_court" and str(c0.part) == "XL" and Echoes.ORDER[Echoes.ORDER.size() - 4] == "the_two_roads" and fits.call(str(c0.ask)) and Marks.AFTER_BANDS.has("the_two_roads"), "whether a heart may walk two roads is asked last of all")
+	check(not c0.is_empty() and str(c0.step) == "s_p40_court" and str(c0.part) == "XL" and Echoes.ORDER[Echoes.ORDER.size() - 5] == "the_two_roads" and fits.call(str(c0.ask)) and Marks.AFTER_BANDS.has("the_two_roads"), "whether a heart may walk two roads is asked last of all")
 	check((c0.options as Array).size() == 3 and c0.after.size() == 3 and c0.end.size() == 3 and c0.echo.has("s_p40_end") and c0.echo.s_p40_end.size() == 3 and Data.step_index("s_p40_end") > Data.step_index("s_p40_court") and bsrc.contains("\"the_two_roads\": [\"ask\"]"), "the_two_roads: three answers, each answered, echoed and told at the end, and the bot has one")
 	var scales40 := {}
 	for o0 in c0.options:
@@ -11681,7 +11682,7 @@ func _rivers_and_lakes() -> void:
 	for mn41 in names41b.slice(4):
 		check(Closeup.SIGNATURE.has(mn41) and Closeup.CLIPS.has(str(Closeup.SIGNATURE[mn41])), "%s has a gesture of their own" % mn41)
 	var c1: Dictionary = Echoes.CROSSROADS.get("the_covenant", {})
-	check(not c1.is_empty() and str(c1.step) == "s_p41_moot" and str(c1.part) == "XLI" and Echoes.ORDER[Echoes.ORDER.size() - 3] == "the_covenant" and fits.call(str(c1.ask)), "what is done with fish on the mud is asked last of all")
+	check(not c1.is_empty() and str(c1.step) == "s_p41_moot" and str(c1.part) == "XLI" and Echoes.ORDER[Echoes.ORDER.size() - 4] == "the_covenant" and fits.call(str(c1.ask)), "what is done with fish on the mud is asked last of all")
 	check((c1.options as Array).size() == 3 and c1.after.size() == 3 and c1.end.size() == 3 and c1.echo.has("s_p41_end") and c1.echo.s_p41_end.size() == 3 and Data.step_index("s_p41_end") > Data.step_index("s_p41_moot") and bsrc.contains("\"the_covenant\": [\"dig\"]"), "the_covenant: three answers, each answered, echoed and told at the end, and the bot has one")
 	check(Echoes.CROSSROADS.the_two_roads.echo.has("s_p41_home") and Echoes.CROSSROADS.the_two_roads.echo.s_p41_home.size() == 3, "and what was answered about a second road is remembered when four sects ask for one covenant")
 	var tilts41 := {}
@@ -12004,15 +12005,15 @@ func _unblunted_knife() -> void:
 
 	print("== Part XLIII: Mastering Life ==")
 	var p43 := Data.step_index("s_p43_home")
-	check(p43 == Data.step_index("s_break47") + 1 and Data.STEPS[Data.STEPS.size() - 1].id == "s_break48" and int(Data.STEPS[Data.STEPS.size() - 1].to) == Data.MAX_LEVEL and Data.MAX_LEVEL == 144, "Part XLIII follows the Joy of Fish and ends the game")
-	check(Data.REALMS.size() == 49 and Data.REALMS[48] == "Masters Life" and Data.level_name(144).ends_with("Masters Life") and Data.REALM_INFO.size() == 49 and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "and adds the realm of Masters Life")
+	check(p43 == Data.step_index("s_break47") + 1 and int(Data.STEPS[Data.step_index("s_break48")].to) == 144 and Data.MAX_LEVEL >= 144, "Part XLIII follows the Joy of Fish and ends the game")
+	check(Data.REALMS.size() >= 49 and Data.REALMS[48] == "Masters Life" and Data.level_name(144).ends_with("Masters Life") and Data.REALM_INFO.size() == Data.REALMS.size() and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "and adds the realm of Masters Life")
 	check(Data.DIALOGUE.has("recall41") and msrc.contains("\"s_break47\": \"recall41\"") and Data.DIALOGUE.has("pre:s_break48") and Data.DIALOGUE.has("post:s_break48"), "he is brought home to begin it (recall41), and it closes on a tribulation")
 	var names43 := ["Narrator", "Lin Feng", "Yue Ling", "Elder Qing Xuan", "Cook Ding", "Old Goulou", "Woodworker Qing", "Ji Xingzi"]
 	var n43 := 0
 	var kinds43 := {}
 	var hunted := 0
 	var CAVES43 := ["fusang", "garden", "mirror"]
-	for i43 in range(p43, Data.STEPS.size()):
+	for i43 in range(p43, Data.step_index("s_break48") + 1):
 		var s3: Dictionary = Data.STEPS[i43]
 		n43 += 1
 		kinds43[str(s3.kind)] = int(kinds43.get(str(s3.kind), 0)) + 1
@@ -12074,7 +12075,7 @@ func _unblunted_knife() -> void:
 					firsts43 += 1
 	check(firsts43 >= 8, "he speaks for himself in his own chapter (%d lines in the first person)" % firsts43)
 	var c3: Dictionary = Echoes.CROSSROADS.get("the_first_form", {})
-	check(not c3.is_empty() and str(c3.step) == "s_p43_moot" and str(c3.part) == "XLIII" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_first_form" and fits.call(str(c3.ask)) and Marks.AFTER_BANDS.has("the_first_form"), "what a sect does with somebody who asks how is asked last of all")
+	check(not c3.is_empty() and str(c3.step) == "s_p43_moot" and str(c3.part) == "XLIII" and Echoes.ORDER[Echoes.ORDER.size() - 2] == "the_first_form" and fits.call(str(c3.ask)) and Marks.AFTER_BANDS.has("the_first_form"), "what a sect does with somebody who asks how is asked last of all")
 	check((c3.options as Array).size() == 3 and c3.after.size() == 3 and c3.end.size() == 3 and c3.echo.has("s_p43_end") and c3.echo.s_p43_end.size() == 3 and Data.step_index("s_p43_end") > Data.step_index("s_p43_moot") and bsrc.contains("\"the_first_form\": [\"show\"]"), "the_first_form: three answers, each answered, echoed and told at the end, and the bot has one")
 	check(Echoes.CROSSROADS.the_joy_of_fish.echo.has("s_p43_home") and Echoes.CROSSROADS.the_joy_of_fish.echo.s_p43_home.size() == 3 and (Echoes.CROSSROADS.the_joy_of_fish.echo.s_p43_home.values() as Array).all(func(l): return fits.call(str(l[0][1]))), "and what he did with the sea floor is remembered when the Elder cannot say how")
 	var tilts43 := {}
@@ -12104,7 +12105,7 @@ func _unblunted_knife() -> void:
 	check(bsrc.contains("\"train\":") and bsrc.contains("\"craft\":") and bsrc.contains("\"tame\":") and bsrc.contains("\"fetch\":") and bsrc.contains("\"retreat\":"), "the bot knows all five new kinds of step")
 	for fid in ["masters_life", "six_lamps", "a_seal_open", "it_rattles", "six_benches", "no_art", "held_out_a_fish", "of_one_heart", "sat_and_forgot"]:
 		check(Feats.FEATS.has(fid), "the feat %s is there to be earned" % fid)
-	check(Feats.need(Feats.FEATS.masters_life.test) == Data.MAX_LEVEL and not str(Feats.FEATS.joy_of_fish.desc).contains("last realm") and Feats.need(Feats.FEATS.six_benches.test) == Crafts.ORDER.size() and Feats.need(Feats.FEATS.of_one_heart.test) == Pets.TIERS.size() - 1, "and none asks for more than there is")
+	check(Feats.need(Feats.FEATS.masters_life.test) == 144 and not str(Feats.FEATS.joy_of_fish.desc).contains("last realm") and Feats.need(Feats.FEATS.six_benches.test) == Crafts.ORDER.size() and Feats.need(Feats.FEATS.of_one_heart.test) == Pets.TIERS.size() - 1, "and none asks for more than there is")
 	print("== what was mended (the Unblunted Knife release) ==")
 	var MG = new_game.call()
 	MG.companion = true
@@ -12438,7 +12439,7 @@ func _sea_floor() -> void:
 		for np42 in Data.AREAS[a43].npcs:
 			check(Folk.POSTS.has(str(np42.id)) and Assets.has("characters/" + str(np42.asset)), "%s has a day, in a body of the towns" % np42.n)
 	var c2: Dictionary = Echoes.CROSSROADS.get("the_joy_of_fish", {})
-	check(not c2.is_empty() and str(c2.step) == "s_p42_moot" and str(c2.part) == "XLII" and Echoes.ORDER[Echoes.ORDER.size() - 2] == "the_joy_of_fish" and fits.call(str(c2.ask)), "whether he may say what a fish enjoys is asked last of all")
+	check(not c2.is_empty() and str(c2.step) == "s_p42_moot" and str(c2.part) == "XLII" and Echoes.ORDER[Echoes.ORDER.size() - 3] == "the_joy_of_fish" and fits.call(str(c2.ask)), "whether he may say what a fish enjoys is asked last of all")
 	check((c2.options as Array).size() == 3 and c2.after.size() == 3 and c2.end.size() == 3 and c2.echo.has("s_p42_end") and c2.echo.s_p42_end.size() == 3 and Data.step_index("s_p42_end") > Data.step_index("s_p42_moot") and bsrc.contains("\"the_joy_of_fish\": [\"teach\"]"), "the_joy_of_fish: three answers, each answered, echoed and told at the end, and the bot has one")
 	check(Echoes.CROSSROADS.the_covenant.echo.has("s_p42_home") and Echoes.CROSSROADS.the_covenant.echo.s_p42_home.size() == 3 and (Echoes.CROSSROADS.the_covenant.echo.s_p42_home.values() as Array).all(func(l): return fits.call(str(l[0][1]))), "and what four sects did with the water is remembered when it comes back brown")
 	var tilts42 := {}
@@ -12508,3 +12509,200 @@ func _sea_floor() -> void:
 	check(not all42.contains("Leigong") and not all42.contains("Shentu") and not all42.contains("Yulei, Door God of the Peach Tree"), "and are called by it wherever they speak")
 	check(Trials.npc_area("master_lie") == "huaxu" and Trials.npc_area("liezi") == "thunder" and not str((Data.AREAS.huaxu.npcs as Array).filter(func(n): return str(n.id) == "master_lie")[0].n).begins_with("Master Lie"), "Master Lie stands on one height, and it is his pupil who keeps the Far Countries")
 	check(not (Memoir.PAGES.p06_maple.lines as Array).any(func(l): return str(l).contains("I do not know who they were")), "his page of the two graves remembers that he met them at the bridge")
+
+
+## The Turned Face release: what the land thinks of him is the difficulty (repute.gd), the new foes sculpted
+## in Blender, Part XLIV, and what was mended.
+func _turned_face() -> void:
+	var bsrc := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	var dfont := ThemeDB.fallback_font
+	var fits := func(text: String) -> bool:
+		var par := TextParagraph.new()
+		par.add_string(text, dfont, 22)
+		par.width = 1100
+		return par.get_line_count() <= 4
+	var new_game := func():
+		var g = load("res://scripts/game.gd").new()
+		g.reset()
+		g.started = true
+		g.prologue = ""
+		return g
+	print("== the turned face: greed and cruelty make the land harder (repute.gd) ==")
+	var RG = new_game.call()
+	check(Repute.stage(RG) == 0 and Repute.score(RG) == 0 and Repute.mod(RG, "foe") == 1.0 and Repute.mod(RG, "price") == 1.0 and not Repute.shuns(RG) and Repute.line(RG, 3) == "" and Repute.battle_word(RG) == "", "somebody who has done nobody any harm fights what he always fought, at the prices there always were")
+	check(Repute.AT.size() == Repute.STAGES.size() and Repute.STREET.size() == Repute.STAGES.size() and Repute.YUE.size() == Repute.STAGES.size(), "every stage has a threshold, words in the street and a word of Yue Ling's")
+	var lastk := 0.0
+	var lastp := 0.0
+	var lastat := -1
+	for i in Repute.STAGES.size():
+		var sd: Dictionary = Repute.STAGES[i]
+		check(float(sd.foe) >= lastk and float(sd.price) >= lastp and int(Repute.AT[i]) > lastat and float(sd.foe) <= 1.6 and float(sd.price) <= 1.5, "stage %d (%s) is no kinder than the one before, and no harder than three fifths" % [i, sd.n])
+		check(fits.call(str(sd.desc)), "stage %d: what it means fits" % i)
+		lastk = float(sd.foe)
+		lastp = float(sd.price)
+		lastat = int(Repute.AT[i])
+		for ln in Repute.STREET[i]:
+			check(str(ln).length() <= 64 and not str(ln).contains(" sir") and not str(ln).contains(" he ") and not str(ln).contains("young man"), "a word in the street at stage %d is short and reads of anybody: %s" % [i, ln])
+		if i > 0:
+			check(fits.call(str(Repute.YUE[i])), "Yue Ling's word at stage %d fits" % i)
+	# greed: wrongs done for a purse, a sleeve, the mat
+	RG.deeds_bad = 5
+	check(Repute.stage(RG) == 2 and Repute.mod(RG, "foe") > 1.1 and Repute.mod(RG, "price") > 1.0 and Repute.line(RG, 0) != "" and Repute.battle_word(RG).contains("14%"), "five people wronged for what it paid: disliked, and every battle is harder (%s)" % Repute.text(RG))
+	RG.pilfered = 4
+	RG.gamble_rounds = 40
+	check(Repute.stage(RG) == 3 and Repute.shuns(RG) and Fame.shunned(RG, "qingshi"), "and a sleeve that keeps what it takes, and nights at the mat: shunned, and nobody follows him about")
+	# amends undo half at most
+	RG.deeds_good = 100
+	RG.restored = 50
+	check(Repute.score(RG) * 2 >= Repute.score(RG) + Repute.amends(RG).size() and Repute.score(RG) >= int(ceil(float(Repute._sum(Repute.harms(RG))) * (1.0 - Repute.MERCY))) and Repute.stage(RG) >= 1, "a hundred kindnesses undo half of it, never the whole: a town forgives, it does not forget")
+	RG.free()
+	# cruelty
+	var KG = new_game.call()
+	KG.slain["somebody"] = {"seen": true, "times": 4}
+	check(Repute.stage(KG) >= 3 and Repute.harms(KG)[0].kind == "cruelty", "four dead by his hand: the land turns its face (%s)" % Repute.text(KG))
+	KG.slain["others"] = {"seen": true, "times": 6}
+	check(Repute.stage(KG) == Repute.STAGES.size() - 1 and Repute.mod(KG, "foe") == 1.6, "ten: cursed in every town, and everything fights three fifths harder")
+	KG.free()
+	# the battle: every foe stands up to more and hits harder, never a tribulation, never a doom
+	var bsr := FileAccess.get_file_as_string("res://scripts/battle.gd")
+	check(bsr.contains("repute_k = 1.0 if c.get(\"tribulation\", false) else Repute.mod(Game, \"foe\")") and bsr.contains("if Dooms.is_doom(str(f.id)):\n\t\t\t\tcontinue\n\t\t\tf.maxhp = float(f.maxhp) * repute_k"), "the battle is made harder by it, but not heaven's tribulation and not a doom")
+	check(FileAccess.get_file_as_string("res://scripts/weal.gd").contains("Repute.mod(g, \"price\") if key == \"price\""), "and the counters of the towns ask more")
+	check(FileAccess.get_file_as_string("res://scripts/menu.gd").contains("func _draw_name()") and FileAccess.get_file_as_string("res://scripts/game.gd").contains("Repute.poll(self)"), "it has a page of its own (Esc > Good Name), and is told when it changes")
+	check(not bsrc.contains("pilfer(") and not bsrc.contains("offer_plight") and bsrc.contains("Repute.text(Game)"), "the bot does nothing greedy or cruel, and says where it stands")
+
+	_turned_face_chapter()
+
+
+## Part XLIV: The Owl Moves East (the Turned Face release): three caves of the Rivers and Lakes, three people, three
+## new bodies, a crossroads, and the last realm.
+func _turned_face_chapter() -> void:
+	var bsrc := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	var msrc := FileAccess.get_file_as_string("res://scripts/main.gd")
+	var dfont := ThemeDB.fallback_font
+	var fits := func(text: String) -> bool:
+		var par := TextParagraph.new()
+		par.add_string(text, dfont, 22)
+		par.width = 1100
+		return par.get_line_count() <= 4
+	print("== the new bodies: the toad, the centipede and the owl (art/monsters) ==")
+	for sh in ["toad", "centipede", "owl"]:
+		check(UI.SHAPES.has(sh) and Assets.MONSTERS.has(sh) and Assets.has(str(Assets.MONSTERS[sh])) and Assets.NATURAL.has(sh) and Models.FALLBACK.has(sh) and Tactics.WIT.has(sh) and Habits.BY_SHAPE.has(sh), "the %s is sculpted, exported, and has a hide, a stand-in, wits and hours" % sh)
+		var mm := Models.monster(sh, Color("88aa66"), false, "")
+		var ap: AnimationPlayer = mm.get_meta("ap", null) if mm.has_meta("ap") else null
+		if ap == null:
+			for c in mm.find_children("*", "AnimationPlayer", true, false):
+				ap = c
+		check(ap != null and ["idle", "walk", "attack", "hurt", "die", "cast"].all(func(cl): return ap.has_animation(cl)), "the %s moves: idle, walk, attack, hurt, die and an art of its own" % sh)
+		mm.free()
+		check(Tactics.ARTS.has(sh) and fits.call(Tactics.art_said(Tactics.ARTS[sh], "A foe", "Lin Feng")) and not Tactics.art_said(Tactics.ARTS[sh], "A foe", "Lin Feng").contains("%s") and Tactics.art_said(Tactics.ARTS[sh], "A foe", "Lin Feng").begins_with("A foe") and float(Tactics.ARTS[sh].mult) <= 1.4, "the %s has an art in battle, with an effect of its own" % sh)
+	check(Tactics.art_of({"shape": "toad", "turns": 3, "boss": false}).has("fx") and Tactics.art_of({"shape": "toad", "turns": 2, "boss": false}).is_empty() and Tactics.art_of({"shape": "owl", "turns": 3, "boss": true}).is_empty() and Tactics.art_of({"shape": "beast", "turns": 3}).is_empty(), "an art comes every third turn, never from a lord, and only to the three new kinds")
+	var fxsrc := FileAccess.get_file_as_string("res://scripts/fx3d.gd")
+	check(fxsrc.contains("static func coins(") and fxsrc.contains("static func venom(") and fxsrc.contains("static func screech("), "each art is drawn: a fountain of cash, fangs of venom out of the ground, rings of a screech")
+	for en in Assets.DRAWN_AS:
+		check(Data.ENEMIES.has(en) and Assets.MONSTERS.has(str(Assets.DRAWN_AS[en])) and str(Data.ENEMIES[en].shape) != str(Assets.DRAWN_AS[en]), "%s, drawn on a body of its own kind at last (%s), fights as it always did" % [en, Assets.DRAWN_AS[en]])
+	check(not Assets.hovers("night_owl") and Assets.hovers("seed_sparrow") == Assets.hovers("seed_sparrow"), "an owl stands on the ground it was drawn standing on")
+	print("== Part XLIV: The Owl Moves East ==")
+	var p44 := Data.step_index("s_p44_home")
+	check(p44 == Data.step_index("s_break48") + 1 and Data.STEPS[Data.STEPS.size() - 1].id == "s_break49" and int(Data.STEPS[Data.STEPS.size() - 1].to) == Data.MAX_LEVEL and Data.MAX_LEVEL == 147, "Part XLIV follows Mastering Life and ends the game")
+	check(Data.REALMS.size() == 50 and Data.REALMS[49] == "Changes Its Cry" and Data.level_name(147).ends_with("Changes Its Cry") and Data.REALM_INFO.size() == 50 and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "and adds the realm of Changes Its Cry")
+	check(Data.DIALOGUE.has("recall42") and msrc.contains("\"s_break48\": \"recall42\"") and Data.DIALOGUE.has("pre:s_break49") and Data.DIALOGUE.has("post:s_break49"), "he is brought home to begin it (recall42), and it closes on a tribulation")
+	var names44 := ["Narrator", "Lin Feng", "Yue Ling", "Elder Qing Xuan", "Ah Shun", "Yang Bu", "Granny Jiu"]
+	var CAVES44 := ["yunmeng", "hanshan", "langya"]
+	var n44 := 0
+	var hunted := 0
+	var kinds := {}
+	for i44 in range(p44, Data.STEPS.size()):
+		var s4: Dictionary = Data.STEPS[i44]
+		n44 += 1
+		kinds[str(s4.kind)] = int(kinds.get(str(s4.kind), 0)) + 1
+		check(str(s4.id).begins_with("s_p44_") or str(s4.id) == "s_break49", "%s is a step of the chapter" % s4.id)
+		check(not str(s4.kind) in ["slay", "crime", "taboo", "kill", "fall"] and not s4.has("if"), "%s asks for nothing the law forbids, has no lord, and is everybody's" % s4.id)
+		check(not s4.has("stones") or int(s4.stones) > 119600, "%s pays as the road has come to pay" % s4.id)
+		if str(s4.kind) == "talk":
+			check(Trials.npc_area(str(s4.npc)) == str(s4.area) and Data.DIALOGUE.has(str(s4.id)), "%s: somebody who stands there, with something to say" % s4.id)
+		elif str(s4.kind) != "breakthrough":
+			check(Data.DIALOGUE.has("done:" + str(s4.id)), "%s: something is said when it is done" % s4.id)
+		if str(s4.kind) == "hunt":
+			hunted += int(s4.n)
+			check(CAVES44.has(str(s4.area)) and int(s4.cave) == -1 and Caves.LATE.has(str(s4.area)) and not s4.has("first") and (s4.of as Array).all(func(f): return (Caves.LATE[str(s4.area)][-1].pool as Array).any(func(pp): return str(pp[0]) == str(f))), "%s is a hunt in a cave no chapter had used, for what lives there" % s4.id)
+		if str(s4.kind) == "collect":
+			var have: int = (Data.AREAS[str(s4.area)].pickups as Array).filter(func(pk): return str(pk.item) == str(s4.item) and bool(pk.get("after", false)) and int(pk.get("cave", 0)) == -1).size()
+			check(have == int(s4.n) and Data.ITEMS.has(str(s4.item)) and Look.PICKUP_COLORS.has(str(s4.item)) and Load.weight_of(str(s4.item)) <= 1.0, "%s: there are as many to find as it asks for (%d)" % [s4.id, have])
+		if str(s4.kind) == "restore":
+			check(int(s4.n) < Trifles.LOST_N and str(s4.area) == "yunmeng", "%s asks for fewer lost things than a town drops in a day" % s4.id)
+		if str(s4.kind) == "retreat":
+			check(int(s4.n) <= 2 and Retreats.KINDS.has(str(s4.where)), "%s names a kind of place there is" % s4.id)
+	check(n44 == 19 and hunted == 282 and int(kinds.get("hunt", 0)) == 6 and int(kinds.get("collect", 0)) == 3 and int(kinds.get("talk", 0)) == 6, "the chapter is nineteen steps: six hunts, three searches, six conversations, a sitting, a road and no lord (%d, %d)" % [n44, hunted])
+	var surf: Dictionary = Atlas.world_of("lakes")
+	for a44 in CAVES44:
+		var lt: Dictionary = Caves.LATE[a44][-1]
+		check(str(lt.vis) == "s_p44_home" and int(lt.n) == 10 and not Caves.OWN.has(a44), "%s: a band of the chapter in a cave that was nobody's" % a44)
+		for pp2 in lt.pool:
+			var en: Dictionary = Data.ENEMIES[str(pp2[0])]
+			check(int(pp2[1]) >= 144 and int(pp2[2]) <= 146 and Lore.BEAST.has(str(pp2[0])) and str(en.shape) in ["toad", "centipede", "owl"] and Habits.habit(str(pp2[0])) != "", "%s has a level of the chapter, a story, one of the new bodies and hours" % en.n)
+		var fw: Dictionary = surf.floors[Caves.fid(a44, -1)]
+		var packs := 0
+		var mine := 0
+		for e3 in fw.ents:
+			if str(e3.kind) == "enemy" and (e3.group as Array).any(func(g): return (lt.pool as Array).any(func(pp3): return str(pp3[0]) == str(g.id))):
+				packs += 1
+			if str(e3.id).begins_with("p44_"):
+				mine += 1
+		check(packs >= 5 and mine == 4, "%s: its packs found room in the cave (%d), and its four things" % [a44, packs])
+	for np in ["ah_shun", "yang_bu", "granny_jiu"]:
+		var ar := Trials.npc_area(np)
+		var nd: Dictionary = (Data.AREAS[ar].npcs as Array).filter(func(n): return str(n.id) == np)[0]
+		check(CAVES44.has(ar) and bool(nd.late) and bool(nd.after) and int(nd.cave) == -1 and Folk.POSTS.has(np) and Assets.has("characters/" + str(nd.asset)) and Closeup.SIGNATURE.has(str(nd.n)) and Closeup.CLIPS.has(str(Closeup.SIGNATURE[str(nd.n)])), "%s stands in a cave, last of all, in a body of the towns, with a day and a gesture" % nd.n)
+		check(surf.floors[Caves.fid(ar, -1)].ents.any(func(e): return str(e.id) == np), "%s found room" % nd.n)
+	var firsts := 0
+	for dk in Data.DIALOGUE:
+		if str(dk).contains("s_p44_") or str(dk) in ["recall42", "pre:s_break49", "post:s_break49"]:
+			for ln in Data.DIALOGUE[dk]:
+				check(fits.call(str(ln[1])) and not str(ln[1]).contains("—"), "%s: a line that fits the box, with no dash in it" % dk)
+				check((ln as Array).size() == 2 or Data.EMOTES.has(str(ln[2])), "%s: its gesture is one everybody has" % dk)
+				check(not str(ln[1]).contains(", sir") and not str(ln[1]).contains("young man") and not str(ln[1]).contains("Sir"), "%s: nobody calls the hero sir" % dk)
+				check(str(ln[0]) in names44, "%s: %s is somebody of the chapter, under the name they stand by" % [dk, ln[0]])
+				if str(ln[0]) == "Lin Feng" and (" " + str(ln[1])).contains(" I "):
+					firsts += 1
+	check(firsts >= 8, "he speaks for himself in his own chapter (%d lines in the first person)" % firsts)
+	var c4: Dictionary = Echoes.CROSSROADS.get("the_owls_cry", {})
+	check(not c4.is_empty() and str(c4.step) == "s_p44_moot" and str(c4.part) == "XLIV" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_owls_cry" and fits.call(str(c4.ask)) and Marks.AFTER_BANDS.has("the_owls_cry"), "what a sect does about its own name is asked last of all")
+	check((c4.options as Array).size() == 3 and c4.after.size() == 3 and c4.end.size() == 3 and c4.echo.has("s_p44_end") and c4.echo.s_p44_end.size() == 3 and Data.step_index("s_p44_end") > Data.step_index("s_p44_moot") and bsrc.contains("\"the_owls_cry\": [\"drum\"]"), "the_owls_cry: three answers, each answered, echoed and told at the end, and the bot has one")
+	check(Echoes.CROSSROADS.the_first_form.echo.has("s_p44_home") and Echoes.CROSSROADS.the_first_form.echo.s_p44_home.size() == 3 and (Echoes.CROSSROADS.the_first_form.echo.s_p44_home.values() as Array).all(func(l): return fits.call(str(l[0][1]))), "and what the outer court was taught is remembered when a farmer writes about an axe")
+	var tilts := {}
+	var mw: Dictionary = Atlas.world_of("surface")
+	for o4 in c4.options:
+		var mk: Dictionary = Marks.MARKS.the_owls_cry.get(str(o4.id), {})
+		check(not mk.is_empty() and mk.has("who") and fits.call(str(mk.desc)) and fits.call(str(mk.who[3])) and fits.call(str(mk.who[4])) and fits.call(str(mk.who[5])) and Assets.has("characters/" + str(mk.who[1])) and not Weal.hears(str(mk.area)).is_empty() and int(mk.get("k", 1)) >= 3, "the_owls_cry/%s leaves a row of things on the mountain, and somebody beside them" % o4.id)
+		var mm4: Node3D = Marks.model(mk, 1)
+		check(mm4 != null and mm4.get_child_count() > 0, "the_owls_cry/%s: what stands is built from code" % o4.id)
+		mm4.free()
+		for tk in o4.tilt:
+			tilts[str(tk)] = true
+		for ck in o4.get("creed", {}):
+			check(Creed.AXES.has(str(ck)) and absi(int(o4.creed[ck])) < Creed.SIDE, "the_owls_cry/%s leans on the Way, and does not by itself decide it" % o4.id)
+		check(fits.call(str(o4.desc)) and fits.call(str(c4.end[str(o4.id)])) and o4.has("log") and fits.call(str(c4.echo.s_p44_end[str(o4.id)][0][1])), "the_owls_cry/%s: what it means, and what is told of it, fit" % o4.id)
+		for al in c4.after[str(o4.id)]:
+			check(fits.call(str(al[1])), "the_owls_cry/%s: what follows fits the dialogue box" % o4.id)
+		check(Mail.ORDER.any(func(l): return Mail.LETTERS[l].get("needs", []) == ["the_owls_cry", str(o4.id)]), "the_owls_cry/%s brings a letter from somebody who lives with it" % o4.id)
+		check(Weal.FATES.any(func(f): return str(f.when[0]) == "the_owls_cry" and str(o4.id) in f.when[1] and fits.call(str(f.line)) and str(f.tag).length() <= 40), "the_owls_cry/%s turns somebody's life" % o4.id)
+	check(tilts.size() == 3, "its answers tip all three scales between them")
+	check(mw.ents.filter(func(e): return e.kind == "mark" and str(e.id).begins_with("mark:the_owls_cry:")).size() == 3, "and its answers found room on the mountain: a row of three, whichever is chosen")
+	for lt44 in ["owl_drum_gao", "owl_herald_fan", "owl_cry_jiu"]:
+		check(Mail.LETTERS.has(lt44) and (Mail.LETTERS[lt44].lines as Array).all(func(l): return fits.call(str(l)) and not str(l).contains(" sir") and not str(l).contains("young man") and str(l).begins_with("Lin Feng:")), "the letter %s fits the box and is said to anybody" % lt44)
+	for pid in ["p44_axe", "p44_coat", "p44_last"]:
+		check(Memoir.PAGES.has(pid) and Memoir.ORDER.has(pid) and Data.step_index(str(Memoir.PAGES[pid].after)) >= p44 and (Memoir.PAGES[pid].lines as Array).all(func(l): return fits.call(str(l))), "the page %s is of the chapter, and fits" % pid)
+	check(str(Memoir.PAGES.p44_last.after) == "s_break49" and str(Memoir.PAGES.p44_last.who) == "elder" and str(Memoir.PAGES.p44_axe.who) == "yue" and str(Memoir.PAGES.p44_coat.who) == "lin", "the chapter closes on a page in the Elder's hand")
+	for fid in ["changes_its_cry", "no_thief", "smelled"]:
+		check(Feats.FEATS.has(fid), "the feat %s is there to be earned" % fid)
+	check(Feats.need(Feats.FEATS.changes_its_cry.test) == Data.MAX_LEVEL, "and none asks for more than there is")
+
+	print("== what was mended (the Turned Face release) ==")
+	var speakers := {}
+	for dk in Data.DIALOGUE:
+		for ln in Data.DIALOGUE[dk]:
+			speakers[str(ln[0])] = true
+	check(not speakers.has("Bamboo Spirit") and not speakers.has("Well Spider") and not speakers.has("Shui Ying, the Drowned Bearer") and speakers.has("Ancient Bamboo Spirit") and speakers.has("Spider in the Village Well") and speakers.has("Drowned Bearer Shui Ying"), "three lords are called in what they say by the names they fight under")
+	check(FileAccess.get_file_as_string("res://scripts/world.gd").contains("n.set_meta(\"foot_y\", maxf(low, base_y - 0.45))"), "a lord on a slope stands on the ground under his feet, not over the downhill side of it")
+	check(not str(Data.DIALOGUE["done:s_p44_lost"][0][1]).contains("doors he knocks at is Old Gao"), "nothing told of a step assumes whose door a lost thing was carried to")
+	check(Assets.DRAWN_AS.size() == 13 and str(Assets.DRAWN_AS.moon_toad) == "toad" and str(Assets.DRAWN_AS.waking_centipede) == "centipede", "eleven toads and frogs are no longer jellies, a centipede no longer a snake, and two owls no longer hawks")

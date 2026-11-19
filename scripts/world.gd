@@ -3798,6 +3798,19 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, 
 				var dv2 := pp - n.position
 				n.rotation.y = lerp_angle(n.rotation.y, atan2(dv2.x, dv2.z), 1.0 - exp(-d * 2.0))
 			var base_y := _ground(vb, n.position) if not vb.is_empty() else ground_y(n.position)
+			# (the Turned Face release: a lord on a slope stood with the ground under the middle of him and hung in
+			# the air over the downhill side; he is set down on the lowest ground under his footprint now, worked
+			# out once, since a lord does not move.  Only the drawing: his tile is where it was)
+			if e.kind == "boss":
+				if not n.has_meta("foot_y"):
+					var fr := 0.55 * Clash.lord_scale(str(e.enemy))
+					var low := base_y
+					for k in 8:
+						var fp := n.position + Vector3(cos(TAU * float(k) / 8.0), 0.0, sin(TAU * float(k) / 8.0)) * fr
+						low = minf(low, _ground(vb, fp) if not vb.is_empty() else ground_y(fp))
+					# (never sunk more than a hand's breadth under his own middle: a cliff edge is not a slope)
+					n.set_meta("foot_y", maxf(low, base_y - 0.45))
+				base_y = float(n.get_meta("foot_y"))
 			# (a pack asleep, habits.gd, neither bobs nor hovers)
 			var asleep: bool = e.kind == "enemy" and str(n.get_meta("act", "")) == "sleep"
 			n.position.y = base_y + (0.0 if asleep else sin(t * 2.2 + e.pos.x) * 0.06 + (0.35 if e.kind == "enemy" and Assets.hovers(str(e.group[0].id)) else 0.0))

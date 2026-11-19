@@ -2015,6 +2015,12 @@ const CROSSROADS := {
 			"show": [["Narrator", "The benches go out under the pine. On the first morning nobody sits at one. On the second Lin Feng does, with a billet of timber, and carves a bead rather badly while forty disciples pretend to be crossing the yard. By the end of the week there is a queue for the second bench, and nobody has been told anything."]],
 		},
 		"echo": {
+			# (the Turned Face release: what the outer court was taught is remembered when the land has opinions of its own)
+			"s_p44_home": {
+				"course": [["Elder Qing Xuan", "The Forty Parts have a section now on conduct in the towns, child. Shen added it after the letter. It is part forty-one. I have read it. It says that a disciple should walk in a manner that cannot be mistaken for theft. I do not know how that is done."]],
+				"fast": [["Elder Qing Xuan", "The ones who kept the forty days walk very slowly in the towns now, child, and look at nothing they do not mean to buy. Nobody has written about any of them. I have begun to wonder whether that is the fast or only the hunger."]],
+				"show": [["Elder Qing Xuan", "Half the court learned to carve watching you at a bench in the yard, child, and half the land has learned what you are like by watching you in the street. It is the same school. I had not thought of the street as a bench before."]],
+			},
 			"s_p43_end": {
 				"course": [["Elder Qing Xuan", "Shen has your girl at the head of his first class, child. She can recite the Governing Vessel backwards. I asked her to show me where it was, on herself, and she looked it up. It is a very good book. I am keeping one by the broom."]],
 				"fast": [["Elder Qing Xuan", "Twenty-nine came out of the forty, child. They do not say much. Du is insufferable. But I watched the girl do the first form in the dark on the thirtieth night, when she thought the hall was asleep, and nobody had told her anything at all."]],
@@ -2025,6 +2031,37 @@ const CROSSROADS := {
 			"course": "Azure Cloud teaches the Chart of the Channels in forty parts, and its graduates can name sixty points in their sleep. The Forty Parts are copied in nine sects. It is said that the Elder who commissioned them kept one by his broom, and was seen now and then to look something up, and then to put it down and sweep.",
 			"fast": "Once in a disciple's life the hall of Azure Cloud is barred for forty days, and whoever is inside it fasts. A third go home. The rest are known all over the land by a way they have of not hurrying. Nobody on the mountain can say what is taught in there. It is the one question the sect has stopped being asked.",
 			"show": "There are benches under the pine on Azure Cloud Mountain, and whoever can do a thing does it there. Nothing is taught. Disciples come out of that yard able to forge, carve and sit still, and when they are asked who their teacher was they name whoever was at the next bench, who generally denies it.",
+		}},
+	# ---- Part XLIV (the Turned Face release): the owl moved east, and the sect has a name of its own in the land
+	"the_owls_cry": {"step": "s_p44_moot", "part": "XLIV", "n": "The Owl's Cry",
+		"ask": "Azure Cloud has a name in the land, and some of it is his now. Hall Master Shen would send heralds down every road with the sect's side of it. Hall Master Du would hang a drum at the gate for anybody with a grievance. The Elder asks what Azure Cloud does.",
+		"options": [
+			{"id": "drum", "label": "Hang a drum at the gate for grievances", "tilt": {"heart": 3, "reach": -2}, "creed": {"virtue": 5}, "gain": {"renown": 6},
+				"desc": "Hang a Drum of Grievances at the foot of the steps, as the old courts did. Anybody whom Azure Cloud has wronged may climb up and beat it, and somebody must come down and hear them, however late. It will be beaten a great deal at first (renown: +6).",
+				"log": "Had a Drum of Grievances hung at the foot of the steps of Azure Cloud, for anybody the sect has wronged."},
+			{"id": "herald", "label": "Send heralds down every road", "tilt": {"craft": 3, "reach": 3}, "creed": {"rule": 6}, "gain": {"stones": 10800},
+				"desc": "Print the sect's account on good paper and send it down every road with heralds who can read it aloud in a market. Where something is said of Azure Cloud, something will be said back, promptly and well. It is how the courts of the land do it (spirit stones: +10800).",
+				"log": "Had heralds sent down every road of the land with the account of Azure Cloud, printed, to be read in the markets."},
+			{"id": "cry", "label": "Neither: send them down without the robe", "tilt": {"heart": -2, "craft": -3}, "creed": {"rule": -6}, "gain": {"stones": 12000},
+				"desc": "No drum and no heralds. Every disciple who goes down the mountain goes without the blue robe and the badge, and earns a name town by town as nobody in particular. The cry is what they do there. The Founder's first disciples went so (spirit stones: +12000).",
+				"log": "Had every disciple of Azure Cloud go down the mountain without the robe or the badge, to earn a name as nobody in particular."},
+		],
+		"after": {
+			"drum": [["Narrator", "The drum is hung by evening. It is beaten twice before the lamps are lit: once by a farmer from Yunmeng about an axe, who stops halfway through and apologises; and once by a child, to hear what it sounds like. The Elder comes down both times."]],
+			"herald": [["Narrator", "Hall Master Shen has the account printed in nine days. Twelve heralds go down twelve roads with it rolled under their arms and read it in every market of the land. In most it is very well received. In two the heralds are pelted, and read it again, more slowly."]],
+			"cry": [["Narrator", "The blue robes are folded and put away in the long chest by the refectory. The first to go down without them come back in a month, thinner and quieter, and one has been taken on at a ferry in Yunmeng and does not want to come back at all."]],
+		},
+		"echo": {
+			"s_p44_end": {
+				"drum": [["Elder Qing Xuan", "The drum was beaten nine times this month, child. Six of them about us. I went down for every one. Two were right. I have written to both and gone down the river to one. It is the first time in seventy years I have apologised to a farmer, and I am rather good at it."]],
+				"herald": [["Elder Qing Xuan", "The heralds are back, and Shen is delighted. The account was read in every market of the land. I asked one of them what the land said back. He said: nothing, Elder. They listened to the end, and then they went on saying what they said before."]],
+				"cry": [["Elder Qing Xuan", "One of ours came back from the lakes without the robe, and nobody had known her for a disciple of anything. A woman at Reedhaven guessed. She asked how. The woman said: you paid for the bowl you broke. I keep thinking about that bowl."]],
+			},
+		},
+		"end": {
+			"drum": "There is a drum at the foot of the steps of Azure Cloud, and anybody the sect has wronged may beat it, and somebody will come down. It is not beaten often now. Disciples of the mountain are said in the towns to be the only cultivators in the land who will hear a complaint to the end before they answer it.",
+			"herald": "Azure Cloud keeps heralds, and its account of itself is read in every market of the land within a month of anything. It is the best-told sect under heaven. The towns know its side of everything, and a few of them, it is said, have begun to ask what the other side was.",
+			"cry": "Disciples of Azure Cloud go down the mountain in plain clothes and are known for nothing but what they do. Nobody can say at a distance which they are. It is said in the towns that a stranger who pays for what is broken is taken to be one of them, and is usually right.",
 		}},
 }
 const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawings", "nineteen", "ancestor", "widow", "crows", "axe", "cauldron_map", "furnace",
@@ -2038,7 +2075,7 @@ const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawin
 	"the_sack",
 	"the_knot",
 	"the_mat",
-	"the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round", "the_higher_sky", "the_red_seal", "the_two_roads", "the_covenant", "the_joy_of_fish", "the_first_form"]
+	"the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round", "the_higher_sky", "the_red_seal", "the_two_roads", "the_covenant", "the_joy_of_fish", "the_first_form", "the_owls_cry"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:

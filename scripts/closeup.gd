@@ -45,6 +45,8 @@ const SIGNATURE := {
 	"Ju Gong": "stroke_beard",
 	# Forgetting One Another in the Rivers and Lakes (Part XLI)
 	"Fleet-Mother Lu Ting": "hand_heart", "Shide, Who Sweeps the Kitchen": "stoop", "Ledger-Mistress Mo Chou": "sleeve_smile", "Banner-Lord Tuoba Lie": "arms_cross",
+	# The Owl Moves East (Part XLIV)
+	"Ah Shun": "hand_heart", "Yang Bu": "arms_cross", "Granny Jiu": "shade_eyes",
 	# Mastering Life (Part XLIII)
 	"Old Goulou": "stoop", "Woodworker Qing": "measure", "Ji Xingzi": "shade_eyes",
 	# The Joy of Fish (Part XLII)

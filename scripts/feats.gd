@@ -98,7 +98,11 @@ const FEATS := {
 	# the Sea Floor release: the last realm, the works, the places of the sea floor and the shaped ground (Part XLII)
 	"joy_of_fish": {"n": "From the Bridge", "kind": "road", "pts": 20, "test": ["level", 141], "desc": "Reach Knows the Joy of Fish."},
 	# the Unblunted Knife release: the last realm, the chart, the crafts, the beasts and the places of peace (Part XLIII)
-	"masters_life": {"n": "Oh. Like That", "kind": "road", "pts": 20, "test": ["level", 144], "desc": "Reach Masters Life: the last realm there is."},
+	"masters_life": {"n": "Oh. Like That", "kind": "road", "pts": 20, "test": ["level", 144], "desc": "Reach Masters Life."},
+	# Part XLIV (the Turned Face release)
+	"changes_its_cry": {"n": "The Same Village", "kind": "road", "pts": 20, "test": ["level", 147], "desc": "Reach Changes Its Cry: the last realm there is."},
+	"no_thief": {"n": "Not the Neighbour's Son", "kind": "road", "pts": 10, "test": ["step", "s_p44_shun"], "desc": "Sit beside the boy a whole village saw a thief in."},
+	"smelled": {"n": "Held Still to Be Smelled", "kind": "road", "pts": 10, "test": ["step", "s_p44_coat"], "desc": "Let a dog that barked at the coat find out who was in it."},
 	"six_lamps": {"n": "Six Lamps of Sixty", "kind": "road", "pts": 10, "test": ["step", "s_p43_gates"], "desc": "Open six ranks of the chart of the channels."},
 	"a_seal_open": {"n": "As Open as It Goes", "kind": "craft", "pts": 20, "test": ["seals_open", 1], "desc": "Open the seal at the end of one of the ten channels."},
 	"it_rattles": {"n": "It Rattles", "kind": "craft", "pts": 10, "test": ["crafted", 1], "desc": "Make something with his own hands."},

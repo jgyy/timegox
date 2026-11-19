@@ -289,6 +289,8 @@ func head3(f: Dictionary) -> Vector3:
 
 ## how far the pack met had grown (almanac.gd)
 var grown := 0
+## how much harder the land's ill will made this battle (repute.gd): 1 for somebody well thought of
+var repute_k := 1.0
 
 func start(foe_list: Array, c: Dictionary) -> void:
 	ctx = c
@@ -354,6 +356,17 @@ func start(foe_list: Array, c: Dictionary) -> void:
 		if grown >= 3 and foes.size() > 1:
 			foes[foes.size() - 1].name = "Old " + str(foes[foes.size() - 1].name)
 	# (creed.gd: the Way he walks is felt in what he gives and takes: see _hit)
+	# the Turned Face release (repute.gd): what the land thinks of him is the difficulty of the battle. People who
+	# dislike him tell the wild where he sleeps and cheer for what he fights: every foe stands up to more and hits
+	# harder.  Heaven's tribulation is not the land's, and a doom cannot be beaten anyway.
+	repute_k = 1.0 if c.get("tribulation", false) else Repute.mod(Game, "foe")
+	if repute_k != 1.0:
+		for f in foes:
+			if Dooms.is_doom(str(f.id)):
+				continue
+			f.maxhp = float(f.maxhp) * repute_k
+			f.hp = float(f.hp) * repute_k
+			f.atk = float(f.atk) * repute_k
 	# the Lost Horse release (dooms.gd): a foe that cannot be beaten, and the round it crests on
 	doomed = Dooms.in_group(foes)
 	crest = Dooms.crest_round(foes)
@@ -466,6 +479,9 @@ func start(foe_list: Array, c: Dictionary) -> void:
 		ctx["said"] = said
 		ctx["crowd"] = 0
 		say("%s, %s: one against one. (Words can be said across the ring. Losing puts him out of the meet, and nothing else.)" % [str(Lists.MEETS[meet].n), str(Lists.ROUNDS[int(c.get("round", 0))].n)])
+	# (the Turned Face release, repute.gd: told when the land's ill will has made the battle harder)
+	if repute_k != 1.0 and Repute.battle_word(Game) != "":
+		say(Repute.battle_word(Game))
 	if ring_root != null and is_instance_valid(ring_root):
 		ring_root.queue_free()
 		ring_root = null
@@ -651,6 +667,26 @@ func _foe_act(f: Dictionary) -> void:
 		return
 	# (the Iron Pestle release, tactics.gd: each foe fights as what it is, and is seen to)
 	var plan := Tactics.choose(f, tg, alive(foes), wits, randf(), randf())
+	# (the Turned Face release, tactics.gd ARTS: a toad, a centipede and an owl have an art of their own, used on
+	# every third turn of their own; its effect is drawn from fx3d.gd and the cast clip)
+	var art := Tactics.art_of(f)
+	if not art.is_empty() and str(plan.act) != "brace":
+		var hit_to: Array = tg if str(art.to) == "all" else [tg[int(plan.to)]]
+		say(Tactics.art_said(art, str(f.name), str(hit_to[0].name)))
+		for v in hit_to:
+			_hit(f, v, float(art.mult), f.elem, true)
+		if not headless():
+			match str(art.fx):
+				"coins":
+					Fx3D.coins(scene3d, pos3(f) + Vector3(0, 0.8, 0), pos3(hit_to[0]))
+				"venom":
+					Fx3D.venom(scene3d, hit_to.map(func(v): return pos3(v)))
+				"screech":
+					Fx3D.screech(scene3d, pos3(f) + Vector3(0, 1.3, 0), pos3(hit_to[0]) + Vector3(0, 1.2, 0))
+			if f.has("model"):
+				Models.act(f.model, "cast", t)
+		timer = 1.2
+		return
 	if str(plan.act) == "brace":
 		wits.braced[int(f.get("slot", 0))] = true
 		f["braced"] = true

@@ -73,6 +73,9 @@ static func line(g, k: int) -> String:
 
 ## Whether somebody in `town` has something for him today.
 static func shunned(g, town: String) -> bool:
+	# (the Turned Face release, repute.gd: nobody follows somebody the whole land has turned from)
+	if Repute.shuns(g):
+		return true
 	return (not g.bounty.is_empty() or Taboo.marked(g)) and Crime.standing(g, Weal.of_folk(town)) > 0
 
 static func gift_due(g, town: String) -> bool:

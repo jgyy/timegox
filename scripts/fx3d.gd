@@ -903,6 +903,77 @@ static func splash(parent: Node3D, pos: Vector3, col: Color, life: float = 0.8, 
 	tw.tween_property(mi, "position:y", pos.y + 1.2 * size, life)
 	tw.chain().tween_callback(mi.queue_free)
 
+# ---------------------------------------------------------------- the arts of three kinds of beast (the Turned Face release)
+## A money toad's Gold Tongue: a fountain of square-holed cash thrown in arcs from its mouth onto whoever it
+## struck, spinning, and a ring of gold where they land.
+static func coins(parent: Node3D, from: Vector3, to: Vector3, life: float = 0.9) -> void:
+	if headless() or parent == null or not parent.is_inside_tree():
+		return
+	var gold := Color(1.0, 0.82, 0.32)
+	for i in 9:
+		var b := MB.new()
+		b.disc(Vector3.ZERO, 0.16, MB.tag(gold, MB.METAL), 12, MB.tag(gold.lightened(0.3), MB.METAL), Vector3(PI / 2, 0, 0))
+		b.box(Vector3.ZERO, Vector3(0.07, 0.07, 0.05), MB.tag(Color(0.15, 0.1, 0.04), MB.METAL))
+		var mi := MB.mesh_node(parent, b.build(MB.mat_glow()), from)
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var a := TAU * float(i) / 9.0
+		var land := to + Vector3(cos(a) * (0.4 + 0.15 * float(i % 3)), 0.0, sin(a) * (0.4 + 0.15 * float(i % 3)))
+		var peak := from.lerp(land, 0.5) + Vector3(0, 2.2 + 0.3 * float(i % 4), 0)
+		var dl := 0.03 * float(i)
+		var tw := mi.create_tween()
+		tw.set_parallel(true)
+		tw.tween_method(func(k: float): mi.position = from.lerp(peak, k).lerp(peak.lerp(land, k), k), 0.0, 1.0, life * 0.7).set_delay(dl)
+		tw.tween_property(mi, "rotation", Vector3(TAU * 2.0, TAU * 1.5, 0), life * 0.7).set_delay(dl)
+		tw.chain().tween_property(mi, "scale", Vector3(0.01, 0.01, 0.01), life * 0.25)
+		tw.chain().tween_callback(mi.queue_free)
+	shockwave(parent, Vector3(to.x, 0.0, to.z), gold, 3.5, life)
+	_burst(parent, to + Vector3(0, 0.6, 0), gold, 26, 4.0, 0.7, quad("glow", 0.25), Vector3(0, -6.0, 0), Vector3(0, 1, 0), 60.0, 0.5)
+
+## A centipede's Hundred Steps of Venom: green fangs of venom come up out of the ground under every one of
+## the party, and a sick mist hangs where they were.
+static func venom(parent: Node3D, targets: Array, col: Color = Color(0.45, 0.9, 0.3)) -> void:
+	if headless() or parent == null or not parent.is_inside_tree():
+		return
+	for to in targets:
+		var at: Vector3 = to
+		at.y = 0.0
+		var b := MB.new()
+		for i in 5:
+			var a := TAU * float(i) / 5.0 + 0.4
+			b.cone(Vector3(cos(a) * 0.45, 0.55, sin(a) * 0.45), 0.12, 1.1 + 0.25 * float(i % 2), MB.tag(col, MB.CRYSTAL), Vector3(sin(a) * 0.4, 0, -cos(a) * 0.4), 6)
+		var mi := MB.mesh_node(parent, b.build(MB.mat_glow()), at + Vector3(0, -1.6, 0))
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var tw := mi.create_tween()
+		tw.tween_property(mi, "position:y", 0.0, 0.16).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+		tw.tween_interval(0.35)
+		tw.tween_property(mi, "position:y", -1.8, 0.3).set_ease(Tween.EASE_IN)
+		tw.tween_callback(mi.queue_free)
+		splash(parent, at + Vector3(0, 0.1, 0), col, 0.7, 0.8)
+		_burst(parent, at + Vector3(0, 0.5, 0), col.darkened(0.2), 22, 1.6, 1.4, quad("smoke", 0.8, false), Vector3(0, 0.6, 0), Vector3(0, 1, 0), 120.0, 0.6)
+
+## An owl's Screech in the Dark: rings of sound go out from its open beak towards the party, one after
+## another, and dark feathers drift down after them.
+static func screech(parent: Node3D, from: Vector3, to: Vector3, col: Color = Color(0.75, 0.7, 1.0)) -> void:
+	if headless() or parent == null or not parent.is_inside_tree():
+		return
+	var d := to - from
+	var yaw := atan2(d.x, d.z)
+	for k in 4:
+		var b := MB.new()
+		# (stood on edge facing the way the cry goes: turned first, then scaled in its own plane)
+		b.prim("torus_hi", Transform3D(Basis.from_euler(Vector3(PI / 2, 0, 0)) * Basis.from_scale(Vector3(2.0, 1.5, 2.0)), Vector3.ZERO), Color(col.r, col.g, col.b, 0.8 - 0.12 * float(k)))
+		var mi := MB.mesh_node(parent, b.build(MB.mat_glow()), from)
+		mi.rotation = Vector3(0, yaw, 0)
+		mi.scale = Vector3.ONE * 0.2
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var tw := mi.create_tween()
+		tw.set_parallel(true)
+		tw.tween_property(mi, "position", to, 0.55).set_delay(0.1 * float(k))
+		tw.tween_property(mi, "scale", Vector3.ONE * (1.6 + 0.4 * float(k)), 0.55).set_delay(0.1 * float(k))
+		tw.chain().tween_callback(mi.queue_free)
+	_flash(parent, from, col, 2.4, 0.4)
+	_burst(parent, to + Vector3(0, 2.4, 0), Color(0.42, 0.38, 0.44, 0.7), 16, 1.0, 2.0, quad("petal", 0.14, false), Vector3(0, -1.0, 0), Vector3(0, -1, 0), 160.0, 2.0)
+
 ## element-coloured hit effect at a world position (big = boss heavy attack or a technique)
 static func hit(parent: Node3D, pos: Vector3, elem: String, big: bool = false) -> void:
 	if headless() or parent == null or not parent.is_inside_tree():

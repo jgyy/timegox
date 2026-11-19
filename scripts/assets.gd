@@ -45,6 +45,9 @@ const MONSTERS := {
 	# the Underclothes release: the ox of the land as an ox (the draught ox of the cart, without its yoke), for the
 	# oxen of the corvee and the Whole Ox of Part XXVI, which were drawn as wolves and nothing
 	"ox": "monsters/ox",
+	# the Turned Face release (Part XLIV): three new kinds of body, sculpted for it: the three-legged money toad,
+	# the hundred-legged centipede and the eagle-owl
+	"toad": "monsters/toad", "centipede": "monsters/centipede", "owl": "monsters/owl",
 }
 ## The Underclothes release: foes of the "bird" shape that are not birds of prey are drawn from the bird
 ## nearest them in kind (the shape, and so the habits and the battle, stay as they were): the waders on
@@ -60,11 +63,21 @@ const BIRD_OF := {
 	"carrion_crow": "monsters/magpie",
 }
 
+## The Turned Face release: foes that were drawn on a body that is not theirs because there was none of their kind,
+## drawn now on the one there is (only the drawing: the shape, and so the habits, the wits and the battle, stay as
+## they were): eleven toads and frogs that were jellies, a centipede that was a snake, and two owls that were hawks.
+const DRAWN_AS := {
+	"mire_toad": "toad", "clay_toad": "toad", "moon_toad": "toad", "flood_toad": "toad", "toad_matriarch": "toad", "cinnabar_toad": "toad",
+	"waking_toad": "toad", "sink_toad": "toad", "still_toad": "toad", "well_frog": "toad",
+	"waking_centipede": "centipede",
+	"owl_shadow": "owl", "night_owl": "owl",
+}
+
 ## Whether a foe is drawn a little off the ground in the land: its kind flies or floats, and it is not
 ## drawn on a model that stands (the crane's).
 static func hovers(enemy: String) -> bool:
 	var shape := str(Data.ENEMIES.get(enemy, {}).get("shape", ""))
-	return shape in ["wisp", "jelly", "bird", "storm", "ray"] and str(BIRD_OF.get(enemy, "")) != "monsters/bifang"
+	return shape in ["wisp", "jelly", "bird", "storm", "ray"] and str(BIRD_OF.get(enemy, "")) != "monsters/bifang" and not DRAWN_AS.has(enemy)
 
 const PEOPLE := {
 	"lin_feng": "characters/lin_feng", "yue_ling": "characters/yue_ling", "elder_qing": "characters/elder_qing",
@@ -606,7 +619,7 @@ static func person(id: String) -> Node3D:
 ## goes where a painter would put it: the eyes, the markings, the glow (the accent keeps the hue).
 ## Spirits, flames, jellies and the like are as bright as they were.
 const NATURAL := ["beast", "ape", "tiger", "fox", "mammoth", "qilin", "kaiming", "tortoise", "crab", "scorpion", "spider", "mantis", "serpent",
-	"moth", "oxhead", "horseface", "mushroom", "plant", "golem", "ray", "jade_rabbit", "bifang", "ox"]
+	"moth", "oxhead", "horseface", "mushroom", "plant", "golem", "ray", "jade_rabbit", "bifang", "ox", "toad", "centipede", "owl"]
 
 ## The colour of a hide that is, in a painter's eye, colour `c`: two-fifths less saturated (never more
 ## than half), drawn a sixth of the way towards the brown of an animal, and kept out of the deepest dark.
@@ -619,7 +632,9 @@ static func natural(c: Color) -> Color:
 static func monster(shape: String, col: Color, enemy: String = "") -> Node3D:
 	var d: Dictionary = Data.ENEMIES.get(enemy, {})
 	var over: Dictionary = d.get("pal", {})
-	if NATURAL.has(shape) and not d.get("bright", false):
+	# (the Turned Face release: a foe drawn on a body of its own kind is coloured as that kind is)
+	var drawn := str(DRAWN_AS.get(enemy, shape))
+	if NATURAL.has(drawn) and not d.get("bright", false):
 		# (the markings and the accent keep the colour it was given: that is where the eye reads its kind)
 		var vivid := col
 		col = natural(col)
@@ -628,7 +643,7 @@ static func monster(shape: String, col: Color, enemy: String = "") -> Node3D:
 			over["mark"] = Color.from_hsv(vivid.h, clampf(vivid.s * 0.9, 0.0, 0.8), clampf(vivid.v * 0.5, 0.16, 0.42))
 		if not over.has("sec"):
 			over["sec"] = palette(vivid)[3]
-	var path: String = str(BIRD_OF.get(enemy, MONSTERS[shape])) if shape == "bird" else str(MONSTERS[shape])
+	var path: String = str(MONSTERS[drawn]) if DRAWN_AS.has(enemy) and has(str(MONSTERS[drawn])) else (str(BIRD_OF.get(enemy, MONSTERS[shape])) if shape == "bird" else str(MONSTERS[shape]))
 	var n := instance(path, col, palette(col, d.get("elem", ""), over))
 	n.set_meta("kind", "monster")
 	n.set_meta("shape", shape)

@@ -1677,6 +1677,8 @@ const POSTS := {
 	"net_hand": ["measure|gather|gaze", "", "doze"], "coral_child": ["pour|gaze|gather", "", "doze"],
 	"sea_turtle": ["think|gaze|doze", "", "doze"], "salter_yan": ["count|point|measure", "", "doze"], "roe_wife": ["count|peer|point", "", "doze"],
 	"lamp_boy": ["pour|peer|stretch", "", "doze"], "kun_watcher": ["gaze|write|peer", "", "stargaze"],
+	# Part XLIV (the Turned Face release): three who were seen as something they were not
+	"ah_shun": ["sweep|gaze|think", "broom", "doze"], "yang_bu": ["think|gaze|read", "", "doze"], "granny_jiu": ["gaze|point|offer", "", "doze"],
 	# Part XLIII (the Unblunted Knife release): three who have skill and cannot say how
 	"old_goulou": ["gaze|peer|point", "", "gaze"], "woodworker_qing": ["think|gaze|measure", "", "doze"], "ji_xingzi": ["peer|gaze|think", "", "doze"],
 	"frog_wa": ["gaze|measure|think", "", "stargaze"], "silt_sweeper": ["sweep|gaze|stretch", "broom", "doze"],

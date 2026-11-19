@@ -205,7 +205,7 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	# Part XXXIX: the desk is carried down to the Cloud Gate
 	"the_red_seal": ["open"], "the_two_roads": ["ask"], "the_covenant": ["dig"],
 	# Part XLII: the clod and the Dao are given to the Loom-Mother
-	"the_joy_of_fish": ["teach"], "the_first_form": ["show"]}
+	"the_joy_of_fish": ["teach"], "the_first_form": ["show"], "the_owls_cry": ["drum"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -3901,6 +3901,8 @@ func _finish(reason: String) -> void:
 	print("the almanac     : day %d of the journey: %s; %s on the roll of nine; %d stipends drawn; %d packs met, %d of them grown since" % [Game.day, Almanac.text(Game), Almanac._place_word(Almanac.place(Game)), Game.stipends,
 		Game.pack_day.size(), grown_n])
 	print("the way         : %s (%s)" % [Creed.name_of(Game), Creed.text(Game)])
+	# (the Turned Face release, repute.gd: what the land thinks of him, and so how hard it fought)
+	print("the good name   : %s" % Repute.text(Game))
 	print("the houses      : %d put to rights, %d things standing where he set them, %d of them where they should not be" % [Game.fitted.size(), Game.placed.size(), Game.misplaced])
 	# (the Open Net release: the law of the land, crime.gd; the shelf nobody opens, taboo.gd; and what all the
 	# hunting did to the countries it was done in, wilds.gd)

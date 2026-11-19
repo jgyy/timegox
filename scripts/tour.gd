@@ -2369,6 +2369,11 @@ func _run() -> void:
 		# a place of peace on a summit, at the back of a cave and in a pavilion, a beast asked to stay and at his
 		# heel, the pages, and Part XLIII
 		await _knife_shots(str(main.args.knife))
+	if main.args.has("turned"):
+		# the Turned Face release (--turned, or --turned=a,b): the three new bodies and the foes of Part XLIV, the old
+		# toads, centipede and owls on bodies of their own kind, each new body's art in battle, the page of his good
+		# name well and ill thought of, a battle made harder by it, the crossroads and what it leaves standing
+		await _turned_shots(str(main.args.turned))
 	if main.args.has("deeps"):
 		# the Sea Floor release (--deeps, or --deeps=a,b): the three towns under the sea, the six works at their
 		# stations, the places of the sea floor, the ground shaped by the Dao of Leading Water, the way down at
@@ -8528,5 +8533,108 @@ func _knife_shots(which: String = "1") -> void:
 		main.ask_crossroads()
 		await _wait(0.6)
 		await _shot("crossroads_first_form")
+		main.set_stack(["world"])
+		Game.cross_pending = []
+
+
+## The Turned Face (--turned, or --turned=a,b): "foes" (Part XLIV's nine), "old" (foes drawn on a body of their own
+## kind at last), "arts" (the toad's Gold Tongue, the centipede's Hundred Steps, the owl's Screech, in battle),
+## "name" (Esc > Good Name, well thought of and shunned), "harder" (a battle the land's ill will made harder),
+## "marks" and "cross" (Part XLIV).
+func _turned_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_burrows_state()
+	Game.level = 146
+	Game.step = Data.step_index("s_p44_cry")
+	Game.companion = true
+	Game.day = 402
+	Game.stones = 121000
+	for rid in [Atlas.HUB] + Data.AREA_CHAIN:
+		Game.seen[rid] = true
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	var quiet := func():
+		Game.toasts.clear()
+		main.toast_list.clear()
+		Game.mail_told = 999
+		Game.fame_told = Fame.rank(Game)
+		Game.page_due = []
+		Game.rite_due = []
+		Game.done_pending = []
+	if want.call("foes"):
+		var fs: Array = []
+		for fid in ["thiefs_gait", "suspecting_eye", "wall_croak", "running_bark", "black_coat", "puffed_pride", "eastward_owl", "same_cry", "hundred_tongues"]:
+			fs.append(_foe(fid))
+		await _gallery("part44_foes", fs, 1.0, 0.3)
+	if want.call("old"):
+		var os: Array = []
+		for fid2 in ["moon_toad", "cinnabar_toad", "toad_matriarch", "waking_centipede", "night_owl"]:
+			os.append(_foe(fid2))
+		await _gallery("drawn_as_their_kind", os, 1.2, 0.3)
+	if want.call("arts"):
+		for a in [["wall_croak", "yunmeng", "art_gold_tongue"], ["hundred_tongues", "langya", "art_hundred_steps"], ["eastward_owl", "hanshan", "art_screech"]]:
+			Clock.set_hour(Game, 15.0)
+			main.battle.start([{"id": a[0], "lv": 146}, {"id": a[0], "lv": 146}], {"theme": str(Data.AREAS[a[1]].theme), "enemy": a[0]})
+			main.push("battle")
+			await _wait(2.4)
+			var f: Dictionary = main.battle.foes[0]
+			f.turns = 3
+			main.battle._foe_act(f)
+			await _wait(0.42)
+			await _shot(a[2])
+			main.set_stack(["world"])
+			await _wait(0.3)
+	if want.call("name"):
+		w.teleport(_nearest_free(Atlas.to_world("sect", Vector2i(20, 10))), "surface")
+		quiet.call()
+		await _wait(0.8)
+		Game.deeds_bad = 0
+		Game.pilfered = 0
+		main.push("menu")
+		main.menu.mode = "name"
+		main.menu.cursor = 0
+		main.menu._build()
+		await _wait(0.3)
+		await _shot("page_good_name")
+		Game.deeds_bad = 6
+		Game.pilfered = 3
+		Game.gamble_rounds = 25
+		Game.deeds_good = 4
+		main.menu._build()
+		await _wait(0.3)
+		await _shot("page_good_name_shunned")
+		main.pop()
+	if want.call("harder"):
+		Game.deeds_bad = 6
+		Game.pilfered = 3
+		Game.gamble_rounds = 25
+		Clock.set_hour(Game, 21.0)
+		main.battle.start([{"id": "suspecting_eye", "lv": 146}, {"id": "wall_croak", "lv": 146}, {"id": "thiefs_gait", "lv": 146}], {"theme": str(Data.AREAS.yunmeng.theme), "enemy": "suspecting_eye"})
+		main.push("battle")
+		await _wait(2.6)
+		await _shot("battle_turned_face")
+		main.set_stack(["world"])
+		Game.deeds_bad = 0
+		Game.pilfered = 0
+		Game.gamble_rounds = 0
+		Game.deeds_good = 0
+	if want.call("marks"):
+		var mk: Array = []
+		for oid in ["drum", "herald", "cry"]:
+			mk.append(Marks.model(Marks.MARKS.the_owls_cry[oid], 0))
+		await _gallery("part44_marks", mk, 1.6, 0.3)
+	if want.call("cross"):
+		main.set_stack(["world"])
+		w.teleport(_nearest_free(Atlas.to_world("sect", Vector2i(20, 10))), "surface")
+		Clock.set_hour(Game, 18.0)
+		quiet.call()
+		await _wait(1.0)
+		Game.picks.erase("the_owls_cry")
+		Game.cross_pending = ["the_owls_cry"]
+		main.ask_crossroads()
+		await _wait(0.6)
+		await _shot("crossroads_owls_cry")
 		main.set_stack(["world"])
 		Game.cross_pending = []

@@ -284,6 +284,19 @@ const PAGES := {
 		"Zhuangzi stood on a bridge and said the fish were happy. Hui Shi said: you are not a fish. I have argued Hui Shi's side all my life without knowing it had a name. Do not presume. Sweep your own step.",
 		"I went down among them. I ate at their tables and carried their crates and learned the one art they had to teach. I still do not know what a fish enjoys. But I know what I saw, and I said it, and I said where I was standing when I saw it.",
 		"I think that is all the man on the bridge ever claimed. Not that he was a fish. Only that he was there, and looking, and that it would have been a kind of lie to say he had seen nothing."]},
+	# Part XLIV (the Turned Face release)
+	"p44_axe": {"n": "A Thief's Walk", "who": "yue", "after": "s_p44_shun", "lines": [
+		"A farmer wrote that you walk like an axe-thief, and I laughed, and then I watched you go down the steps to the river and I could see it. That is the frightening part. I saw it at once, and I know you better than anybody alive.",
+		"Ah Shun has been looked at like that for a year. He sits with his hands where you can see them. You sat down beside him and put yours on your knees in the same way, and did not notice that you had.",
+		"I am going to stop seeing it. I have decided. It turns out not to be hard. It is only like stopping looking for an axe."]},
+	"p44_coat": {"n": "The Coat", "who": "lin", "after": "s_p44_coat", "lines": [
+		"A dog barked at me at a gate in Clearbell, and I stopped, and did not know why. Yang Bu knew. He said I was wearing something it did not know.",
+		"I have worn a great many things through forty-nine realms: a sword, a name, the Elder's favour, whatever was in the way. People see the coat. They are not wrong to. I put it on.",
+		"The yellow dog lay across my feet when it was done. It did not need anything of me. It wanted to smell my hand. I have not been asked for so little in years, and I did not mind giving it."]},
+	"p44_last": {"n": "The Same Village", "who": "elder", "after": "s_break49", "lines": [
+		"Fifty. The child came back from the end of the east with four feathers and a dove's opinion, and sat on my top step and listened to the towns. I have never seen the child listen so long to anything that was not an order.",
+		"The land says a great many things about the child. Some are true. I used to mind, for the child's sake. I find that I mind less than the child does now, and the child less than it did, and that this may be what fifty realms are for.",
+		"There is an owl on the refectory roof. It came at the turn of the season and cries every night, and nobody on this mountain has thrown anything at it. I take that as a sign we have learned something, though I could not say what."]},
 	# Part XLIII (the Unblunted Knife release)
 	"p43_guard": {"n": "It Rattles", "who": "lin", "after": "s_p43_guard", "lines": [
 		"I have carried a sword since I was fourteen and I did not know how the guard is fixed to the tang. I know now. It is fixed with a wedge, and mine is not quite the right wedge.",
@@ -306,7 +319,7 @@ const ORDER := ["p01_post", "p01_broom", "p01_gate", "p02_emperor", "p03_hollow"
 	"p13_gates", "p14_karma", "p15_woven", "p16_year", "p17_spring", "p18_fire", "p19_works", "p20_hollow", "p21_arms", "p22_roads", "p23_host", "p24_horse", "p25_town", "p26_springs", "p27_sack",
 	"p28_grass", "p29_chimney", "p30_net", "p31_shoe", "p32_mirror", "p33_pestle", "p34_road", "p35_block", "p36_fish", "p37_round",
 	"p38_word", "p38_fuchai_down_lin", "p38_fuchai_down_yue", "p38_fuchai_up_lin", "p38_pang_down_lin", "p38_pang_down_yue", "p38_pang_up_lin",
-	"p38_lian_down_lin", "p38_lian_down_yue", "p38_lian_up_lin", "p38_lian_won_lin", "p38_low", "p38_last", "p39_ring", "p39_paper", "p39_last", "p40_leaves", "p40_two", "p40_last", "p41_bowl", "p41_crooked", "p41_last", "p42_floor", "p42_hands", "p42_last", "p43_guard", "p43_wolf", "p43_last"]
+	"p38_lian_down_lin", "p38_lian_down_yue", "p38_lian_up_lin", "p38_lian_won_lin", "p38_low", "p38_last", "p39_ring", "p39_paper", "p39_last", "p40_leaves", "p40_two", "p40_last", "p41_bowl", "p41_crooked", "p41_last", "p42_floor", "p42_hands", "p42_last", "p43_guard", "p43_wolf", "p43_last", "p44_axe", "p44_coat", "p44_last"]
 
 static var _by_step := {}
 

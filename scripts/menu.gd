@@ -28,10 +28,10 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Root & Rites", "In Their Own Words", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "The Land", "The Way", "The Law", "The Wild", "The Almanac", "Bestiary", "World Map", "Annals", "Seals & Lists", "Leaves", "The Sects", "The Sea Floor", "The Channels", "Hands & Beasts", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "rites", "words", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "land", "way", "law", "wild", "almanac", "bestiary", "map", "annals", "seals", "leaves", "sects", "deeps", "channels", "hands", "resume"]
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Root & Rites", "In Their Own Words", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "The Land", "The Way", "Good Name", "The Law", "The Wild", "The Almanac", "Bestiary", "World Map", "Annals", "Seals & Lists", "Leaves", "The Sects", "The Sea Floor", "The Channels", "Hands & Beasts", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "rites", "words", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "land", "way", "name", "law", "wild", "almanac", "bestiary", "map", "annals", "seals", "leaves", "sects", "deeps", "channels", "hands", "resume"]
 		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, true, true, Game.companion or Game.bond > 0,
-			Game.dao != "" or not Game.met.is_empty(), Game.prologue == "", not Game.pages.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, Game.done(Seals.OPEN), Game.prologue == "", Game.prologue == "", Game.prologue == "", Game.prologue == "", Game.prologue == "", true]
+			Game.dao != "" or not Game.met.is_empty(), Game.prologue == "", not Game.pages.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, Game.done(Seals.OPEN), Game.prologue == "", Game.prologue == "", Game.prologue == "", Game.prologue == "", Game.prologue == "", true]
 	elif mode == "bestiary":
 		labels = []
 		ids = []
@@ -67,7 +67,7 @@ func _build() -> void:
 		labels.append("Back")
 		ids.append("back")
 		enabled.append(true)
-	elif mode == "way" or mode == "almanac" or mode == "wild" or mode == "seals" or mode == "sects" or mode == "deeps":
+	elif mode == "way" or mode == "name" or mode == "almanac" or mode == "wild" or mode == "seals" or mode == "sects" or mode == "deeps":
 		# creed.gd, almanac.gd, wilds.gd: a page to read
 		labels = ["Back"]
 		ids = ["back"]
@@ -291,7 +291,7 @@ func press(act: String) -> void:
 				var k := ls.find(map_layer)
 				map_layer = ls[(k + (1 if act == "right" else -1) + ls.size()) % ls.size()]
 		"cancel":
-			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words", "seals", "leaves", "sects", "deeps", "channels", "hands"]:
+			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "name", "almanac", "law", "wild", "rites", "words", "seals", "leaves", "sects", "deeps", "channels", "hands"]:
 				mode = "root"
 				cursor = 0
 				_build()
@@ -397,7 +397,7 @@ func press(act: String) -> void:
 				"forbidden":
 					main.pop()
 					main.open_forbidden()
-				"works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words", "seals", "leaves", "sects", "deeps", "channels", "hands":
+				"works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "name", "almanac", "law", "wild", "rites", "words", "seals", "leaves", "sects", "deeps", "channels", "hands":
 					mode = id
 					cursor = 0
 					msg = ""
@@ -574,6 +574,51 @@ func _draw_way() -> void:
 		var ax2: Dictionary = Creed.AXIS[str(c.axis)]
 		UI.text(self, Vector2(r.position.x + 24, y + 22.0 * float(i + 1)), "%s %+d" % [str(ax2.pos if int(c.d) > 0 else ax2.neg), absi(int(c.d))], 13, ax2.col if int(c.d) > 0 else ax2.neg_col)
 		UI.text(self, Vector2(r.position.x + 170, y + 22.0 * float(i + 1)), str(c.why), 13, UI.C_TEXT)
+
+## Good Name (the Turned Face release, repute.gd): what the land thinks of him, why, and what it costs in battle
+## and at the counters.  The stages are drawn as a ladder with where he stands lit.
+func _draw_name() -> void:
+	UI.text(self, Vector2(60, 70), "Good Name", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 16)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	var st := Repute.stage(Game)
+	var cur: Dictionary = Repute.STAGES[st]
+	UI.text(self, r.position + Vector2(24, 44), str(cur.n), 26, cur.col)
+	UI.wrapped(self, r.position + Vector2(24, 66), main.told(str(cur.desc)), 15, UI.C_TEXT, r.size.x - 48)
+	# the ladder: six rungs, the score on a bar under them
+	var y := r.position.y + 150.0
+	var x0 := r.position.x + 24.0
+	var rw := (r.size.x - 48.0) / float(Repute.STAGES.size())
+	for i in Repute.STAGES.size():
+		var sd: Dictionary = Repute.STAGES[i]
+		var rr := Rect2(x0 + rw * float(i) + 2.0, y, rw - 4.0, 54.0)
+		UI.panel(self, rr, (sd.col as Color).darkened(0.55) if i == st else Color(0.1, 0.12, 0.18, 0.9), sd.col if i == st else UI.C_BORDER)
+		UI.wrapped(self, rr.position + Vector2(6, 18), str(sd.n), 12, sd.col if i <= st else UI.C_DIM, rw - 14.0)
+		UI.text(self, rr.position + Vector2(6, 50), "foes x%.2f" % float(sd.foe), 11, UI.C_DIM)
+	var sc := Repute.score(Game)
+	var top := float(Repute.AT[Repute.AT.size() - 1]) * 1.2
+	UI.panel(self, Rect2(x0, y + 66.0, r.size.x - 48.0, 12.0), Color(0.1, 0.12, 0.18, 0.9), UI.C_BORDER)
+	draw_rect(Rect2(x0 + 1.0, y + 68.0, (r.size.x - 50.0) * clampf(float(sc) / top, 0.0, 1.0), 8.0), cur.col)
+	var nx := Repute.next_at(Game)
+	UI.text(self, Vector2(x0, y + 100.0), "Held against him: %d" % sc + ("" if nx < 0 else "   (the next stage at %d)" % nx), 14, UI.C_DIM)
+	y += 128.0
+	var x2 := r.position.x + 24.0 + (r.size.x - 48.0) * 0.5
+	UI.text(self, Vector2(x0, y), "What is held against him", 16, UI.C_RED)
+	UI.text(self, Vector2(x2, y), "What is set against it (half at most)", 16, UI.C_JADE)
+	var hs := Repute.harms(Game)
+	var am := Repute.amends(Game)
+	if hs.is_empty():
+		UI.wrapped(self, Vector2(x0, y + 22), "Nothing. He has taken nothing that was not his, and hurt nobody who did not come at him.", 13, UI.C_DIM, (r.size.x - 72) * 0.5)
+	for i in mini(hs.size(), 9):
+		UI.text(self, Vector2(x0, y + 22.0 * float(i + 1)), "%d" % int(hs[i].d), 13, UI.C_RED.lightened(0.2))
+		UI.text(self, Vector2(x0 + 40.0, y + 22.0 * float(i + 1)), str(hs[i].why), 13, UI.C_TEXT)
+	if am.is_empty():
+		UI.text(self, Vector2(x2, y + 22), "Nothing yet.", 13, UI.C_DIM)
+	for i in mini(am.size(), 9):
+		UI.text(self, Vector2(x2, y + 22.0 * float(i + 1)), "%d" % int(am[i].d), 13, UI.C_JADE)
+		UI.text(self, Vector2(x2 + 40.0, y + 22.0 * float(i + 1)), str(am[i].why), 13, UI.C_TEXT)
+	UI.wrapped(self, Vector2(x0, r.end.y - 60.0), "Greed and cruelty to the people of the land make every battle harder: they tell the wild where he sleeps, and cheer for what he fights. Counters ask more from the third stage. Nothing a step asks for is ever refused.", 13, UI.C_DIM, r.size.x - 48)
 
 ## Leaves (the Two Roads release, yezi.gd): how the hands have gone, who he has sat down with, the leaves the
 ## masters painted, and the round of the five phases for whoever has forgotten what overcomes what.
@@ -1898,6 +1943,9 @@ func _draw() -> void:
 		return
 	if mode == "way":
 		_draw_way()
+		return
+	if mode == "name":
+		_draw_name()
 		return
 	if mode == "almanac":
 		_draw_almanac()
