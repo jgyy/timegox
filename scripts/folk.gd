@@ -60,6 +60,15 @@ const TOWNS := {
 		"roles": {"porter": 4, "merchant": 3, "youth": 3, "child": 3, "elder": 2, "scholar": 1, "cook": 1, "watchman": 1, "lamplighter": 1, "washer": 2, "waiter": 1, "giant": 1}},
 	"fourstreams": {"n": "Fourstreams", "area": "zhongbei", "at": Vector2i(37, 31), "race": "human",
 		"roles": {"farmer": 4, "musician": 3, "child": 3, "elder": 2, "washer": 2, "cook": 1, "monk": 1, "youth": 2, "waiter": 1, "giant": 1}},
+	# (the Rivers and Lakes release: the four towns of the sects)
+	"reedhaven": {"n": "Reedhaven", "area": "yunmeng", "at": Vector2i(41, 32), "race": "human",
+		"roles": {"fisher": 5, "musician": 4, "child": 4, "washer": 2, "elder": 2, "youth": 2, "cook": 1, "merchant": 1, "waiter": 1, "giant": 1}},
+	"clearbell": {"n": "Clearbell", "area": "hanshan", "at": Vector2i(47, 32), "race": "human",
+		"roles": {"monk": 5, "scholar": 3, "farmer": 3, "child": 2, "elder": 2, "cook": 2, "youth": 2, "washer": 1, "lamplighter": 1, "giant": 1}},
+	"ashmarket": {"n": "Ashmarket", "area": "heishui", "at": Vector2i(37, 32), "race": "human",
+		"roles": {"merchant": 5, "porter": 4, "watchman": 2, "youth": 3, "elder": 1, "cook": 1, "waiter": 2, "lamplighter": 1, "giant": 1}},
+	"knifegate": {"n": "Knifegate", "area": "langya", "at": Vector2i(45, 32), "race": "human",
+		"roles": {"guard": 5, "huntsman": 3, "smith": 2, "porter": 3, "youth": 3, "cook": 1, "merchant": 1, "elder": 1, "waiter": 1, "giant": 2}},
 }
 
 ## The Two Roads release: the towns are fuller.  Who has come to live in each since, by kind: made after
@@ -82,6 +91,11 @@ const MORE := {
 	"landfall": {"leafer": 2, "hawker": 2, "storyteller": 1, "child": 1, "fisher": 1},
 	"lightfoot": {"leafer": 2, "hawker": 2, "storyteller": 1, "porter": 1},
 	"fourstreams": {"leafer": 2, "hawker": 1, "storyteller": 1, "farmer": 2},
+	# (the Rivers and Lakes release: the four towns of the sects were built full)
+	"reedhaven": {"leafer": 1, "hawker": 1, "storyteller": 1, "fisher": 1, "child": 1},
+	"clearbell": {"leafer": 1, "hawker": 1, "storyteller": 1, "monk": 1, "child": 1},
+	"ashmarket": {"leafer": 2, "hawker": 3, "storyteller": 1, "porter": 1},
+	"knifegate": {"leafer": 1, "hawker": 1, "storyteller": 1, "guard": 1, "youth": 1},
 }
 
 ## How many people a town has in all (`TOWNS` and `MORE`).
@@ -1636,6 +1650,15 @@ const POSTS := {
 	# Part XXXVIII (the Higher Sky release)
 	# Part XL (the Two Roads release): the keeper of monkeys counts acorns all day, and sleeps sitting among his troop
 	"ju_gong": ["count|offer|think", "", "doze"],
+	# Part XLI (the Rivers and Lakes release): the people of the four towns of the sects
+	"lu_ting": ["count|gaze|point", "", "doze"], "piper_yan": ["carve|measure|think", "", "doze"], "ferrier_ke": ["measure|carve|gaze", "", "doze"],
+	"net_wife_shui": ["sew|count|gather", "", "doze"], "deaf_oarsman": ["fish|gaze|stretch", "", "doze"], "reed_girl": ["gather|gaze|think", "", "doze"],
+	"shide": ["sweep|think|gaze", "broom", "doze"], "lu_qiu": ["read|write|pray", "", "read"], "woodman_han": ["gather|stretch|gaze", "", "doze"],
+	"gruel_nun": ["offer|count|pray", "", "meditate"], "copyist_bo": ["trace|read|write", "", "read"], "bell_boy": ["sweep|gaze|stretch", "broom", "doze"],
+	"mo_chou": ["write|count|read", "book", "read"], "fence_gou": ["count|peer|offer", "", "doze"], "poisoner_she": ["gather|measure|count", "", "doze"],
+	"debtor_niu": ["dig|count|think", "", "doze"], "cutpurse_ya": ["peer|stretch|gaze", "", "stargaze"], "blind_teller": ["think|touch|count", "", "meditate"],
+	"tuoba_lie": ["gaze|point|think", "", "stargaze"], "pit_keeper": ["sweep|measure|gaze", "broom", "doze"], "wolf_mother": ["offer|gather|count", "", "doze"],
+	"ransom_clerk": ["write|count|peer", "book", "read"], "deserter_qi": ["gaze|think|stretch", "", "stargaze"], "toll_boy": ["count|peer|point", "", "doze"],
 	"goujian": ["think|gaze", "", "doze"], "sun_bin": ["measure|write|think", "", "doze"], "lin_xiangru": ["think|gaze|write", "", "doze"],
 	"yangzi_wife": ["weave|sew|spin", "", "weave"], "yang_zhen": ["read|write|gaze", "", "read"], "bell_thief": ["peer|knock|gaze", "", "doze"], "pei_du": ["gaze|count|read", "", "gaze"],
 	"tai_widow": ["sew|sweep", "needle", "doze"], "xu_qian": ["write|peer", "", "read"], "qian_liu": ["point|peer|count", "", "doze"], "bo_yi": ["dig|peer|point", "", "doze"],

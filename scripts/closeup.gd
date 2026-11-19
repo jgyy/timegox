@@ -43,6 +43,8 @@ const SIGNATURE := {
 	"Deng Xi, Advocate of Zheng": "sleeve_smile", "Hui Shi, Minister of Wei": "stroke_beard", "Gongsun Long": "arms_cross", "Registrar Yin Wen": "measure",
 	# Three in the Morning (Part XL)
 	"Ju Gong": "stroke_beard",
+	# Forgetting One Another in the Rivers and Lakes (Part XLI)
+	"Fleet-Mother Lu Ting": "hand_heart", "Shide, Who Sweeps the Kitchen": "stoop", "Ledger-Mistress Mo Chou": "sleeve_smile", "Banner-Lord Tuoba Lie": "arms_cross",
 	# A Sky Above the Sky (Part XXXVIII)
 	"Goujian of Yue": "hand_heart", "Sun Bin": "measure", "Lin Xiangru": "sleeve_smile",
 	"Fuchai, King of Wu": "shade_eyes", "Pang Juan, General of Wei": "stroke_beard", "Lian Po, General of Zhao": "arms_cross",

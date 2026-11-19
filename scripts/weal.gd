@@ -54,8 +54,13 @@ const TOWNS := {
 	# (the Cloud Keel release: the towns of the Far Countries, which only an ark reaches: arks.gd)
 	"lightfoot": {"n": "Lightfoot", "area": "huaxu", "areas": ["huaxu", "gumang"], "office": "moorer_lightfoot"},
 	"fourstreams": {"n": "Fourstreams", "area": "zhongbei", "areas": ["zhongbei", "fuluo"], "office": "reeve_fourstreams"},
+	# (the Rivers and Lakes release: the four towns of the sects, down the river: sects.gd, sides.gd)
+	"reedhaven": {"n": "Reedhaven", "area": "yunmeng", "areas": ["yunmeng"], "office": "hall_reed"},
+	"clearbell": {"n": "Clearbell", "area": "hanshan", "areas": ["hanshan"], "office": "hall_cold"},
+	"ashmarket": {"n": "Ashmarket", "area": "heishui", "areas": ["heishui"], "office": "hall_black"},
+	"knifegate": {"n": "Knifegate", "area": "langya", "areas": ["langya"], "office": "hall_wolf"},
 }
-const ORDER := ["sect", "cloudfoot", "qingshi", "yanggu", "shazhou", "longmen", "tushan", "featherfall", "tearwater", "youdu_city", "landfall", "lightfoot", "fourstreams"]
+const ORDER := ["sect", "cloudfoot", "qingshi", "yanggu", "shazhou", "longmen", "tushan", "featherfall", "tearwater", "youdu_city", "landfall", "lightfoot", "fourstreams", "reedhaven", "clearbell", "ashmarket", "knifegate"]
 ## the towns the Rice Hearth keeps: where the home fire is
 const HOME_TOWNS := ["qingshi", "sect", "cloudfoot"]
 
@@ -104,6 +109,8 @@ const ACTS := {
 	"drawn": {"m": "regard", "per": -1, "max": 3, "why": "times he drew on somebody here and was put on his back", "one": "Once he drew on somebody here and was put on his back."},
 	# the Unpicked Road release (trifles.gd): what was dropped in its roads and carried home; what was somebody's
 	# and went into his sleeve while somebody looked
+	# the Rivers and Lakes release (raids.gd): a raid on its roads or on the camp of its country, broken by his coming
+	"rescued": {"m": "peace", "per": 2, "max": 3, "why": "raids on its roads broken by his coming", "one": "One raid on its roads broken by his coming."},
 	"restored": {"m": "regard", "per": 2, "max": 3, "why": "lost things carried to whose they were", "one": "One lost thing carried to whose it was."},
 	# the Higher Sky release (betters.gd): he was beaten by somebody above him, and the country heard
 	"bested": {"m": "peace", "per": -2, "max": 3, "why": "times he was beaten in its country by somebody above him", "one": "Once he was beaten in its country by somebody above him."},
@@ -203,7 +210,9 @@ static func _told(g, tid: String, was: String) -> void:
 static func towns(g) -> Array:
 	var out: Array = []
 	for tid in ORDER:
-		if not Arks.beyond(str(TOWNS[tid].area)) or g.seen.has(str(TOWNS[tid].area)):
+		# (the Rivers and Lakes release: and a town down the river counts for nothing until the river-boat has
+		# set him down in its country)
+		if not (Arks.beyond(str(TOWNS[tid].area)) or Data.layer_of(str(TOWNS[tid].area)) == "lakes") or g.seen.has(str(TOWNS[tid].area)):
 			out.append(tid)
 	return out
 
@@ -411,7 +420,8 @@ static func mod(g, area: String, key: String) -> float:
 		return 1.0
 	# (the Open Net release, crime.gd: a wanted man is served dearer where his bill hangs)
 	# (the Higher Sky release, betters.gd: and somebody who was put down by a better in sight of a town)
-	return float(STATES[state(g, tid)].get(key, 1.0)) * Crime.mod(g, tid, key) * Betters.mod(g, key)
+	# (the Rivers and Lakes release: and a town is what its sect is, sides.gd; a guest of the sect pays less, sects.gd)
+	return float(STATES[state(g, tid)].get(key, 1.0)) * Crime.mod(g, tid, key) * Betters.mod(g, key) * Sides.mod(g, tid, key) * (Sects.price(g, tid) if key == "price" else 1.0)
 
 ## A price asked at a counter in region `area`.
 static func price(g, area: String, base: int) -> int:
@@ -606,6 +616,10 @@ const FATES := [
 	# Part XXXIX (the Red Seal release)
 	{"npc": "cook_zhou", "when": ["the_red_seal", ["open"]], "tag": "Proven, in the cleaver", "line": "He asked me to show him the part that is not the knife. I showed him the bone I left in. Thirty years I have jointed for this mountain and nobody ever asked me what I leave. It is on the wall by the stove. Do not touch it."},
 	{"npc": "cook_zhou", "when": ["the_red_seal", ["strict"]], "tag": "who feeds the ones who failed", "line": "A hundred and sixty of them failed, and every one came through my kitchen after with a folded paper and no appetite. I read none of them. I gave them all the same soup. It is not on any register, that soup."},
+	# Part XLI (the Rivers and Lakes release)
+	{"npc": "deserter_qi", "when": ["the_covenant", ["bind"]], "tag": "who rides for the league", "line": "I left the Banner, and now I ride the east road under four colours with a Reed boy and a Gate collector. We do not talk. We have not lost a cart. I think that may be what a league is."},
+	{"npc": "deserter_qi", "when": ["the_covenant", ["dig"]], "tag": "whom nobody has sent for", "line": "The water is back, and nobody needs a rider who left his banner. Nobody is hunting one either. I have a hut above the pass and a goat. I had not known a man could be let alone. It is large."},
+	{"npc": "deserter_qi", "when": ["the_covenant", ["toll"]], "tag": "who holds a rope for the Banner he left", "line": "I left the Banner because it had gone soft. Now it holds every road down here and I hold a rope for it at half pay, as a deserter should. The Banner-Lord nodded to me. Once. I am not over it."},
 	# Part XL (the Two Roads release)
 	{"npc": "disciple_han", "when": ["the_two_roads", ["one"]], "tag": "who was refused a second road", "line": "I signed, in the seniority column, and was refused with the rest. I had an answer ready for Mian if he gloated. He did not gloat. He brought me tea. It is very hard to be superior to that boy, and I have tried."},
 	{"npc": "disciple_han", "when": ["the_two_roads", ["two"]], "tag": "who has the Formations beside the Sword", "line": "I have the Formations beside the Sword, since the new moon. I am worse at the Sword than I was. I have told nobody. Everybody knows. Mian says it passes. Mian. Advising me. I listened, which is the worst of it."},

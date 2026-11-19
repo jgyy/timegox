@@ -24,6 +24,16 @@ const THEMES := {
 		"sky_top": Color("04202e"), "sky_hor": Color("2a8aa8"), "fog": Color("1a6a8a"), "fog_d": 0.030, "sun": Color("a8ffff"), "sun_e": 0.9, "amb": Color("5aa0b8"), "amb_e": 0.9, "weather": "bubbles_up", "tree": "coral", "decor": "shell"},
 	"volcano": {"g1": Color("4a2a22"), "g2": Color("54302a"), "path": Color("7a4a32"), "wall": Color("24100c"), "water": Color("e0501a"), "bg": Color("140604"),
 		"sky_top": Color("280a04"), "sky_hor": Color("e0602a"), "fog": Color("8a3a1a"), "fog_d": 0.024, "sun": Color("ff9a5a"), "sun_e": 1.0, "amb": Color("a06a50"), "amb_e": 0.8, "weather": "embers", "tree": "spire", "decor": "ember"},
+	# the Rivers and Lakes release: Yunmeng (reed-green under standing mist), Cold Mountain (snow and blue shadow),
+	# the Black Water (ash and a water that reflects nothing) and the Wolf-Tooth Pass (ochre rock, a hard sky)
+	"yunmeng": {"g1": Color("7a9a6a"), "g2": Color("88a874"), "path": Color("c8bc98"), "wall": Color("4a6a4a"), "water": Color("8ab0b8"), "bg": Color("0c1410"),
+		"sky_top": Color("7aa0b8"), "sky_hor": Color("e0e8e0"), "fog": Color("c0d0c8"), "fog_d": 0.03, "sun": Color("fff0d8"), "sun_e": 1.0, "amb": Color("a8c0b8"), "amb_e": 1.0, "weather": "mist", "tree": "willow", "decor": "lotus"},
+	"hanshan": {"g1": Color("b8c8d8"), "g2": Color("c6d4e2"), "path": Color("a0b0c0"), "wall": Color("6a7a94"), "water": Color("3a5a8a"), "bg": Color("0a0e16"),
+		"sky_top": Color("5a7aa8"), "sky_hor": Color("dce8f4"), "fog": Color("c8d8e8"), "fog_d": 0.02, "sun": Color("f4f8ff"), "sun_e": 1.05, "amb": Color("a8b8d0"), "amb_e": 1.0, "weather": "snow", "tree": "pine", "decor": "icicle"},
+	"heishui": {"g1": Color("48444a"), "g2": Color("524e54"), "path": Color("807880"), "wall": Color("2e2a32"), "water": Color("0e0e14"), "bg": Color("060508"),
+		"sky_top": Color("2a2030"), "sky_hor": Color("7a5a5a"), "fog": Color("4a3a40"), "fog_d": 0.028, "sun": Color("ffb090"), "sun_e": 0.75, "amb": Color("8a7078"), "amb_e": 0.9, "weather": "ash", "tree": "dead", "decor": "bone"},
+	"langya": {"g1": Color("9a8458"), "g2": Color("a68e60"), "path": Color("d0bc90"), "wall": Color("5a4630"), "water": Color("6a8a9a"), "bg": Color("140e06"),
+		"sky_top": Color("4a78b0"), "sky_hor": Color("f0dcb0"), "fog": Color("d8c8a0"), "fog_d": 0.014, "sun": Color("fff0c8"), "sun_e": 1.3, "amb": Color("c8b088"), "amb_e": 1.0, "weather": "dust", "tree": "spire", "decor": "bone"},
 	"void": {"g1": Color("2a1e4a"), "g2": Color("32245a"), "path": Color("4a3a7a"), "wall": Color("120a2a"), "water": Color("6a2aa8"), "bg": Color("06020e"),
 		"sky_top": Color("08041a"), "sky_hor": Color("4a2a88"), "fog": Color("2a1a52"), "fog_d": 0.020, "sun": Color("b890ff"), "sun_e": 0.8, "amb": Color("7a60b8"), "amb_e": 0.85, "weather": "stars", "tree": "shard", "decor": "starcrystal"},
 	"celestial": {"g1": Color("d8d4e8"), "g2": Color("e4e0f2"), "path": Color("f0d890"), "wall": Color("b8a8d8"), "water": Color("8ab8f0"), "bg": Color("1a2040"),
@@ -196,6 +206,10 @@ const EXTRA := {
 	"zhongbei": {"hill": 0.75, "tex": "grass", "tuft": "flowers", "horizon": "karst", "clouds": 0.25, "rays": 0.7, "haze": 0.3, "sun_pitch": -36.0},
 	"gumang": {"hill": 0.5, "tex": "underworld", "tuft": "crystal", "horizon": "towers", "clouds": 0.0, "stars": 0.9, "haze": 0.5},
 	"fuluo": {"hill": 0.55, "tex": "cracked", "tuft": "deadgrass", "horizon": "dunes", "clouds": 0.05, "rays": 0.8, "haze": 0.9, "sun_pitch": -70.0, "sun_yaw": 60.0},
+	"yunmeng": {"hill": 0.3, "tex": "mud", "tuft": "reed", "horizon": "hills", "clouds": 0.85, "haze": 0.7, "rays": 0.3},
+	"hanshan": {"hill": 1.1, "tex": "snow", "tuft": "snow", "horizon": "peaks", "clouds": 0.4, "haze": 0.4, "rays": 0.5},
+	"heishui": {"hill": 0.45, "tex": "mud", "tuft": "deadgrass", "horizon": "hills", "clouds": 0.9, "stars": 0.3, "haze": 0.6},
+	"langya": {"hill": 1.3, "tex": "rock", "tuft": "deadgrass", "horizon": "peaks", "clouds": 0.2, "rays": 0.6, "haze": 0.5},
 }
 
 const PICKUP_COLORS := {
@@ -227,6 +241,7 @@ const PICKUP_COLORS := {
 	"entry_tally": Color("c8b070"), "turnip_seal": Color("c83a2a"), "half_stick": Color("8a6a44"),
 	# Part XL (the Two Roads release)
 	"keeper_acorn": Color("9a7a3a"), "pricked_leaf": Color("d85a3a"), "fork_stone": Color("a8a498"),
+	"reed_flute": Color("b8c878"), "rock_poem": Color("e8e4d8"), "debt_slip": Color("8a2a30"),
 	# Part XXXVIII (the Higher Sky release)
 	"bed_gall": Color("5a6a3a"), "war_slip": Color("c8b070"), "linchpin": Color("5a5a62"),
 	"charred_shingle": Color("4a3a30"), "crane_feather": Color("f4f4f8"), "furrow_piece": Color("e8c040"),

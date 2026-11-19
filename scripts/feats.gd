@@ -88,9 +88,13 @@ const FEATS := {
 	"on_the_board": {"n": "A Name on the Board", "kind": "road", "pts": 10, "test": ["step", "s_p39_outer"], "desc": "Fight the Lists of the Outer Court to an end, at whatever place."},
 	"the_hammer": {"n": "Wanted It When He Did", "kind": "road", "pts": 10, "test": ["step", "s_p39_room"], "desc": "Win a lot in an auction room."},
 	# the Two Roads release: the last realm, the leaves and the roads (Part XL)
-	"two_roads": {"n": "Seven Either Way", "kind": "road", "pts": 20, "test": ["level", 135], "desc": "Reach Walking Two Roads: the last realm there is."},
+	"two_roads": {"n": "Seven Either Way", "kind": "road", "pts": 20, "test": ["level", 135], "desc": "Reach Walking Two Roads."},
+	"in_the_lakes": {"n": "Nobody Saw Him Off", "kind": "road", "pts": 20, "test": ["level", 138], "desc": "Reach Forgotten in the Lakes: the last realm there is."},
 	"the_loser_pours": {"n": "The Loser Pours", "kind": "road", "pts": 10, "test": ["step", "s_p40_du"], "desc": "Win a hand of leaves from Hall Master Du."},
 	"the_keepers_table": {"n": "Without a Tail", "kind": "road", "pts": 10, "test": ["step", "s_p40_ju"], "desc": "Take the table from the keeper of monkeys, at Three in the Morning."},
+	"down_the_river": {"n": "Fed Before He Was Asked", "kind": "road", "pts": 10, "test": ["step", "s_p41_boat"], "desc": "Take the river-boat down to the Rivers and Lakes, and eat what is put in his hands."},
+	"four_tables": {"n": "All Four Tables", "kind": "road", "pts": 10, "test": ["step", "s_p41_wolf"], "desc": "Sit down with all four sects of the Rivers and Lakes, two upright and two crooked."},
+	"forty_home": {"n": "Forty Out, Forty Home", "kind": "road", "pts": 10, "test": ["raids", 12], "desc": "Break twelve raids on the roads and the camps."},
 	"both_at_once": {"n": "Neither Promised the Morning", "kind": "road", "pts": 10, "test": ["step", "s_p40_two"], "desc": "Walk a second road as well as the first."},
 	"leaves_ten": {"n": "Has Not Poured Since the New Year", "kind": "odd", "pts": 10, "test": ["card_wins", 10], "desc": "Win ten hands of leaves."},
 	"five_painted": {"n": "A Hand of Nines", "kind": "odd", "pts": 20, "test": ["masters", 5], "desc": "Win a hand from every master of the leaves."},
@@ -149,8 +153,8 @@ const FEATS := {
 	"companion": {"n": "Two on the Road", "kind": "road", "pts": 5, "test": ["step", "s_yue"], "desc": "Wake the girl by the lotus pond."},
 	"sky_held": {"n": "The Sky Is Held", "kind": "road", "pts": 10, "test": ["step", "s_ch_hundun"], "desc": "End the Falling Sky."},
 	"tribulations": {"n": "Struck Twenty Times", "kind": "road", "pts": 10, "test": ["realm", 20], "desc": "Come through twenty Heavenly Tribulations."},
-	"far_traveller": {"n": "Thirty Countries", "kind": "road", "pts": 10, "test": ["seen", 30], "desc": "Set foot in thirty regions of the four realms."},
-	"every_country": {"n": "The Whole Map", "kind": "road", "pts": 20, "test": ["seen", 48], "desc": "Set foot in forty-eight regions of the four realms."},
+	"far_traveller": {"n": "Thirty Countries", "kind": "road", "pts": 10, "test": ["seen", 30], "desc": "Set foot in thirty regions of the realms."},
+	"every_country": {"n": "The Whole Map", "kind": "road", "pts": 20, "test": ["seen", 48], "desc": "Set foot in forty-eight regions of the realms."},
 	"crossroads": {"n": "Asked and Answered", "kind": "road", "pts": 10, "test": ["picks", 10], "desc": "Answer ten crossroads of the road."},
 	"calendar": {"n": "A Season on the Road", "kind": "road", "pts": 5, "test": ["day", 30], "desc": "See the thirtieth day of the journey."},
 	# ---- the sword
@@ -262,6 +266,11 @@ static func value(g, t: Array) -> float:
 			return float(Plights.kinds_done(g, "good"))
 		"card_wins":
 			return float(g.card_wins)
+		"raids":
+			# (the Rivers and Lakes release, raids.gd: raids on the roads and the camps broken)
+			return float(g.raids_broken)
+		"sect_tasks":
+			return float(Sects.done_count(g))
 		"masters":
 			return float(Yezi.beaten(g))
 		"roads":

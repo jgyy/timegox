@@ -409,6 +409,19 @@ var cards := {}
 var leaves := {}
 var leaf := ""
 var step_cards := 0
+## the Rivers and Lakes release (sects.gd, raids.gd, sides.gd): the tasks of the sects (task -> "taken" or "done") and
+## what was so when each was taken; raids broken (in all, by his coming alone, this watch's by key, since the step
+## began); the day a cutpurse last tried him and the day he was last mended for nothing, by town; and how often
+var sect_q := {}
+var sect_base := {}
+var raids_broken := 0
+var raids_fled := 0
+var raid_done := {}
+var step_raids := 0
+var purse_day := {}
+var alms_day := {}
+var purses_cut := 0
+var alms_taken := 0
 ## the Two Roads release (plights.gd): good deeds and bad ones done in the street (plight:what -> how often), who
 ## was met in one and on which day, and what the wrong ones put in his purse
 var deeds_done := {}
@@ -710,6 +723,16 @@ func reset() -> void:
 	lots_won = 0
 	lot_spent = 0
 	lot_saved = 0
+	sect_q = {}
+	sect_base = {}
+	raids_broken = 0
+	raids_fled = 0
+	raid_done = {}
+	step_raids = 0
+	purse_day = {}
+	alms_day = {}
+	purses_cut = 0
+	alms_taken = 0
 	card_n = 0
 	card_hands = 0
 	card_wins = 0
@@ -1169,6 +1192,7 @@ func advance() -> void:
 	step = Betters.skip(self, step)
 	# (memoir.gd: and what one of them had to say of it is written down)
 	Memoir.written(self)
+	step_raids = 0
 	step_fit = 0
 	step_toil = 0
 	step_restore = 0
@@ -1329,6 +1353,12 @@ func poll_steps() -> void:
 			"braid":
 				# Part XL (braid.gd): so many roads held at once
 				ok = Braid.count(self) >= int(s.n)
+			"rescue":
+				# Part XLI (raids.gd): so many raids on the roads and the camps broken since the step began
+				ok = step_raids >= int(s.n)
+			"sect":
+				# Part XLI (sects.gd): so many tasks done for one of the sects of the Rivers and Lakes
+				ok = Sects.done_count(self, str(s.sect)) >= int(s.n)
 			"weal":
 				# Part XXVIII: so many towns of the land left the better for his coming since the step
 				# began (weal.gd)
@@ -1460,6 +1490,10 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(step_cards, int(s.n)), int(s.n)]
 	elif s.kind == "braid":
 		t += "  (%d/%d)" % [mini(Braid.count(self), int(s.n)), int(s.n)]
+	elif s.kind == "rescue":
+		t += "  (%d/%d)" % [mini(step_raids, int(s.n)), int(s.n)]
+	elif s.kind == "sect":
+		t += "  (%d/%d)" % [mini(Sects.done_count(self, str(s.sect)), int(s.n)), int(s.n)]
 	elif s.kind == "meet" and Lists.entered(self, str(s.meet)):
 		t += "  (%s: %s)" % [str(Lists.ROUNDS[int(meets[str(s.meet)].round)].n), str(Data.ENEMIES[Lists.rival(self, str(s.meet))].n)]
 	elif s.kind == "fate":

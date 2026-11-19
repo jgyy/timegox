@@ -78,11 +78,18 @@ const STRATA := {
 	# the far west, Huaxu where the arks moor, Zhongbei north-east of it and Fuluo in the far east
 	"far": {"n": "The Far Countries", "w": 520, "h": 200, "y": 0.0, "land": 1.25, "holes": 176, "start": ["huaxu", Vector2i(13, 32)], "at": Vector2i(-1400, 300),
 		"sites": {"gumang": [72, 104, 0], "huaxu": [190, 96, 0], "zhongbei": [310, 82, 0], "fuluo": [428, 102, 0]}},
+	# the Rivers and Lakes release: the country of the sects, down the Yellow River past the last gorge and
+	# south, where the Son of Heaven's calendar is read and nothing else of his is.  The river-boat of
+	# Longmen goes there (Data.LADDERS "river_boat": its end in the land is stood last of all, so no older
+	# map moves), and the realm says where it lies itself.  Yunmeng of the marshes in the west, where the
+	# boat puts in; Cold Mountain; the Black Water; and the Wolf-Tooth Pass in the east
+	"lakes": {"n": "The Rivers and Lakes", "w": 520, "h": 200, "y": 0.0, "land": 1.24, "holes": 178, "start": ["yunmeng", Vector2i(13, 32)], "at": Vector2i(300, 1300),
+		"sites": {"yunmeng": [80, 100, 0], "hanshan": [196, 82, 0], "heishui": [312, 114, 0], "langya": [430, 96, 0]}},
 }
-const LAYER_NAMES := {"surface": "The Unbroken Land", "heaven": "The Nine Heavens", "under": "The Nine Springs", "sea": "The Eastern Sea", "far": "The Far Countries"}
+const LAYER_NAMES := {"surface": "The Unbroken Land", "heaven": "The Nine Heavens", "under": "The Nine Springs", "sea": "The Eastern Sea", "far": "The Far Countries", "lakes": "The Rivers and Lakes"}
 ## every realm, in the order they were found (the bot and the story keep to the first four: nothing of
-## the story is asked for in the Far Countries)
-const LAYERS := ["surface", "heaven", "under", "sea", "far"]
+## the story is asked for in the Far Countries; Part XLI is set in the sixth, the Rivers and Lakes)
+const LAYERS := ["surface", "heaven", "under", "sea", "far", "lakes"]
 
 static var _layout := {}
 static var _world := {}
@@ -549,8 +556,13 @@ static func _build(layer: String = "surface") -> Dictionary:
 			var ld: Dictionary = le[2]
 			var other: Array = ld["b" if le[3] == "a" else "a"]
 			var to_layer := Data.layer_of(other[0])
+			var to_t: Vector2i = to_world(other[0], other[1] + other[2])
+			if str(ld.get("late", "")) != "":
+				# (the Rivers and Lakes release: a ladder whose other end was stood last of all in its realm, on
+				# whatever open ground was left: it comes out where that end really stands)
+				to_t = late_ladder_out(str(ld.id))
 			ents.append({"kind": "ladder", "id": "%s:%s" % [ld.id, le[3]], "n": ld["n" + str(le[3])], "pos": to_world(id, le[0]), "area": id, "layer": layer,
-				"to_layer": to_layer, "to_tile": to_world(other[0], other[1] + other[2]), "open": ld.open, "style": str(ld.get("style", "climb")),
+				"to_layer": to_layer, "to_tile": to_t, "open": ld.open, "style": str(ld.get("style", "climb")),
 				"dir": 1 if layer_y(to_layer) > layer_y(layer) else -1})
 	for s in seals:
 		s["layer"] = layer
@@ -671,6 +683,10 @@ static func _build(layer: String = "surface") -> Dictionary:
 	for id0 in ids:
 		seventh.append([id0, "warband7", "t"])
 	_place_bands(seventh, grid, W, H, owner, ids, ents, layer, reach_e, pks.peaks, camps)
+	# ---- the Rivers and Lakes release: the end of a way between the realms that came later in the story
+	# (Data.LADDERS with "late": the river-boat of Longmen) is stood now, after every band, mark and height,
+	# on open ground near where it was asked for with open ground all round it: nothing older moves for it
+	_place_late_ladders(grid, W, owner, ids, ents, layer, reach_e, pks.peaks, camps)
 	# ---- and who is at home (rooms.gd `residents`): people indoors in the houses of every town, stood
 	# after everything else on floor nobody needs to get past
 	ents.append_array(Rooms.residents(buildings, grid, W, ents, layer))
@@ -753,6 +769,73 @@ static func _place_bands(slots: Array, grid: PackedByteArray, W: int, H: int, ow
 			for dy6 in range(-4, 5):
 				for dx6 in range(-4, 5):
 					near[c5 + Vector2i(dx6, dy6)] = true
+
+## The ends of the ways between the realms that are stood last of all (`"late": "a"` or `"b"` in
+## Data.LADDERS): the open ground of the end's own region nearest the tile written for it that the
+## sect can reach, three tiles from anybody and anything, off the peaks and away from the camp, with
+## the tile a traveller steps off on open too.
+static func _place_late_ladders(grid: PackedByteArray, W: int, owner: PackedByteArray, ids: Array, ents: Array, layer: String, reach_e: Dictionary, peaks: Array, camps: Dictionary) -> void:
+	for ld in Data.LADDERS:
+		var end := str(ld.get("late", ""))
+		if end == "" or not ids.has(str(ld[end][0])):
+			continue
+		var id3: String = ld[end][0]
+		var near := {}
+		for e5 in ents:
+			if str(e5.get("area", "")) == id3 and e5.has("pos"):
+				for dy5 in range(-3, 4):
+					for dx5 in range(-3, 4):
+						near[e5.pos + Vector2i(dx5, dy5)] = true
+		if camps.has(id3):
+			for dy7 in range(-7, 8):
+				for dx7 in range(-7, 8):
+					near[(camps[id3] as Vector2i) + Vector2i(dx7, dy7)] = true
+		for pk5 in peaks:
+			if str(pk5.area) == id3:
+				var pr5 := int(pk5.r) + 2
+				for dy8 in range(-pr5, pr5 + 1):
+					for dx8 in range(-pr5, pr5 + 1):
+						if dx8 * dx8 + dy8 * dy8 <= pr5 * pr5:
+							near[(pk5.c as Vector2i) + Vector2i(dx8, dy8)] = true
+		var want: Vector2i = to_world(id3, ld[end][1])
+		var out: Vector2i = dir_to_world(id3, ld[end][2])
+		var best := Vector2i(-1, -1)
+		var bd := 1 << 30
+		for p5 in reach_e:
+			var g5: int = grid[p5.y * W + p5.x]
+			if g5 != MapGen.FLOOR or str(ids[owner[p5.y * W + p5.x]]) != id3 or near.has(p5) or near.has(p5 + out) or not reach_e.has(p5 + out):
+				continue
+			if grid[(p5.y + out.y) * W + p5.x + out.x] != MapGen.FLOOR:
+				continue
+			# (open ground all round it: not against a wall, a wood or the water's edge)
+			var open5 := true
+			for dy9 in range(-1, 2):
+				for dx9 in range(-1, 2):
+					var g9: int = grid[(p5.y + dy9) * W + p5.x + dx9]
+					open5 = open5 and (g9 == MapGen.FLOOR or g9 == MapGen.PATH or g9 == MapGen.DECOR)
+			if not open5:
+				continue
+			var dd: int = (p5.x - want.x) * (p5.x - want.x) + (p5.y - want.y) * (p5.y - want.y)
+			if dd < bd or (dd == bd and p5 < best):
+				bd = dd
+				best = p5
+		if best.x < 0:
+			continue
+		var other: Array = ld["b" if end == "a" else "a"]
+		var to_layer := Data.layer_of(other[0])
+		ents.append({"kind": "ladder", "id": "%s:%s" % [ld.id, end], "n": ld["n" + end], "pos": best, "area": id3, "layer": layer,
+			"to_layer": to_layer, "to_tile": to_world(other[0], other[1] + other[2]), "open": ld.open, "style": str(ld.get("style", "climb")),
+			"dir": 1 if layer_y(to_layer) > layer_y(layer) else -1, "late": true, "out": out})
+
+## Where a traveller who takes ladder `lid` from its written end comes out: the tile beside its late end.
+static func late_ladder_out(lid: String) -> Vector2i:
+	for ld in Data.LADDERS:
+		if str(ld.id) == lid and str(ld.get("late", "")) != "":
+			var end := str(ld.late)
+			for e in world_of(Data.layer_of(str(ld[end][0]))).ents:
+				if e.kind == "ladder" and str(e.id) == "%s:%s" % [lid, end]:
+					return (e.pos as Vector2i) + (e.out as Vector2i)
+	return Vector2i(-1, -1)
 
 ## A building's upper storey (`lv` 1) or cellar (-1) as a small world of its own, the size of the
 ## building's rectangle (its own tiles start at the rectangle's corner), with the people and things

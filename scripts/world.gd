@@ -289,7 +289,7 @@ func _bundle(lid: String) -> Dictionary:
 					Terrain3D.sky_world(root, lw)
 				"under":
 					Terrain3D.deep_world(root, lw)
-				"sea", "far":
+				"sea", "far", "lakes":
 					# the Eastern Sea (Part XII): real sea round the isles, the same ocean as the land's
 					# (and the Far Countries, the Cloud Keel release: lands of their own in a sea no keel has crossed)
 					Terrain3D.world_sea(root, lw)
@@ -2201,11 +2201,113 @@ func _arks_tick(_d: float) -> void:
 		an.rotation.y = float(uw.yaw)
 		an.rotation.z = sin(t * 0.4 + k * 1.7) * 0.03
 
+## The Rivers and Lakes release (traffic.gd, wagons.gd): what goes along the roads, drawn round where he is.  Each
+## vehicle near enough to be made out is built once and moved to where the clock says it is; it waits for
+## him if he stands in the road in front of it, and catches up when he has gone.  Drawn only: nothing is
+## stood in the land and nothing is in anybody's way.
+var traffic_nodes := {}
+var raid_nodes := {}
+var _raid_block := {}
+var _raid_block_t := 0.0
+const TRAFFIC_SHOW := 78.0
+func _traffic_tick(d: float) -> void:
+	var on_land: bool = not is_floor() and Game.prologue == "" and not wd.is_empty() and layer in Atlas.LAYERS
+	var seen := {}
+	if on_land:
+		_raid_block_t -= d
+		if _raid_block_t <= 0.0:
+			_raid_block_t = 1.0
+			_raid_block = Raids.blocked(Game, layer)
+			_raids_draw()
+		var here := Vector2(player.position.x - off.x, player.position.z - off.z) / TS
+		# (the clock of the day wraps at midnight: the day-vehicles go by all the daylight there has been)
+		for it in Traffic.near(layer, here, TRAFFIC_SHOW, float(Game.day) * Clock.DAY + float(Game.clock), float(Game.playtime), _raid_block):
+			var v: Dictionary = it.v
+			var w: Dictionary = it.w
+			var id := str(v.id)
+			seen[id] = true
+			var n: Node3D = traffic_nodes.get(id)
+			var goal := Vector2(w.pos)
+			if n == null:
+				n = Wagons.build(str(v.kind), int(v.seed))
+				n.set_meta("at", goal)
+				scene3d.add_child(n)
+				traffic_nodes[id] = n
+			var at: Vector2 = n.get_meta("at")
+			var gap := at.distance_to(goal)
+			var moving: bool = bool(w.moving)
+			# (somebody standing in the road in front of it: it waits, and makes up the ground afterwards)
+			var ahead := here - at
+			var blocked_by_him: bool = ahead.length() < 2.4 and ahead.dot(Vector2(w.dir)) > 0.0
+			if gap > 14.0:
+				at = goal
+			elif blocked_by_him:
+				moving = false
+			elif gap > 0.02:
+				at = at.move_toward(goal, float(v.pace) * 2.0 * d)
+				moving = true
+			n.set_meta("at", at)
+			var wx := at.x * TS + off.x
+			var wz := at.y * TS + off.z
+			n.position = Vector3(wx, ground_y(Vector3(wx, 0, wz)), wz)
+			var yaw := atan2(float(w.dir.x), float(w.dir.y))
+			n.rotation.y = lerp_angle(n.rotation.y, yaw, minf(1.0, d * 3.0)) if gap <= 14.0 else yaw
+			Wagons.animate(n, t + float(int(v.seed) % 17), moving)
+	for id2 in traffic_nodes.keys():
+		if not seen.has(id2):
+			(traffic_nodes[id2] as Node3D).queue_free()
+			traffic_nodes.erase(id2)
+	if not on_land:
+		_raids_clear()
+	else:
+		for k in raid_nodes:
+			var rn: Node3D = raid_nodes[k]
+			var i := 0
+			for m in rn.get_meta("raiders", []):
+				i += 1
+				Models.anim_monster(m, t + i * 0.7, float(i), "idle")
+				# (they circle whoever they came for)
+				var a := t * 0.35 + TAU * float(i) / float((rn.get_meta("raiders") as Array).size())
+				var r := 2.3 + sin(t * 0.9 + i) * 0.5
+				(m as Node3D).position = Vector3(cos(a) * r, 0, sin(a) * r)
+				(m as Node3D).rotation.y = atan2(-cos(a), -sin(a))
+
+## The raids of this realm that still stand and are near enough to be made out (raids.gd): drawn, not stood.
+func _raids_draw() -> void:
+	var seen := {}
+	for r in Raids.on(Game, layer):
+		if bool(r.broken) or maxi(absi(r.tile.x - ptile.x), absi(r.tile.y - ptile.y)) > int(TRAFFIC_SHOW):
+			continue
+		seen[str(r.key)] = true
+		if not raid_nodes.has(str(r.key)):
+			var n := Wagons.raid_scene(r)
+			var wp := wpos(r.tile)
+			n.position = Vector3(wp.x, ground_y(wp), wp.z)
+			scene3d.add_child(n)
+			raid_nodes[str(r.key)] = n
+	for k in raid_nodes.keys():
+		if not seen.has(k):
+			(raid_nodes[k] as Node3D).queue_free()
+			raid_nodes.erase(k)
+
+func _raids_clear() -> void:
+	for k in raid_nodes.keys():
+		(raid_nodes[k] as Node3D).queue_free()
+	raid_nodes = {}
+
+## A raid is over (main.gd): whatever was drawn of it goes.
+func raid_over(raid: Dictionary) -> void:
+	_raid_block_t = 0.0
+	if raid_nodes.has(str(raid.get("key", ""))):
+		(raid_nodes[str(raid.key)] as Node3D).queue_free()
+		raid_nodes.erase(str(raid.key))
+
 func _process(d: float) -> void:
 	t += d
 	if not headless() and player != null:
 		_fans_tick(d)
 		_arks_tick(d)
+		_traffic_tick(d)
 		_weal_doors(d)
 		# (the Tall People release, visage.gd: the face his Way has given him, looked at again now and then)
 		_visage_t -= d
@@ -2516,12 +2618,23 @@ func _move(d: float) -> void:
 				_summit_check()
 				# (load.gd: a tile walked under a load is counted, for whoever sews the pouch)
 				Load.walked(Game, riding_here())
+				# (the Rivers and Lakes release, raids.gd: a raid on the road or on a camp, come up to)
+				_raid_check()
 			var rid := Atlas.owner_id(wd, ptile)
 			if rid != area_id:
 				_enter_region(rid)
 		else:
 			move_t += budget / st
 			budget = 0.0
+
+## The Rivers and Lakes release (raids.gd): he has walked up to a raid that still stands: the raiders turn on him.
+func _raid_check() -> void:
+	if is_floor() or main == null or not Raids.open(Game) or main.top_name() != "world":
+		return
+	var rd := Raids.at(Game, layer, ptile)
+	if not rd.is_empty():
+		move_dir = Vector2i.ZERO
+		main.start_raid(rd)
 
 # ---------------------------------------------------------------- the High Roads: summits and the glider
 ## He has come to the very top of a peak: the first time, it is told.

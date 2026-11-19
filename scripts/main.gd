@@ -636,7 +636,14 @@ func begin_at_sect() -> void:
 	Game.prologue = ""
 	# (the Heavy Road release: the morning three years ago is not a region walked into; it used to be
 	# kept as one, and a junk or the kite would go there before the story had opened the way)
-	Game.seen = {"sect": true}
+	# (the Rivers and Lakes release: a journey dropped at a late step, --bot-start, has walked into every region its
+	# steps were set in, and was told so before the morning began: that used to be wiped here, so that such a
+	# journey had seen nothing but the sect, and no camp, kite, coach or raid knew where it had been)
+	if Game.step <= 0:
+		Game.seen = {"sect": true}
+	else:
+		Game.seen["sect"] = true
+		Game.seen[Atlas.HUB] = true
 	world.load_area("sect", Vector2i(20, 8))
 	set_stack(["world"])
 	var intro: Array = [["Narrator", "Azure Cloud Sect, perched above the sea of clouds. For three years the orphan Lin Feng has swept its steps."]]
@@ -993,12 +1000,24 @@ func talk_folk(e: Dictionary) -> void:
 		# (and once in a while, of the weapon in his hand)
 		if wn % 16 == 14 and Rites.arm_said(Game) != "":
 			lines = [[str(fp.n), Rites.arm_said(Game)]]
+	# (the Rivers and Lakes release: the sixth word with anybody is what kind of town theirs is, sides.gd, or, at a
+	# camp, what the last raid cost them, raids.gd; and in a crooked town the first word of the day costs a
+	# stranger a little of his purse)
+	if wn % 8 == 5 and Game.prologue == "" and not Folk.new_year(Game):
+		var sdl := Raids.news(Game, str(fp.area), int(fp.seed)) if Folk.is_camp(str(fp.town)) else Sides.line(str(fp.town), int(fp.seed) + wn / 8)
+		if sdl != "":
+			lines = [[str(fp.n), sdl]]
+	if Game.prologue == "":
+		var cut := Sides.take_purse(Game, str(fp.town))
+		if cut != "":
+			lines.push_front(["Narrator", cut])
 	# a first word with one of a hearth's people (cultures.gd) is a step towards being its guest
 	var hid := Cultures.of_town(str(fp.town))
 	if hid != "" and not Game.folk_talk.has(str(fp.id)) and Game.prologue == "":
 		Game.add_hearth(hid, Cultures.TALK)
 	Game.folk_talk[str(fp.id)] = int(Game.folk_talk.get(str(fp.id), 0)) + 1
 	Jobs.folk_talked(Game, fp)
+	Sects.folk_talked(Game, fp)
 	world.folk_talking = str(fp.id)
 	# Part XVI: a step's errand with the people of the towns (red paper from the merchants, red envelopes
 	# for the children on New Year's Day, folk.gd ERRANDS)
@@ -1757,6 +1776,20 @@ func offer_carriage(e: Dictionary) -> void:
 			"desc": "For the granary, the well-rope and the watch's lamp-oil: %d spirit stones (you have %d). A town is the better for it, a little, for good. A chest takes three gifts of one giver and no more (%d given here).%s" % [Weal.gift_cost(Game), Game.stones, Weal.acts(Game, wtid, "gift"), "" if gb == "" else "\n\n" + gb],
 			"col": UI.C_JADE if gb == "" else UI.C_DIM, "enabled": gb == ""})
 		opts.append({"id": "weal:ask", "label": "Ask how the town stands", "note": str(Weal.STATES[Weal.state(Game, wtid)].n), "desc": "%s\n\n%s" % [str(Weal.STATES[Weal.state(Game, wtid)].desc), Weal.town_text(Game, wtid)]})
+	# (the Rivers and Lakes release: the hall of tasks of the sect that answers for this town, sects.gd; what kind
+	# of town it is, sides.gd; and in an upright one a wounded traveller mended for nothing, once a day)
+	var sect_id := Sects.of_office(office)
+	if sect_id != "" and Sects.open(Game, sect_id):
+		opts.append({"id": "sect:tasks", "label": "Go to the hall of tasks", "note": Sects.rank_name(Game, sect_id),
+			"desc": "%s
+
+%s
+
+%d of %d tasks done for %s." % [str(Sects.SECTS[sect_id].custom), str(Sects.SECTS[sect_id].pay), Sects.done_count(Game, sect_id), Sects.tasks_of(sect_id).size(), str(Sects.SECTS[sect_id].short)], "col": UI.C_GOLD})
+	if wtid != "" and Sides.of(wtid) != "plain":
+		if Sides.alms_due(Game, wtid):
+			opts.append({"id": "side:alms", "label": "Ask to be mended", "desc": "Somebody of the party is hurt, and this is an upright town: whoever answers for it sees a wounded traveller mended, once a day, for nothing.", "col": UI.C_JADE})
+		opts.append({"id": "side:ask", "label": "Ask what kind of town this is", "note": str(Sides.NAMES[Sides.of(wtid)]), "desc": str(Sides.DESC[Sides.of(wtid)])})
 	# (the Red Seal release: the desk of the Hall of Seals, the board of the lists, the auction room, and what
 	# else the post carries: seals.gd, lists.gd, auction.gd, mail.gd)
 	if Seals.open(Game) and Seals.is_desk(office):
@@ -1894,6 +1927,14 @@ func offer_carriage(e: Dictionary) -> void:
 					)
 		elif oid == "leaves":
 			offer_leaves(Yezi.at(office))
+		elif oid == "sect:tasks":
+			offer_sect(e, sect_id)
+		elif oid == "side:ask":
+			say([[str(e.n), str(Sides.WORD[Sides.of(wtid)])]])
+		elif oid == "side:alms":
+			var mended := Sides.take_alms(Game, wtid)
+			if mended != "":
+				say([[str(e.n), mended]])
 		elif oid == "seals":
 			offer_seals(e)
 		elif oid == "lists":
@@ -2562,6 +2603,39 @@ func offer_jobs(e: Dictionary) -> void:
 			say([[str(e.n), "\"%s.\" Done, and witnessed. I shall take it down." % str(Jobs.JOBS[jid].n)], [str(Jobs.JOBS[jid].by).capitalize() if not str(Jobs.JOBS[jid].by).begins_with("the ") else "Narrator", str(Jobs.JOBS[jid].thanks)]])
 	)
 
+## The Rivers and Lakes release (sects.gd): the hall of tasks of a sect, at the counter of whoever keeps it: what
+## hangs on the wall ("Nothing today" first); a task not yet taken is taken, one that is done is reported and
+## paid in the sect's own way, one in hand says how far along it is.
+func offer_sect(e: Dictionary, sect_id: String) -> void:
+	var sc: Dictionary = Sects.SECTS[sect_id]
+	var opts: Array = [{"id": "later", "label": "Nothing today", "desc": "The wall will be here. %s: %s (%d of %d tasks done)." % [str(sc.n), Sects.rank_name(Game, sect_id), Sects.done_count(Game, sect_id), Sects.tasks_of(sect_id).size()], "col": UI.C_DIM}]
+	for t in Sects.tasks_of(sect_id):
+		var st := Sects.state(Game, t)
+		if st == "done":
+			continue
+		var rdy := Sects.ready(Game, t)
+		var p := Sects.progress(Game, t)
+		opts.append({"id": ("report:" if rdy else ("take:" if st == "" else "have:")) + str(t), "label": Sects.label(Game, t),
+			"note": "" if st == "" else ("done: report it" if rdy else "%d of %d" % [int(p[0]), int(p[1])]),
+			"desc": Sects.text(Game, t), "col": UI.C_JADE if rdy else ((UI.C_RED if bool(Sects.TASKS[t].get("foul", false)) else UI.C_GOLD) if st == "" else UI.C_DIM), "enabled": st == "" or rdy})
+	var greet: Array = [[str(e.n), str(Sects.GREET[sect_id][Sects.rank(Game, sect_id)])]]
+	say(greet, func():
+		choose(Sects.ASK, opts, func(id: String):
+			if id == "" or id == "later":
+				return
+			var tid := id.get_slice(":", 1)
+			if id.begins_with("take:"):
+				Sects.take(Game, tid)
+				Game.toast("Taken: %s" % str(Sects.TASKS[tid].n))
+				# (a task that was already done when it was taken is reported in the same breath)
+				if not Sects.ready(Game, tid):
+					return
+			if Sects.finish(Game, tid):
+				Feats.poll(Game)
+				say([[str(e.n), str(Sects.TASKS[tid].thanks)]])
+		)
+	)
+
 const HOLD_ASK := "The steward's table at Guiyun: what is to be done?"
 
 ## The Three Burrows release (hold.gd): the steward's table: what is in the chest, and what is drawn up
@@ -2869,6 +2943,24 @@ func open_abode(e: Dictionary) -> void:
 		open_talent_choice()
 	)
 
+## The Rivers and Lakes release (raids.gd): he has come up to a raid on the road or on a camp.  The raiders are
+## fought in earnest; two great realms below him they run at his coming, which breaks it too.
+func start_raid(raid: Dictionary) -> void:
+	var grp: Array = Raids.group(raid)
+	if grp.is_empty() or top_name() != "world":
+		return
+	if Game.scatters(grp):
+		var after: Array = Raids.broke(Game, raid, true)
+		var fl: Array = [["Narrator", Raids.seen_line(raid)], ["Narrator", "They look up. One of them says something short. Then there is only the road, and whoever they had come for, breathing."]]
+		fl.append_array(after)
+		world.raid_over(raid)
+		say(fl)
+		return
+	say([["Narrator", Raids.seen_line(raid)]], func():
+		var fake := {"id": "raid:" + str(raid.key), "kind": "enemy", "group": grp, "pos": raid.tile, "area": str(raid.area), "layer": world.layer, "late": true, "vis": ["", ""]}
+		battle.start(grp, {"entity": fake, "boss": false, "theme": battle_theme(), "ambush": false, "habit": "hunt", "group": grp, "raid": raid})
+		push("battle"))
+
 func start_encounter(e: Dictionary, ambush: bool = false) -> void:
 	# (`ambush`: the pack was struck first in the land, impact.gd, and opens the battle reeling)
 	# (and the hour it was met at decides what it was doing: asleep, hunting, resting, habits.gd)
@@ -3068,7 +3160,7 @@ const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "reca
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
 	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
-	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31", "s_break38": "recall32", "s_break39": "recall33", "s_break40": "recall34", "s_break41": "recall35", "s_break42": "recall36", "s_break43": "recall37", "s_break44": "recall38"}
+	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31", "s_break38": "recall32", "s_break39": "recall33", "s_break40": "recall34", "s_break41": "recall35", "s_break42": "recall36", "s_break43": "recall37", "s_break44": "recall38", "s_break45": "recall39"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,
@@ -3180,12 +3272,21 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 				world.battle_mark(e2, false)
 				Game.defeated[e2.id] = Game.playtime
 				# (almanac.gd: a pack put down begins again from nothing; what fell is what it had grown to)
-				Almanac.put_down(Game, str(e2.id))
+				# (raiders are no pack of the land: nothing of them is kept to grow again)
+				if not ctx.has("raid"):
+					Almanac.put_down(Game, str(e2.id))
 				# (the Open Net release, wilds.gd: one of the land's own packs put down is felt by the country)
 				if Wilds.native(e2):
 					Wilds.culled(Game, str(e2.get("area", Game.area)))
 				var fought: Array = ctx.get("group", e2.group)
 				Game.record_kills(e2.get("area", Game.area), fought.size(), fought.map(func(g): return g.id))
+				# (the Rivers and Lakes release, raids.gd: they were raiders, and whoever they had come for is still there)
+				if ctx.has("raid"):
+					Game.defeated.erase(e2.id)
+					var thanks: Array = Raids.broke(Game, ctx.raid)
+					world.raid_over(ctx.raid)
+					if not thanks.is_empty():
+						say(thanks)
 		"fall":
 			# the Lost Horse release (dooms.gd): a battle that could not be won has been lost, and the
 			# story goes on from the losing: nothing is taken, nobody is carried home

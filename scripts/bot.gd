@@ -164,6 +164,8 @@ const PICK_PLAN := {"qilin": "ride"}
 ## studied, the drawings kept, the axe given, the wheel given hours) and the wide world (the palace
 ## opened, the sea-roads, the names to the wind, the map copied); and for the last question the
 ## wheel's answer, as a builder of engines, if it has built three of them.
+## the realms the story is set in (the Rivers and Lakes release added the sixth; nothing of the story lies in the fifth)
+const REALMS_WALKED := ["surface", "heaven", "under", "sea", "lakes"]
 const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatch"], "palace": ["open"], "dragon_boon": ["sea"], "drawings": ["keep"], "nineteen": ["wind"],
 	"ancestor": ["strike"], "widow": ["truth"], "crows": ["pardon"], "axe": ["give"], "cauldron_map": ["copy"], "furnace": ["return"],
 	"the_wheel": ["hours"], "the_player": ["keep"], "the_works": ["wheel", "hand", "dao", "ask"],
@@ -200,7 +202,7 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	"the_needle": ["turn"],
 	"the_belts": ["wait"], "the_stone": ["keep"], "the_ladle": ["teach"], "the_round": ["watch"], "the_higher_sky": ["ditch"],
 	# Part XXXIX: the desk is carried down to the Cloud Gate
-	"the_red_seal": ["open"], "the_two_roads": ["ask"]}
+	"the_red_seal": ["open"], "the_two_roads": ["ask"], "the_covenant": ["dig"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -438,6 +440,10 @@ func _apply_start() -> void:
 		if str(st4.kind) == "jobs":
 			for jid in ["job_tally", "job_mill"]:
 				Game.jobs[jid] = "done"
+		# (Part XLI, sects.gd: the tasks a sect had of him by then)
+		if str(st4.kind) == "sect":
+			for stt in Sects.tasks_of(str(st4.sect)).slice(0, int(st4.n)):
+				Game.sect_q[stt] = "done"
 	# Part XXV: the town that is his own, as far along as the steps behind would have left it (hold.gd)
 	# (betters.gd: with --bot-watch each of those above him has been watched as often as he can be, as a player
 	# who took the days for it would have: the bot itself never spends them)
@@ -1001,6 +1007,13 @@ func _world(d: float) -> void:
 				if not Game.airs.has(Cultures.of_npc(str(an))):
 					_goto_entity(Trials.npc_area(str(an)), str(an))
 					break
+		"rescue":
+			# Part XLI (raids.gd): the nearest raid on a road or a camp that still stands, fought as anything is
+			_rescue_step(s)
+		"sect":
+			# Part XLI (sects.gd): the tasks of a sect of the Rivers and Lakes, taken in order at its hall and done
+			# as a hunt or a rescue is done (the choice takes and reports, _choice)
+			_sect_step(s)
 		"jobs", "host":
 			# Part XXIII: the notice board of Qingshi: Clerk Bai, by the Drum Tower (the choice takes down
 			# what can be reported at once, _choice)
@@ -1068,6 +1081,57 @@ func _world(d: float) -> void:
 				_start_meditate("rest")
 			else:
 				_goto_entity(Trials.boss_area(g), "boss_" + g)
+
+## Part XLI (raids.gd): to the nearest raid of the step's realm that still stands (the one he is in, if it names
+## none); with every raid of this watch broken, he waits for the watch to change.
+func _rescue_step(s: Dictionary) -> void:
+	var want := str(s.get("layer", Data.layer_of(Game.area)))
+	if world.layer != want:
+		_goto_layer(want)
+		return
+	if _hp_ratio() < 0.6:
+		_start_meditate("rest")
+		return
+	var r: Dictionary = Raids.nearest(Game, world.layer, world.ptile)
+	if r.is_empty():
+		_start_meditate("respawn")
+		return
+	_walk_to(r.tile, "raid:" + str(r.key))
+
+## Part XLI: a hunt for the foes `of` in region `area`, outside any step of that kind (a sect's task).
+func _hunt_in(area: String, of: Array) -> void:
+	if Game.area != area or world.layer != Data.layer_of(area):
+		_travel(area)
+	elif _hp_ratio() < 0.6:
+		_start_meditate("rest")
+	else:
+		var e = _nearest_enemy(area, false, of)
+		if e == null:
+			e = _any_enemy(area, false, of)
+		if e != null:
+			_walk_to(e.pos, "enemy:" + e.id)
+		else:
+			_start_meditate("respawn")
+
+## Part XLI (sects.gd): the next task of the step's sect: to its hall to take it or to report it, and between
+## the two out into its country to do it.
+func _sect_step(s: Dictionary) -> void:
+	var sid := str(s.sect)
+	var sc: Dictionary = Sects.SECTS[sid]
+	var t := Sects.next(Game, sid)
+	if t == "":
+		return
+	if Sects.state(Game, t) == "" or Sects.ready(Game, t):
+		_goto_entity(str(sc.area), str(sc.office))
+		return
+	var nd: Array = Sects.TASKS[t].need
+	match str(nd[0]):
+		"kills":
+			_hunt_in(str(sc.area), nd[1])
+		"raids":
+			_rescue_step({"layer": Data.layer_of(str(sc.area))})
+		_:
+			_grind()
 
 ## Part XXXIV (trifles.gd): the lost thing of region `area` to go for: the nearest that still lies in the
 ## road with nothing stood on it, or {}.
@@ -1951,9 +2015,22 @@ func _choice() -> void:
 		elif not st.is_empty() and st.kind == "cards" and ids.has("leaves") and (not st.has("of") or (("At the counter of " + str(Offices.OFFICES.get(str(Yezi.MASTERS[str(st.of)].at), {}).get("n", ""))) == str(c.title) and Yezi.blocked(Game, str(st.of)) == "")):
 			# (the Two Roads release, yezi.gd: a hand of leaves while a step asks that the master here be beaten)
 			want = ids.find("leaves")
+		elif not st.is_empty() and st.kind == "sect" and ids.has("sect:tasks") and ("At the counter of " + str(Offices.OFFICES[str(Sects.SECTS[str(st.sect)].office)].n)) == str(c.title):
+			# (the Rivers and Lakes release, sects.gd: the hall of tasks of the sect a step asks for work done for)
+			want = ids.find("sect:tasks")
 		elif not st.is_empty() and st.kind == "bid" and ids.has("room") and ("At the counter of " + str(Offices.OFFICES[str(Auction.HOUSES[str(st.house)].office)].n)) == str(c.title):
 			want = ids.find("room")
 		_nav(ids.size(), c.cursor, want)
+		return
+	if str(c.title) == Sects.ASK:
+		# the hall of tasks of a sect (sects.gd): report what is done; else take the next task in order; else leave it
+		want = -1
+		for ks in ids.size():
+			if want < 0 and str(ids[ks]).begins_with("report:"):
+				want = ks
+		if want < 0 and not st.is_empty() and st.kind == "sect":
+			want = ids.find("take:" + Sects.next(Game, str(st.sect)))
+		_nav(ids.size(), c.cursor, want if want >= 0 else ids.find("later"))
 		return
 	if str(c.title) == main.PLIGHT_ASK:
 		# somebody in the middle of something (plights.gd): the bot walks on
@@ -2418,7 +2495,7 @@ func _marks_step() -> void:
 			mark_id = ""
 	if mark_id == "":
 		var bd := 1 << 30
-		for lid in ["surface", "heaven", "under", "sea"]:
+		for lid in REALMS_WALKED:
 			var lw: Dictionary = Atlas.world_of(lid)
 			var here: Vector2i = world.ptile if world.layer == lid else Vector2i(-100000, 0)
 			for e in lw.ents:
@@ -2825,7 +2902,7 @@ func _deed_dist(d: Dictionary) -> int:
 ## How many of `item` can still be picked up somewhere (keepsakes on the floors of buildings).
 func _pickups_of(item: String) -> int:
 	var n := 0
-	for lid in ["surface", "heaven", "under", "sea"]:
+	for lid in REALMS_WALKED:
 		var lw: Dictionary = Atlas.world_of(lid)
 		var groups: Array = [lw.ents]
 		for fid in lw.floors:
@@ -2846,7 +2923,7 @@ func _fetch(item: String) -> bool:
 	var me: Vector2i = world.ptile + (Vector2i(world.wd.origin) if world.is_floor() else Vector2i.ZERO)
 	var best = null
 	var bd := 1 << 30
-	for lid in ["surface", "heaven", "under", "sea"]:
+	for lid in REALMS_WALKED:
 		var lw: Dictionary = Atlas.world_of(lid)
 		var groups: Array = [[lw.ents, Vector2i.ZERO]]
 		for fid in lw.floors:
@@ -3544,7 +3621,7 @@ func _finish(reason: String) -> void:
 	print("the roads       : %d held %s (the most at once %d); %s" % [Braid.count(Game), str(Braid.held(Game)), Game.braid_most, Braid.burden(Game)])
 	print("their own words : %d of %d pages written (Lin Feng %d, Yue Ling %d, Elder Qing Xuan %d)" % [Game.pages.size(), Memoir.ORDER.size(), Game.pages.keys().filter(func(k): return str(Memoir.PAGES[k].who) == "lin").size(), Game.pages.keys().filter(func(k): return str(Memoir.PAGES[k].who) == "yue").size(), Game.pages.keys().filter(func(k): return str(Memoir.PAGES[k].who) == "elder").size()])
 	var stood := 0
-	for lid9 in ["surface", "heaven", "under", "sea"]:
+	for lid9 in REALMS_WALKED:
 		stood += Marks.standing(Game, Atlas.world_of(lid9).ents)
 	print("the reckoning   : %s" % (", ".join(Game.reckoned.keys().map(func(id): return str(Data.ENEMIES[id].n))) if not Game.reckoned.is_empty() else "nobody met"))
 	print("trades          : %d shifts at %d trades, %d spirit stones in wages%s" % [int(Offices.worked(Game)[0]), int(Offices.worked(Game)[1]), Game.wages, (": " + Offices.careers(Game)) if Offices.careers(Game) != "" else ""])

@@ -298,9 +298,9 @@ const LETTERS := {
 	"hui_drink": {"from": "Hui Shi", "on": ["hui_wine", "drink"], "after": "s_p39_schools", "wait": 2, "gift": {"item": "qi_pill", "n": 2},
 		"lines": ["I drank it. He was right. He is always right about wine and wrong about everything else, and it is very hard on me. I enclose what the physician gave me for the morning after, since I did not need it, since I stopped at the second cup, since you told me to."]},
 	"seal_open_roll": {"from": "Mian of the Outer Court", "needs": ["the_red_seal", "open"], "wait": 1,
-		"lines": ["Senior: I sat for the Crimson Flame Palm. The registrar said: show me the part that is not the fire. I showed him the tub I stand by. He sealed it. Entered, it says. A cook from Cloudfoot sat after me, for the cleaver, and got Proven. I have decided to be pleased about that. It took most of an evening."]},
+		"lines": ["Senior: I sat for the Crimson Flame Palm. The registrar said: show me the part that is not the fire. I showed him the tub I stand by. He sealed it. Entered, it says. Auntie Zhou sat before me, for the cleaver, and got Proven. I have decided to be pleased about that. It took most of an evening."]},
 	"seal_strict_roll": {"from": "Mian of the Outer Court", "needs": ["the_red_seal", "strict"], "wait": 1,
-		"lines": ["Senior: I sat for the Crimson Flame Palm and was failed. He told me why, in one sentence, and it was the sentence I have been not saying to myself since the night of the pines. I sit again in the spring. Eleven of us failed. We practise together now, at the hour nobody else wants. It is the best hour I have."]},
+		"lines": ["Senior: I sat for the Crimson Flame Palm and was failed. He told me why, in one sentence, and it was the sentence I have been not saying to myself since the night of the pines. I sit again in the spring. Eleven of us who failed practise together now, at the hour nobody else wants. It is the best hour I have."]},
 	"seal_blank_roll": {"from": "Mian of the Outer Court", "needs": ["the_red_seal", "blank"], "wait": 1, "gift": {"stones": 420},
 		"lines": ["Senior: they have washed the registry and hung the leaves on the east wall to dry. Blank, all of them. A farmer asked me what I am, with no paper to say. I put out his chimney. He gave me this for the sect and said: that, then. I am sending it on. I did not know what else a paper would have told him."]},
 	# Part XL (the Two Roads release): whether a disciple may walk a second road
@@ -310,6 +310,13 @@ const LETTERS := {
 		"lines": ["Senior: I have the Heart, beside the Flame. I was fourth in the queue. Nobody told me it would feel like being new again at something while being watched by the thing I was already good at. I burnt my hand on Tuesday and mended it on Wednesday and I should like you to know that I count that a draw."]},
 	"roads_ask_court": {"from": "Hall Master Shen of Discipline", "needs": ["the_two_roads", "ask"], "wait": 1, "gift": {"stones": 440},
 		"lines": ["Lin Feng: the rule stands. One road. I keep the list of the forty who are guests on a second until autumn, which is not a change to the rule, as I have explained to the Elder on four occasions. The enclosed was collected in a rice bowl by the outer court. I do not know what for. I was asked to send it, and I do what is on the list."]},
+	# Part XLI (the Rivers and Lakes release): what four sects on the mud did when one hand was offered them
+	"covenant_bind_reed": {"from": "Fleet-Mother Lu Ting of Reedhaven", "needs": ["the_covenant", "bind"], "wait": 1, "gift": {"stones": 520},
+		"lines": ["Lin Feng: we counted sixty-one home last night. Forty of ours, nine of the Gate's carters, eleven riders, and a hermit who came down for salt and was fed before he could say so. I do not know all their tunes yet. I am learning them. The enclosed is from the clerk, who insists a league pays its signers. Eat first."]},
+	"covenant_dig_cold": {"from": "Guest-Monk Fenggan of Clearbell", "needs": ["the_covenant", "dig"], "wait": 1,
+		"lines": ["Lin Feng: I write for Shide, who cannot. He swept toward the west door this morning, which is the way you went, and then leaned the broom by it and left it there. He has not leaned that broom anywhere in forty years. The water is in all four beds. Nobody from below has come up to say so. He says that is how he knows."]},
+	"covenant_toll_wolf": {"from": "Gate-Captain Hu of Knifegate", "needs": ["the_covenant", "toll"], "wait": 1, "gift": {"stones": 700},
+		"lines": ["Lin Feng: forty ropes, forty slates. Nothing taken between any two of them since the new moon. The Banner-Lord has halved the toll on a cart with a child in it. He did not say why. Three riders left over it. The enclosed is your share. We do not say thank you. I am told to say that the share is not small."]},
 }
 const ORDER := ["ge_satchel", "wen_first", "wen_eaten", "wen_truth", "bandits_mend", "bandits_drive", "garden_study", "garden_burn", "egg_hatch", "egg_sell",
 	"palace_open", "palace_seal", "boon_rain", "boon_sea", "drawings_keep", "drawings_burn", "widow_truth", "widow_kind", "axe_give", "emperor", "yue_note", "ge_arks", "yue_write", "yue_say",
@@ -317,7 +324,7 @@ const ORDER := ["ge_satchel", "wen_first", "wen_eaten", "wen_truth", "bandits_me
 	"horse_keep", "horse_loose", "horse_breed",
 	"tally_burn", "tally_collect", "tally_shares", "door_all", "door_hearth", "door_sweep", "seat_found", "seat_take", "seat_serve",
 	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "mat_cut", "mat_whole", "mat_road", "tian_chimney", "verdict_sword", "verdict_bench", "verdict_field", "fowler_net", "lintel_grow", "lintel_stay", "lintel_each", "kuafu_home", "mirror_rivet", "mirror_recast", "mirror_halves", "bridge_girl", "needle_truth", "needle_finish", "needle_turn", "duke_arrows", "belts_wait", "belts_cry", "belts_lie", "bell_down", "stone_keep", "stone_cut", "stone_bury", "jade_cut", "wen_last", "ladle_bind", "ladle_teach", "ladle_ground", "qi_counts", "round_break", "round_watch", "round_leave", "cai_qin", "sky_gall", "sky_ditch", "sky_road",
-	"seal_open", "meng_needled", "han_praised", "yue_nu_door", "hui_wine", "hui_argue", "hui_drink", "seal_open_roll", "seal_strict_roll", "seal_blank_roll", "roads_one_court", "roads_two_court", "roads_ask_court"]
+	"seal_open", "meng_needled", "han_praised", "yue_nu_door", "hui_wine", "hui_argue", "hui_drink", "seal_open_roll", "seal_strict_roll", "seal_blank_roll", "covenant_bind_reed", "covenant_dig_cold", "covenant_toll_wolf", "roads_one_court", "roads_two_court", "roads_ask_court"]
 
 ## The step a letter is written after: its own, or the step of the crossroads it answers.
 static func after_of(id: String) -> String:

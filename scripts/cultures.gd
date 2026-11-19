@@ -261,7 +261,7 @@ const ENDINGS := {
 	"open": {"n": "The Open Door", "label": "Open the gate", "sub": "One hearth for every people",
 		"desc": "Four hearths call you a guest and four peoples of the realms call you friend. Take the gate off the sect, and build one great hearth in the courtyard where anybody at all may sit: the horse-folk and the shades, the founders and the Feathered Folk.",
 		"needs": [["guests", 4], ["peoples", 4]], "sky": Color(1.0, 0.94, 0.8),
-		"lines": [["Narrator", "Lin Feng takes the gate of the Azure Cloud Sect off its hinges, and Smith Tie beats the hinges into a fire-ring for the great courtyard, and the fire lit in it has a coal from every hearth in the three realms."],
+		"lines": [["Narrator", "Lin Feng takes the gate of the Azure Cloud Sect off its hinges, and Smith Tie beats the hinges into a fire-ring for the great courtyard, and the fire lit in it has a coal from every hearth in the realms."],
 			["Narrator", "A Yumin and a horse-herder argue over it about the right way to make tea. A shade of Youdu and a founder of Tushan sit up with it at night. Nobody is asked where they come from until they have eaten. That is the whole of the rule."]]},
 	"lotus": {"n": "The Lotus Hearth", "label": "Build a house with her", "sub": "A small fire, for two",
 		"desc": "You and Yue Ling have come as close as two people come. Leave the sky to hold itself for an afternoon at a time, and build one small house with one small fire in it, by the pond where she wakes.",

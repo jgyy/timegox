@@ -78,11 +78,21 @@ const DRESS := {
 	"dusk": {"wall": "70749a", "roof": "242846", "roof2": "1a1e36", "column": "3a3e5e", "beam": "2c3050", "trim": "c8d0f0", "glow": Color(0.55, 0.65, 1.0, 0.5), "k": 0.8},
 	# Fuluo: sun-baked brick under a flat roof, with nothing to shut
 	"noon": {"wall": "d8a86a", "roof": "b07a48", "roof2": "8a5a30", "column": "8a4a2a", "beam": "a0623a", "trim": "f0d090", "kind": "flat", "k": 0.75},
+	# the Rivers and Lakes release: the four towns of the sects, and a town is dressed as what it is (sides.gd).
+	# Reedhaven of the Listening Reeds, upright: lime-washed boards, reed-thatch gold, green posts, a row of lanterns
+	"reed": {"wall": "eef0e0", "roof": "b8a45a", "roof2": "96843e", "column": "4a8a6a", "beam": "6a8a5a", "trim": "f0e8b8", "kind": "gable", "lanterns": true, "k": 0.7},
+	# Clearbell under the Hermitage, upright: bare grey plaster, slate roofs with snow-blue shadow, nothing gilt
+	"hermit": {"wall": "e4e4e0", "roof": "58607a", "roof2": "444c64", "column": "6a6a70", "beam": "50586a", "trim": "d0d8e4", "k": 0.75},
+	# Ashmarket of the Black Water Gate, crooked: soot-black boards, roofs like wet slate, windows lit a low red
+	"ash": {"wall": "4a4248", "roof": "1a161c", "roof2": "121014", "column": "6a1e1e", "beam": "2a2228", "trim": "a83a30", "lanterns": true, "glow": Color(1.0, 0.25, 0.15, 0.5), "k": 0.85},
+	# Knifegate of the Wolf Banner, crooked: raw ochre stone under flat roofs, iron-dark posts, a chimney for every hearth
+	"fang": {"wall": "a88a5a", "roof": "5a4a38", "roof2": "443828", "column": "2e2a28", "beam": "4a3a2a", "trim": "c84a2a", "kind": "flat", "chimney": true, "k": 0.85},
 }
 ## which country builds which way
 const DRESS_OF := {"dunes": "sand", "longmen": "river", "karst": "river", "tushan": "forge", "volcano": "forge", "yanggu": "dawn", "fusang": "dawn",
 	"juntian": "sky", "changhe": "sky", "ninesprings": "pearl", "youdu": "shade", "penglai": "sea", "fangzhang": "sea", "yingzhou": "sea", "guixu": "sea",
-	"huaxu": "cloud", "zhongbei": "spring", "gumang": "dusk", "fuluo": "noon"}
+	"huaxu": "cloud", "zhongbei": "spring", "gumang": "dusk", "fuluo": "noon",
+	"yunmeng": "reed", "hanshan": "hermit", "heishui": "ash", "langya": "fang"}
 ## styles that keep their own roof whatever country they stand in
 const OWN_ROOF := ["shrine", "hall", "hermitage", "aerie", "bathhouse"]
 ## what a window is lit with (set by `house` for the building being built)
@@ -1066,6 +1076,7 @@ const SETTLE := {
 	"juntian": ["tower", "pavilion", "shrine"], "changhe": ["pavilion", "pavilion", "shrine"], "ninesprings": ["stilt", "house", "ruin"], "youdu": ["ruin", "shrine", "tower"],
 	"penglai": ["stilt", "house", "pavilion"], "fangzhang": ["pavilion", "shrine", "house"], "yingzhou": ["shrine", "ruin"], "guixu": ["ruin", "ruin"],
 	"huaxu": ["pavilion", "house", "tower"], "zhongbei": ["house", "pavilion", "shrine"], "gumang": ["house", "ruin"], "fuluo": ["tower", "ruin"],
+	"yunmeng": ["stilt", "stilt", "shrine"], "hanshan": ["shrine", "pavilion", "house"], "heishui": ["ruin", "house", "tower"], "langya": ["tower", "ruin", "house"],
 }
 static var _mesh_cache := {}
 
