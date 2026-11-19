@@ -375,6 +375,8 @@ static func tick(n: Node3D, t: float, on: bool) -> void:
 				mi.position = at + Vector3(0, float(how.amp) * c2, 0)
 				mi.scale = Vector3.ONE * (0.4 + 0.6 * c2) * (1.0 - smoothstep(0.8, 1.0, c2))
 
+## (A beam that lies on its side is a `limb` from end to end, not a `cyl` turned over: MB scales after it
+## turns, and a turned cylinder comes out a plank.)
 static func _machine(root: Node3D, m: String, tint: Color, k: int) -> void:
 	var b := MB.new()
 	var g := MB.new()
@@ -407,7 +409,7 @@ static func _machine(root: Node3D, m: String, tint: Color, k: int) -> void:
 			for sx in [-0.7, 0.7]:
 				b.box(Vector3(sx, 0.7, z0 - 0.25), Vector3(0.1, 1.4, 0.1), wood)
 			var sh := MB.new()
-			sh.cyl(Vector3.ZERO, 0.06, 1.5, dark, Vector3(0, 0, PI / 2), 8)
+			sh.limb(Vector3(-0.75, 0, 0), Vector3(0.75, 0, 0), 0.06, 0.06, dark, 8)
 			for i in 3:
 				sh.box(Vector3(-0.4 + 0.4 * i, 0.09 * cos(i * 2.1), 0.09 * sin(i * 2.1)), Vector3(0.08, 0.1, 0.1), iron)
 			_part(root, sh, Vector3(0, 1.25, z0 - 0.25), {"k": "spin", "axis": Vector3.RIGHT, "v": 2.0})
@@ -440,10 +442,10 @@ static func _machine(root: Node3D, m: String, tint: Color, k: int) -> void:
 			for i in 8:
 				var a := TAU * i / 8.0
 				wh.limb(Vector3.ZERO, Vector3(cos(a) * 0.6, sin(a) * 0.6, 0), 0.018, 0.018, dark, 4)
-			wh.cyl(Vector3.ZERO, 0.07, 0.3, dark, Vector3(PI / 2, 0, 0), 8)
+			wh.limb(Vector3(0, 0, -0.15), Vector3(0, 0, 0.15), 0.07, 0.07, dark, 8)
 			_part(root, wh, Vector3(-0.25, 0.95, z0), {"k": "spin", "axis": Vector3.BACK, "v": 2.4})
 			var sp := MB.new()
-			sp.cyl(Vector3.ZERO, 0.015, 0.34, iron, Vector3(PI / 2, 0, 0), 6)
+			sp.limb(Vector3(0, 0, -0.17), Vector3(0, 0, 0.17), 0.015, 0.015, iron, 6)
 			sp.sph(Vector3.ZERO, Vector3(0.05, 0.05, 0.11), stuff)
 			_part(root, sp, Vector3(0.52, 0.8, z0), {"k": "spin", "axis": Vector3.BACK, "v": 14.0})
 			b.limb(Vector3(-0.25, 1.57, z0), Vector3(0.52, 0.83, z0), 0.006, 0.006, stuff, 3)
@@ -454,8 +456,8 @@ static func _machine(root: Node3D, m: String, tint: Color, k: int) -> void:
 				b.box(Vector3(sx, 0.45, z0 + 0.25), Vector3(0.08, 0.9, 0.08), wood)
 				b.box(Vector3(sx, 0.9, z0 - 0.05), Vector3(0.06, 0.06, 0.7), dark)
 			b.box(Vector3(0, 1.5, z0 - 0.35), Vector3(1.3, 0.08, 0.08), wood)
-			b.cyl(Vector3(0, 0.9, z0 - 0.35), 0.07, 1.2, dark, Vector3(0, 0, PI / 2), 8)
-			b.cyl(Vector3(0, 0.88, z0 + 0.25), 0.08, 1.2, stuff, Vector3(0, 0, PI / 2), 8)
+			b.limb(Vector3(-0.6, 0.9, z0 - 0.35), Vector3(0.6, 0.9, z0 - 0.35), 0.07, 0.07, dark, 8)
+			b.limb(Vector3(-0.6, 0.88, z0 + 0.25), Vector3(0.6, 0.88, z0 + 0.25), 0.08, 0.08, stuff, 8)
 			b.box(Vector3(0, 0.9, z0 - 0.05), Vector3(1.05, 0.01, 0.6), MB.tag(tint.lightened(0.2), MB.CLOTH))
 			var rd := MB.new()
 			rd.box(Vector3(0, 0, 0), Vector3(1.12, 0.3, 0.03), dark)
@@ -496,7 +498,7 @@ static func _machine(root: Node3D, m: String, tint: Color, k: int) -> void:
 				b.box(Vector3(sx, 0.15, z0), Vector3(0.07, 0.3, 0.4), dark)
 				b.box(Vector3(sx, 0.55, z0), Vector3(0.05, 0.5, 0.05), iron)
 			var pp := MB.new()
-			pp.cyl(Vector3.ZERO, 0.018, 1.5, iron, Vector3(0, 0, PI / 2), 6)
+			pp.limb(Vector3(-0.75, 0, 0), Vector3(0.75, 0, 0), 0.018, 0.018, iron, 6)
 			_part(root, pp, Vector3(-0.1, 0.82, z0), {"k": "spin", "axis": Vector3.RIGHT, "v": 3.0})
 			var gl := MB.new()
 			gl.ball(Vector3.ZERO, 0.17, Color(tint.r, tint.g, tint.b, 0.75), true)
@@ -523,11 +525,11 @@ static func _machine(root: Node3D, m: String, tint: Color, k: int) -> void:
 			b.box(Vector3(0.75, 0.6, z0), Vector3(0.5, 0.02, 0.2), stuff)
 			var tw := MB.new()
 			tw.torus(Vector3.ZERO, 0.68, 0.04, wood, Vector3(PI / 2, 0, 0), true)
-			tw.cyl(Vector3.ZERO, 0.07, 0.7, dark, Vector3(PI / 2, 0, 0), 8)
+			tw.limb(Vector3(0, 0, -0.35), Vector3(0, 0, 0.35), 0.07, 0.07, dark, 8)
 			for i in 8:
 				var a2 := TAU * i / 8.0
 				tw.limb(Vector3.ZERO, Vector3(cos(a2) * 0.66, sin(a2) * 0.66, 0), 0.02, 0.02, dark, 4)
-				tw.cyl(Vector3(cos(a2) * 0.72, sin(a2) * 0.72, 0.0), 0.07, 0.14, MB.tag(Color("a86a4a"), MB.STONE), Vector3(0, 0, a2), 6)
+				tw.sph(Vector3(cos(a2) * 0.74, sin(a2) * 0.74, 0.0), Vector3(0.08, 0.09, 0.08), MB.tag(Color("a86a4a"), MB.STONE))
 			_part(root, tw, Vector3(0, 0.95, z0), {"k": "spin", "axis": Vector3.BACK, "v": -0.7})
 		"pan":
 			# a long iron pan over a warm vent, a rake that draws the crust, and the warm water going up
