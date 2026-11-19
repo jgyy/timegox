@@ -844,6 +844,9 @@ func _draw_channels() -> void:
 	for b2 in Channels.ORDER:
 		var br: Dictionary = Channels.BRANCHES[b2]
 		var tip: Vector2 = c + Channels.pos(str(br.nodes[Channels.SEAL].id)) * k * 1.1
+		# (clear of the seal: further out along the spoke, and further still to the side on the level ones)
+		var out_dir: Vector2 = (tip - c).normalized()
+		tip += Vector2(out_dir.x * 46.0, out_dir.y * 6.0)
 		UI.text(self, Vector2(tip.x - 90.0, tip.y + 4.0), str(br.n).trim_prefix("The Channel of ").trim_prefix("the "), 11, br.col, HORIZONTAL_ALIGNMENT_CENTER, 180.0)
 		for nd in br.nodes:
 			var id := str(nd.id)

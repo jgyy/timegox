@@ -4743,7 +4743,7 @@ func _draw_hud() -> void:
 		UI.wrapped(self, Vector2(VIEW.x - 506, 35 - (15 - osz)), obj, osz, UI.C_TEXT, 486)
 	# (the line grew a key with every release and was still drawn 580 px wide: since G was added its
 	# end was cut off, "Esc men")
-	UI.text(self, Vector2(VIEW.x - 1204, VIEW.y - 14), "Arrows/WASD move   Q/E camera   P eyes   R ride   T talk   F strike   H hand   K phase   G sword qi   V glide   C work   B cook   Y shape   N make   M sit   L beasts   Z/Enter act   Esc menu", 12, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 1120.0)
+	UI.text(self, Vector2(VIEW.x - 1204, VIEW.y - 14), "WASD move  Q/E camera  P eyes  R ride  T talk  F strike  H hand  K phase  G sword qi  V glide  C work  B cook  Y shape  N make  M sit  L beasts  Enter act  Esc menu", 12, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 1120.0)
 	_draw_minimap()
 	_draw_clock()
 	if banner_t > 0.0:
