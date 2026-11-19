@@ -12594,7 +12594,7 @@ func _turned_face_chapter() -> void:
 				ap = c
 		check(ap != null and ["idle", "walk", "attack", "hurt", "die", "cast"].all(func(cl): return ap.has_animation(cl)), "the %s moves: idle, walk, attack, hurt, die and an art of its own" % sh)
 		mm.free()
-		check(Tactics.ARTS.has(sh) and fits.call(str(Tactics.ARTS[sh].said) % ["A foe", "Lin Feng"]) and float(Tactics.ARTS[sh].mult) <= 1.4, "the %s has an art in battle, with an effect of its own" % sh)
+		check(Tactics.ARTS.has(sh) and fits.call(Tactics.art_said(Tactics.ARTS[sh], "A foe", "Lin Feng")) and not Tactics.art_said(Tactics.ARTS[sh], "A foe", "Lin Feng").contains("%s") and Tactics.art_said(Tactics.ARTS[sh], "A foe", "Lin Feng").begins_with("A foe") and float(Tactics.ARTS[sh].mult) <= 1.4, "the %s has an art in battle, with an effect of its own" % sh)
 	check(Tactics.art_of({"shape": "toad", "turns": 3, "boss": false}).has("fx") and Tactics.art_of({"shape": "toad", "turns": 2, "boss": false}).is_empty() and Tactics.art_of({"shape": "owl", "turns": 3, "boss": true}).is_empty() and Tactics.art_of({"shape": "beast", "turns": 3}).is_empty(), "an art comes every third turn, never from a lord, and only to the three new kinds")
 	var fxsrc := FileAccess.get_file_as_string("res://scripts/fx3d.gd")
 	check(fxsrc.contains("static func coins(") and fxsrc.contains("static func venom(") and fxsrc.contains("static func screech("), "each art is drawn: a fountain of cash, fangs of venom out of the ground, rings of a screech")

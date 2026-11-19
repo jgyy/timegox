@@ -672,7 +672,7 @@ func _foe_act(f: Dictionary) -> void:
 	var art := Tactics.art_of(f)
 	if not art.is_empty() and str(plan.act) != "brace":
 		var hit_to: Array = tg if str(art.to) == "all" else [tg[int(plan.to)]]
-		say(str(art.said) % [f.name, hit_to[0].name if hit_to.size() == 1 else "the party"])
+		say(Tactics.art_said(art, str(f.name), str(hit_to[0].name)))
 		for v in hit_to:
 			_hit(f, v, float(art.mult), f.elem, true)
 		if not headless():

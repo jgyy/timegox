@@ -960,7 +960,8 @@ static func screech(parent: Node3D, from: Vector3, to: Vector3, col: Color = Col
 	var yaw := atan2(d.x, d.z)
 	for k in 4:
 		var b := MB.new()
-		b.torus(Vector3.ZERO, 1.0, 0.06, Color(col.r, col.g, col.b, 0.8 - 0.12 * float(k)), Vector3(PI / 2, 0, 0), true)
+		# (stood on edge facing the way the cry goes: turned first, then scaled in its own plane)
+		b.prim("torus_hi", Transform3D(Basis.from_euler(Vector3(PI / 2, 0, 0)) * Basis.from_scale(Vector3(2.0, 1.5, 2.0)), Vector3.ZERO), Color(col.r, col.g, col.b, 0.8 - 0.12 * float(k)))
 		var mi := MB.mesh_node(parent, b.build(MB.mat_glow()), from)
 		mi.rotation = Vector3(0, yaw, 0)
 		mi.scale = Vector3.ONE * 0.2
@@ -971,7 +972,7 @@ static func screech(parent: Node3D, from: Vector3, to: Vector3, col: Color = Col
 		tw.tween_property(mi, "scale", Vector3.ONE * (1.6 + 0.4 * float(k)), 0.55).set_delay(0.1 * float(k))
 		tw.chain().tween_callback(mi.queue_free)
 	_flash(parent, from, col, 2.4, 0.4)
-	_burst(parent, to + Vector3(0, 2.4, 0), Color(0.18, 0.15, 0.2), 30, 1.2, 2.0, quad("petal", 0.3, false), Vector3(0, -1.2, 0), Vector3(0, -1, 0), 160.0, 2.0)
+	_burst(parent, to + Vector3(0, 2.4, 0), Color(0.42, 0.38, 0.44, 0.7), 16, 1.0, 2.0, quad("petal", 0.14, false), Vector3(0, -1.0, 0), Vector3(0, -1, 0), 160.0, 2.0)
 
 ## element-coloured hit effect at a world position (big = boss heavy attack or a technique)
 static func hit(parent: Node3D, pos: Vector3, elem: String, big: bool = false) -> void:

@@ -47,6 +47,11 @@ const ARTS := {
 	"owl": {"n": "Screech in the Dark", "to": "all", "mult": 0.6, "fx": "screech", "said": "%s mantles and screeches: a cry nobody in the land can bear!"},
 }
 
+## What the log says of an art: the foe's name, and whoever it struck if it struck one.
+static func art_said(art: Dictionary, foe: String, victim: String) -> String:
+	var said := str(art.said)
+	return said % [foe, victim] if said.count("%s") == 2 else said % foe
+
 ## The art a foe uses on this turn of its own ({} for a plain blow): a lord never, and only every third turn.
 static func art_of(f: Dictionary) -> Dictionary:
 	if bool(f.get("boss", false)) or not ARTS.has(str(f.get("shape", ""))):

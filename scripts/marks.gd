@@ -698,9 +698,12 @@ static func model(sp: Dictionary, i: int = 0) -> Node3D:
 					b.box(Vector3(0, 1.78, 0), Vector3(1.32, 0.1, 0.14), blk)
 					b.box(Vector3(0, 0.25, 0), Vector3(1.2, 0.06, 0.1), blk)
 					# the drum on its side, its heads facing the path, studded round the rim
-					b.cyl(Vector3(0, 1.0, 0), 0.4, 0.5, MB.tag(Color("8a2a20"), MB.WOOD), Vector3(PI / 2, 0, 0), 16)
+					# (MB.cyl scales along the world's axes after it turns, so a drum lying on its side is set with its own
+					# basis: turned first, then scaled along its own length)
+					var lie := Basis.from_euler(Vector3(PI / 2, 0, 0))
+					b.prim("cyl16", Transform3D(lie * Basis.from_scale(Vector3(0.8, 0.5, 0.8)), Vector3(0, 1.0, 0)), MB.tag(Color("8a2a20"), MB.WOOD))
 					for hd2 in [-1.0, 1.0]:
-						b.cyl(Vector3(0, 1.0, 0.26 * hd2), 0.37, 0.02, MB.tag(Color("e0d0b0") if hd2 > 0 else Color("c8b898"), MB.CLOTH), Vector3(PI / 2, 0, 0), 16)
+						b.prim("cyl16", Transform3D(lie * Basis.from_scale(Vector3(0.74, 0.02, 0.74)), Vector3(0, 1.0, 0.26 * hd2)), MB.tag(Color("e0d0b0") if hd2 > 0 else Color("c8b898"), MB.CLOTH))
 					for stud in 10:
 						var aa := TAU * float(stud) / 10.0
 						b.box(Vector3(cos(aa) * 0.4, 1.0 + sin(aa) * 0.4, 0.24), Vector3(0.03, 0.03, 0.03), MB.tag(Color("c8a050"), MB.METAL))
