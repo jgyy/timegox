@@ -33,7 +33,7 @@ const BODIES := ["folk_giant", "folk_giantess"]
 ## the people of the story who are of the Great People (their entity id or `asset`)
 const NAMED := ["fangfeng", "kuafu", "longbo_angler"]
 ## how many of them live in each town (folk.gd TOWNS says the same: the tests compare)
-const TOWNS := {"cloudfoot": 1, "qingshi": 2, "drumtower": 1, "yanggu": 2, "shazhou": 1, "longmen": 2, "tushan": 2, "landfall": 3, "lightfoot": 1, "fourstreams": 1}
+const TOWNS := {"cloudfoot": 1, "qingshi": 2, "drumtower": 1, "yanggu": 2, "shazhou": 1, "longmen": 2, "tushan": 2, "landfall": 3, "lightfoot": 1, "fourstreams": 1, "reedhaven": 1, "clearbell": 1, "ashmarket": 1, "knifegate": 2}
 
 ## How big person `p` of the towns (folk.gd) is drawn.
 static func of_folk(p: Dictionary) -> float:

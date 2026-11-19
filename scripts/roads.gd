@@ -98,7 +98,8 @@ static func _lay(wd: Dictionary, layer: String) -> Dictionary:
 	# what stands in the land (a road goes round it): everything but the packs, which move
 	var things := {}
 	for e in wd.ents:
-		if e.has("pos") and e.kind != "enemy" and e.kind != "seal":
+		# (the Rivers and Lakes release: nor the landing of the river-boat, stood last of all: no older road moves for it)
+		if e.has("pos") and e.kind != "enemy" and e.kind != "seal" and not (e.kind == "ladder" and bool(e.get("late", false))):
 			things[e.pos] = true
 	var lo := Vector2i(W, H)
 	var hi := Vector2i.ZERO

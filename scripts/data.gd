@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 135
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole", "Practised Hand", "Sleeves of Wind", "Uncarved Block", "Light Hand", "Five in One Hand", "Low as the Sea", "Hidden and Nameless", "Walking Two Roads"]
+const MAX_LEVEL := 138
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole", "Practised Hand", "Sleeves of Wind", "Uncarved Block", "Light Hand", "Five in One Hand", "Low as the Sea", "Hidden and Nameless", "Walking Two Roads", "Forgotten in the Lakes"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000, 900000, 940000, 980000, 940000, 980000, 1020000, 980000, 1020000, 1060000, 1020000, 1060000, 1100000, 1060000, 1100000, 1140000, 1100000, 1140000, 1180000, 1140000, 1180000, 1220000, 1180000, 1220000, 1260000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700, 52400, 53100, 53800, 54500, 55200, 55900, 56600, 57300, 58000, 58700, 59400, 60100, 60800, 61500, 62200, 62900, 63600, 64300, 65000, 65700, 66400, 67100, 67800, 68500]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000, 900000, 940000, 980000, 940000, 980000, 1020000, 980000, 1020000, 1060000, 1020000, 1060000, 1100000, 1060000, 1100000, 1140000, 1100000, 1140000, 1180000, 1140000, 1180000, 1220000, 1180000, 1220000, 1260000, 1220000, 1260000, 1300000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700, 52400, 53100, 53800, 54500, 55200, 55900, 56600, 57300, 58000, 58700, 59400, 60100, 60800, 61500, 62200, 62900, 63600, 64300, 65000, 65700, 66400, 67100, 67800, 68500, 69200, 69900, 70600]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -113,6 +113,8 @@ const REALM_INFO := [
 	{"life": 0, "title": "Whom No Paper Names", "note": "An advocate proved either side of anything for the price of a coat. A minister filled five carts with books and missed the one man who laughed at them. A disputer rode a white horse to a gate and proved it was not a horse. The Way is hidden and has no name, says the old book, and a name is the guest of what is so. This is the realm of having been certified, and of not needing to take the paper out."},
 	# Part XL (the Two Roads release): the hinge of the wheel, where both sides are let turn
 	{"life": 0, "title": "Who Rests at the Hinge", "note": "A keeper of monkeys said: three in the morning and four at night, and they were furious; four in the morning and three at night, and they were delighted. Nothing was altered, and joy and anger were both made use of. So the sage harmonizes with right and wrong alike and rests at the hinge of Heaven's wheel. This is called walking two roads. It is the realm of having stopped asking which of them is the road."},
+	# Part XLI (the Rivers and Lakes release): the fish that has stopped needing to be kept wet
+	{"life": 0, "title": "Who Is Forgotten in the Lakes", "note": "When the springs dry up the fish lie together on the mud, and wet one another with their breath, and moisten one another with spit. It is better to forget one another in the rivers and lakes. So the Zhuangzi. This is the realm of somebody who has been needed by every sect in the land at once, has put the water back, and has been allowed to go home without being thanked."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -1105,6 +1107,20 @@ const ENEMIES := {
 	"forked_shadow": {"n": "Shadow at a Fork", "elem": "thunder", "weak": "earth", "col": Color("4a4a5e"), "shape": "wraith", "pal": {"sec": Color("22222e"), "acc": Color("9a9ac8")}},
 	"road_untaken": {"n": "Road Not Taken", "elem": "earth", "weak": "wood", "col": Color("a89a78"), "shape": "serpent", "pal": {"sec": Color("5e563e"), "acc": Color("e8e0c0")}},
 	"two_minded": {"n": "Thing of Two Minds", "elem": "wood", "weak": "fire", "col": Color("6a7a5a"), "shape": "golem", "pal": {"sec": Color("38422e"), "acc": Color("c85a3a")}},
+	# ---- Part XLI: Forgetting One Another in the Rivers and Lakes (the Rivers and Lakes release): what comes down
+	# to the roads when the springs dry, in the four countries of the sects
+	"gasping_carp": {"n": "Carp Left on the Mud", "elem": "water", "weak": "thunder", "col": Color("b8a070"), "shape": "carp", "pal": {"sec": Color("6a5a3a"), "under": Color("e8e0c8"), "acc": Color("c85a3a")}},
+	"reed_reaver": {"n": "Reaver of the Reed-Banks", "elem": "phys", "weak": "fire", "col": Color("5a6a4a"), "shape": "humanoid", "pal": {"sec": Color("2e3826"), "acc": Color("c8b060")}},
+	"spit_wisp": {"n": "Breath That Kept Another Wet", "elem": "water", "weak": "earth", "col": Color("a8d0d8"), "shape": "wisp", "pal": {"sec": Color("5a8a98"), "acc": Color("f0f8f8")}},
+	"uncopied_poem": {"n": "Poem Nobody Copied Down", "elem": "wood", "weak": "fire", "col": Color("d8d0b8"), "shape": "tome", "pal": {"sec": Color("7a7460"), "acc": Color("2a2a30")}},
+	"cliff_gibbon": {"n": "Gibbon of the Cold Cliff", "elem": "earth", "weak": "wood", "col": Color("8a8a90"), "shape": "ape", "pal": {"sec": Color("4a4a54"), "acc": Color("e8e8f0")}},
+	"pine_laughter": {"n": "Laughter in the Pines", "elem": "thunder", "weak": "earth", "col": Color("c8d8e8"), "shape": "wraith", "pal": {"sec": Color("6a7a94"), "acc": Color("f8f8ff")}},
+	"owed_ledger": {"n": "Ledger That Is Owed", "elem": "dark", "weak": "fire", "col": Color("3a2e3a"), "shape": "tome", "pal": {"sec": Color("1a141c"), "acc": Color("c83a30")}},
+	"blackwater_leech": {"n": "Leech of the Black Water", "elem": "water", "weak": "thunder", "col": Color("2a2a34"), "shape": "serpent", "pal": {"sec": Color("14141a"), "acc": Color("8a2a30")}},
+	"gate_collector": {"n": "Collector of the Gate", "elem": "dark", "weak": "thunder", "col": Color("4a3a40"), "shape": "humanoid", "pal": {"sec": Color("221a1e"), "acc": Color("c8a050")}},
+	"banner_wolf": {"n": "Wolf of the Banner", "elem": "earth", "weak": "wood", "col": Color("8a7a60"), "shape": "beast", "pal": {"sec": Color("4a4030"), "acc": Color("c83a2a")}},
+	"pass_raider": {"n": "Rider of the Pass", "elem": "phys", "weak": "thunder", "col": Color("7a4a3a"), "shape": "humanoid", "pal": {"sec": Color("3a2620"), "acc": Color("c8c0b0")}},
+	"tooth_golem": {"n": "Tooth of the Pass", "elem": "earth", "weak": "water", "col": Color("a89878"), "shape": "golem", "pal": {"sec": Color("5e5440"), "acc": Color("e8e0c8")}},
 	"list_meng": {"n": "Brother Meng Zhi", "elem": "fire", "weak": "water", "col": Color("a85a3a"), "shape": "person:folk_youth"},
 	"list_bai_lu": {"n": "Senior Sister Bai Lu", "elem": "water", "weak": "thunder", "col": Color("7a9ab8"), "shape": "person:folk_maiden"},
 	"list_han_yue": {"n": "Senior Brother Han Yue", "elem": "thunder", "weak": "earth", "col": Color("4a5a8a"), "shape": "person:folk_guard", "boss": true},
@@ -3765,9 +3781,194 @@ const AREAS := {
 				"props": [["table", Vector2i(43, 20), true], ["stool", Vector2i(44, 20), false], ["stove", Vector2i(49, 19), true], ["rack", Vector2i(41, 19), true], ["cabinet", Vector2i(49, 22), true], ["lantern", Vector2i(42, 22), false]]},
 		],
 	},
+	# ---- the Rivers and Lakes release (Part XLI): a sixth realm (atlas.gd STRATA "lakes"), the country of the
+	# sects, down the Yellow River from Longmen by the river-boat (LADDERS "river_boat").  "When the springs
+	# dry up the fish lie together on the ground, wetting one another with their spit: better to forget
+	# one another in the rivers and lakes" (Zhuangzi).  Four countries in a chain, each with a town that a
+	# sect answers for (sects.gd): Yunmeng of the marshes and Reedhaven of the Listening Reeds, Cold Mountain
+	# and Clearbell of the Hermitage, both upright; the Black Water and Ashmarket of the Gate, the
+	# Wolf-Tooth Pass and Knifegate of the Wolf Banner, both crooked (sides.gd)
+	"yunmeng": {
+		"n": "Yunmeng, the Marsh of Cloud and Dream", "w": 100, "h": 64, "seed": 611, "theme": "yunmeng", "enemies": 20, "races": [], "layer": "lakes", "hill": 0.3,
+		"pool": [["gasping_carp", 135, 135], ["reed_reaver", 135, 135], ["spit_wisp", 135, 135]],
+		"portals": [
+			{"to": "hanshan", "pos": Vector2i(98, 32), "dest": Vector2i(4, 32), "open": "s_p41_flutes"},
+		],
+		"npcs": [
+			{"id": "lu_ting", "n": "Fleet-Mother Lu Ting", "pos": Vector2i(38, 29), "col": Color("3a7a8a"), "asset": "folk_boatwoman"},
+			{"id": "piper_yan", "n": "Old Yan, Who Cuts the Flutes", "pos": Vector2i(41, 30), "col": Color("8a9a5a"), "asset": "folk_grandpa"},
+			{"id": "ferrier_ke", "n": "Boatwright Ke of the Reed Slip", "pos": Vector2i(24, 36), "col": Color("7a6a4a"), "asset": "folk_porter"},
+			{"id": "net_wife_shui", "n": "Mistress Shui of the Drying Nets", "pos": Vector2i(66, 35), "col": Color("5a8a9a"), "asset": "folk_shopwife"},
+			{"id": "deaf_oarsman", "n": "Oarsman Long, Who Hears by the Oar", "pos": Vector2i(52, 35), "col": Color("4a6a6a"), "asset": "folk_fisher"},
+			{"id": "reed_girl", "n": "Xiao Di, the Youngest Piper", "pos": Vector2i(37, 35), "col": Color("9ab86a"), "asset": "folk_maiden"},
+		],
+		"bosses": [],
+		"pickups": [
+			{"id": "cache_ym1", "item": "stones", "n": 9200, "pos": Vector2i(78, 14), "always": true},
+			{"id": "sense_ym1", "item": "stones", "n": 7800, "pos": Vector2i(14, 52), "always": true, "sense": true},
+			{"id": "p41_flute1", "item": "reed_flute", "pos": Vector2i(84, 16), "vis": ["s_p41_flutes", ""]},
+			{"id": "p41_flute2", "item": "reed_flute", "pos": Vector2i(16, 12), "vis": ["s_p41_flutes", ""]},
+			{"id": "p41_flute3", "item": "reed_flute", "pos": Vector2i(86, 52), "vis": ["s_p41_flutes", ""]},
+			{"id": "p41_flute4", "item": "reed_flute", "pos": Vector2i(10, 46), "vis": ["s_p41_flutes", ""]},
+		],
+		"pickup_vis": "",
+		"springs": [Vector2i(22, 44)],
+		"steles": [Vector2i(42, 33)],
+		"roads": [[Vector2i(2, 32), Vector2i(13, 32), Vector2i(24, 33), Vector2i(34, 32), Vector2i(44, 31), Vector2i(56, 32), Vector2i(70, 33), Vector2i(84, 32), Vector2i(97, 32)],
+			[Vector2i(34, 27), Vector2i(34, 32)], [Vector2i(48, 27), Vector2i(48, 31)], [Vector2i(62, 28), Vector2i(62, 32)], [Vector2i(32, 37), Vector2i(32, 33)], [Vector2i(44, 37), Vector2i(44, 32)], [Vector2i(57, 37), Vector2i(57, 33)], [Vector2i(70, 37), Vector2i(70, 33)]],
+		"buildings": [
+			{"id": "reed_hall", "n": "The Hall of the Listening Reeds", "style": "hall", "rect": Rect2i(28, 18, 13, 9), "door": Vector2i(34, 26),
+				"props": [["desk", Vector2i(33, 20), true], ["bookshelf", Vector2i(29, 19), true], ["bookshelf", Vector2i(39, 19), true], ["scroll", Vector2i(31, 19), false], ["scroll", Vector2i(37, 19), false], ["cushion", Vector2i(31, 23), false], ["lantern", Vector2i(37, 24), false]]},
+			{"id": "moored_inn", "n": "The Inn of the Moored Lantern", "style": "inn", "rect": Rect2i(44, 19, 10, 8), "door": Vector2i(48, 26),
+				"props": [["table", Vector2i(46, 22), true], ["stool", Vector2i(47, 22), false], ["counter", Vector2i(51, 21), true], ["barrel", Vector2i(52, 24), true], ["stove", Vector2i(45, 20), true], ["lantern", Vector2i(45, 24), false]]},
+			{"id": "nine_bends_tea", "n": "The Tea-House of Nine Bends", "style": "teahouse", "rect": Rect2i(57, 20, 11, 8), "door": Vector2i(62, 27),
+				"props": [["table", Vector2i(59, 22), true], ["cushion", Vector2i(60, 23), false], ["table", Vector2i(65, 22), true], ["cushion", Vector2i(64, 23), false], ["stove", Vector2i(58, 21), true], ["scroll", Vector2i(62, 21), false], ["lantern", Vector2i(66, 25), false]]},
+			{"id": "flute_cutters", "n": "The Flute-Cutters' House", "style": "house", "rect": Rect2i(27, 38, 10, 7), "door": Vector2i(32, 38),
+				"props": [["bed", Vector2i(28, 43), true], ["table", Vector2i(31, 41), true], ["stool", Vector2i(32, 41), false], ["stove", Vector2i(35, 43), true], ["loom", Vector2i(35, 40), true], ["lantern", Vector2i(29, 40), false]]},
+			{"id": "net_house", "n": "The House of the Drying Nets", "style": "seahouse", "rect": Rect2i(39, 38, 10, 7), "door": Vector2i(44, 38),
+				"props": [["bed", Vector2i(40, 43), true], ["cabinet", Vector2i(47, 43), true], ["table", Vector2i(43, 41), true], ["stool", Vector2i(44, 41), false], ["stove", Vector2i(47, 40), true], ["lantern", Vector2i(41, 40), false]]},
+			{"id": "oar_hands", "n": "The Long House of the Oar-Hands", "style": "dorm", "rect": Rect2i(51, 38, 12, 8), "door": Vector2i(57, 38),
+				"props": [["bed", Vector2i(52, 40), true], ["bed", Vector2i(52, 42), true], ["bed", Vector2i(52, 44), true], ["bed", Vector2i(61, 42), true], ["bed", Vector2i(61, 44), true], ["table", Vector2i(57, 42), true], ["stool", Vector2i(57, 43), false], ["lantern", Vector2i(55, 44), false]]},
+			{"id": "reed_chandler", "n": "Shui's Chandlery of Reed and Cord", "style": "shop", "rect": Rect2i(65, 38, 10, 7), "door": Vector2i(70, 38),
+				"props": [["counter", Vector2i(69, 41), true], ["shelf", Vector2i(66, 43), true], ["shelf", Vector2i(73, 43), true], ["barrel", Vector2i(66, 40), true], ["rack", Vector2i(73, 40), true], ["lantern", Vector2i(70, 43), false]]},
+		],
+	},
+	"hanshan": {
+		"n": "Hanshan, the Cold Mountain", "w": 100, "h": 64, "seed": 621, "theme": "hanshan", "enemies": 20, "races": [], "layer": "lakes", "hill": 1.1,
+		"pool": [["uncopied_poem", 136, 136], ["cliff_gibbon", 136, 136], ["pine_laughter", 136, 136]],
+		"portals": [
+			{"to": "yunmeng", "pos": Vector2i(1, 32), "dest": Vector2i(95, 32), "open": "s_p41_flutes"},
+			{"to": "heishui", "pos": Vector2i(98, 32), "dest": Vector2i(4, 32), "open": "s_p41_cliff"},
+		],
+		"npcs": [
+			{"id": "shide", "n": "Shide, Who Sweeps the Kitchen", "pos": Vector2i(44, 29), "col": Color("8a8a7a"), "asset": "folk_monk"},
+			{"id": "lu_qiu", "n": "Prefect Lu Qiu, Who Came to Bow", "pos": Vector2i(47, 30), "col": Color("5a5a8a"), "asset": "folk_scholar"},
+			{"id": "woodman_han", "n": "Woodman Han of the Lower Path", "pos": Vector2i(30, 36), "col": Color("6a5a3a"), "asset": "folk_farmer"},
+			{"id": "gruel_nun", "n": "Sister Jing of the Gruel Pot", "pos": Vector2i(72, 35), "col": Color("9a9a8a"), "asset": "folk_grandma"},
+			{"id": "copyist_bo", "n": "Copyist Bo, Who Reads the Rocks", "pos": Vector2i(58, 35), "col": Color("6a7a8a"), "asset": "folk_youth"},
+			{"id": "bell_boy", "n": "The Novice Who Rings Late", "pos": Vector2i(43, 35), "col": Color("a89a6a"), "asset": "folk_boy"},
+		],
+		"bosses": [],
+		"pickups": [
+			{"id": "cache_hs1", "item": "stones", "n": 9400, "pos": Vector2i(78, 14), "always": true},
+			{"id": "sense_hs1", "item": "stones", "n": 8000, "pos": Vector2i(14, 52), "always": true, "sense": true},
+			{"id": "p41_poem1", "item": "rock_poem", "pos": Vector2i(82, 12), "vis": ["s_p41_poems", ""]},
+			{"id": "p41_poem2", "item": "rock_poem", "pos": Vector2i(14, 14), "vis": ["s_p41_poems", ""]},
+			{"id": "p41_poem3", "item": "rock_poem", "pos": Vector2i(88, 50), "vis": ["s_p41_poems", ""]},
+			{"id": "p41_poem4", "item": "rock_poem", "pos": Vector2i(12, 48), "vis": ["s_p41_poems", ""]},
+		],
+		"pickup_vis": "",
+		"springs": [Vector2i(20, 44)],
+		"steles": [Vector2i(48, 33)],
+		"roads": [[Vector2i(2, 32), Vector2i(13, 32), Vector2i(30, 33), Vector2i(40, 32), Vector2i(50, 31), Vector2i(62, 32), Vector2i(76, 33), Vector2i(84, 32), Vector2i(97, 32)],
+			[Vector2i(40, 27), Vector2i(40, 32)], [Vector2i(54, 27), Vector2i(54, 31)], [Vector2i(68, 28), Vector2i(68, 32)], [Vector2i(38, 37), Vector2i(38, 33)], [Vector2i(50, 37), Vector2i(50, 32)], [Vector2i(63, 37), Vector2i(63, 33)], [Vector2i(76, 37), Vector2i(76, 33)]],
+		"buildings": [
+			{"id": "guoqing_hall", "n": "The Guest Hall of the Hermitage", "style": "hall", "rect": Rect2i(34, 18, 13, 9), "door": Vector2i(40, 26),
+				"props": [["desk", Vector2i(39, 20), true], ["bookshelf", Vector2i(35, 19), true], ["bookshelf", Vector2i(45, 19), true], ["scroll", Vector2i(37, 19), false], ["scroll", Vector2i(43, 19), false], ["cushion", Vector2i(37, 23), false], ["lantern", Vector2i(43, 24), false]]},
+			{"id": "cold_gruel_inn", "n": "The Inn of Cold Gruel and a Warm Floor", "style": "inn", "rect": Rect2i(50, 19, 10, 8), "door": Vector2i(54, 26),
+				"props": [["table", Vector2i(52, 22), true], ["stool", Vector2i(53, 22), false], ["counter", Vector2i(57, 21), true], ["barrel", Vector2i(58, 24), true], ["stove", Vector2i(51, 20), true], ["lantern", Vector2i(51, 24), false]]},
+			{"id": "moon_window_tea", "n": "The Tea-House of the Moon in the Window", "style": "teahouse", "rect": Rect2i(63, 20, 11, 8), "door": Vector2i(68, 27),
+				"props": [["table", Vector2i(65, 22), true], ["cushion", Vector2i(66, 23), false], ["table", Vector2i(71, 22), true], ["cushion", Vector2i(70, 23), false], ["stove", Vector2i(64, 21), true], ["scroll", Vector2i(68, 21), false], ["lantern", Vector2i(72, 25), false]]},
+			{"id": "woodmans_house", "n": "The Woodman's House", "style": "farmhouse", "rect": Rect2i(33, 38, 10, 7), "door": Vector2i(38, 38),
+				"props": [["bed", Vector2i(34, 43), true], ["table", Vector2i(37, 41), true], ["stool", Vector2i(38, 41), false], ["stove", Vector2i(41, 43), true], ["loom", Vector2i(41, 40), true], ["lantern", Vector2i(35, 40), false]]},
+			{"id": "copyists_house", "n": "The Copyists' House", "style": "huizhou", "rect": Rect2i(45, 38, 10, 7), "door": Vector2i(50, 38),
+				"props": [["bed", Vector2i(46, 43), true], ["cabinet", Vector2i(53, 43), true], ["table", Vector2i(49, 41), true], ["stool", Vector2i(50, 41), false], ["stove", Vector2i(53, 40), true], ["lantern", Vector2i(47, 40), false]]},
+			{"id": "novices_dorm", "n": "The Novices' Long House", "style": "dorm", "rect": Rect2i(57, 38, 12, 8), "door": Vector2i(63, 38),
+				"props": [["bed", Vector2i(58, 40), true], ["bed", Vector2i(58, 42), true], ["bed", Vector2i(58, 44), true], ["bed", Vector2i(67, 42), true], ["bed", Vector2i(67, 44), true], ["table", Vector2i(63, 42), true], ["stool", Vector2i(63, 43), false], ["lantern", Vector2i(61, 44), false]]},
+			{"id": "brush_shop", "n": "The Shop of Brushes Nobody Buys", "style": "shop", "rect": Rect2i(71, 38, 10, 7), "door": Vector2i(76, 38),
+				"props": [["counter", Vector2i(75, 41), true], ["shelf", Vector2i(72, 43), true], ["shelf", Vector2i(79, 43), true], ["barrel", Vector2i(72, 40), true], ["rack", Vector2i(79, 40), true], ["lantern", Vector2i(76, 43), false]]},
+		],
+	},
+	"heishui": {
+		"n": "Heishui, the Black Water", "w": 100, "h": 64, "seed": 631, "theme": "heishui", "enemies": 20, "races": [], "layer": "lakes", "hill": 0.45,
+		"pool": [["owed_ledger", 137, 137], ["blackwater_leech", 137, 137], ["gate_collector", 137, 137]],
+		"portals": [
+			{"to": "hanshan", "pos": Vector2i(1, 32), "dest": Vector2i(95, 32), "open": "s_p41_cliff"},
+			{"to": "langya", "pos": Vector2i(98, 32), "dest": Vector2i(4, 32), "open": "s_p41_carts"},
+		],
+		"npcs": [
+			{"id": "mo_chou", "n": "Ledger-Mistress Mo Chou", "pos": Vector2i(34, 29), "col": Color("3a2a3a"), "asset": "folk_shopwife"},
+			{"id": "fence_gou", "n": "Gou the Fence, Who Asks Nothing", "pos": Vector2i(37, 30), "col": Color("5a4a3a"), "asset": "folk_merchant"},
+			{"id": "poisoner_she", "n": "Apothecary She of the Black Jar", "pos": Vector2i(20, 36), "col": Color("4a5a4a"), "asset": "folk_grandma"},
+			{"id": "debtor_niu", "n": "Niu, Who Owes Nine Lifetimes", "pos": Vector2i(62, 35), "col": Color("7a6a5a"), "asset": "folk_farmer"},
+			{"id": "cutpurse_ya", "n": "Ya of the Quick Fingers", "pos": Vector2i(48, 35), "col": Color("6a5a6a"), "asset": "folk_youth"},
+			{"id": "blind_teller", "n": "Blind Jin, Who Tells Fortunes Truly", "pos": Vector2i(33, 35), "col": Color("8a8a9a"), "asset": "folk_grandpa"},
+		],
+		"bosses": [],
+		"pickups": [
+			{"id": "cache_bw1", "item": "stones", "n": 9600, "pos": Vector2i(78, 14), "always": true},
+			{"id": "sense_bw1", "item": "stones", "n": 8200, "pos": Vector2i(14, 52), "always": true, "sense": true},
+			{"id": "p41_slip1", "item": "debt_slip", "pos": Vector2i(84, 14), "vis": ["s_p41_slips", ""]},
+			{"id": "p41_slip2", "item": "debt_slip", "pos": Vector2i(12, 12), "vis": ["s_p41_slips", ""]},
+			{"id": "p41_slip3", "item": "debt_slip", "pos": Vector2i(86, 50), "vis": ["s_p41_slips", ""]},
+			{"id": "p41_slip4", "item": "debt_slip", "pos": Vector2i(14, 46), "vis": ["s_p41_slips", ""]},
+		],
+		"pickup_vis": "",
+		"springs": [Vector2i(24, 46)],
+		"steles": [Vector2i(38, 33)],
+		"roads": [[Vector2i(2, 32), Vector2i(13, 32), Vector2i(20, 33), Vector2i(30, 32), Vector2i(40, 31), Vector2i(52, 32), Vector2i(66, 33), Vector2i(84, 32), Vector2i(97, 32)],
+			[Vector2i(30, 27), Vector2i(30, 32)], [Vector2i(44, 27), Vector2i(44, 31)], [Vector2i(58, 28), Vector2i(58, 32)], [Vector2i(28, 37), Vector2i(28, 33)], [Vector2i(40, 37), Vector2i(40, 32)], [Vector2i(53, 37), Vector2i(53, 33)], [Vector2i(66, 37), Vector2i(66, 33)]],
+		"buildings": [
+			{"id": "ledger_hall", "n": "The Hall of the Black Ledger", "style": "hall", "rect": Rect2i(24, 18, 13, 9), "door": Vector2i(30, 26),
+				"props": [["desk", Vector2i(29, 20), true], ["bookshelf", Vector2i(25, 19), true], ["bookshelf", Vector2i(35, 19), true], ["scroll", Vector2i(27, 19), false], ["scroll", Vector2i(33, 19), false], ["cushion", Vector2i(27, 23), false], ["lantern", Vector2i(33, 24), false]]},
+			{"id": "no_names_inn", "n": "The Inn Where No Names Are Asked", "style": "inn", "rect": Rect2i(40, 19, 10, 8), "door": Vector2i(44, 26),
+				"props": [["table", Vector2i(42, 22), true], ["stool", Vector2i(43, 22), false], ["counter", Vector2i(47, 21), true], ["barrel", Vector2i(48, 24), true], ["stove", Vector2i(41, 20), true], ["lantern", Vector2i(41, 24), false]]},
+			{"id": "bitter_cup_tea", "n": "The Tea-House of the Bitter Cup", "style": "teahouse", "rect": Rect2i(53, 20, 11, 8), "door": Vector2i(58, 27),
+				"props": [["table", Vector2i(55, 22), true], ["cushion", Vector2i(56, 23), false], ["table", Vector2i(61, 22), true], ["cushion", Vector2i(60, 23), false], ["stove", Vector2i(54, 21), true], ["scroll", Vector2i(58, 21), false], ["lantern", Vector2i(62, 25), false]]},
+			{"id": "fences_house", "n": "The Fence's House", "style": "house", "rect": Rect2i(23, 38, 10, 7), "door": Vector2i(28, 38),
+				"props": [["bed", Vector2i(24, 43), true], ["table", Vector2i(27, 41), true], ["stool", Vector2i(28, 41), false], ["stove", Vector2i(31, 43), true], ["loom", Vector2i(31, 40), true], ["lantern", Vector2i(25, 40), false]]},
+			{"id": "black_jar", "n": "The House of the Black Jar", "style": "alchemist", "rect": Rect2i(35, 38, 10, 7), "door": Vector2i(40, 38),
+				"props": [["bed", Vector2i(36, 43), true], ["cabinet", Vector2i(43, 43), true], ["table", Vector2i(39, 41), true], ["stool", Vector2i(40, 41), false], ["stove", Vector2i(43, 40), true], ["lantern", Vector2i(37, 40), false]]},
+			{"id": "collectors_dorm", "n": "The Collectors' Long House", "style": "dorm", "rect": Rect2i(47, 38, 12, 8), "door": Vector2i(53, 38),
+				"props": [["bed", Vector2i(48, 40), true], ["bed", Vector2i(48, 42), true], ["bed", Vector2i(48, 44), true], ["bed", Vector2i(57, 42), true], ["bed", Vector2i(57, 44), true], ["table", Vector2i(53, 42), true], ["stool", Vector2i(53, 43), false], ["lantern", Vector2i(51, 44), false]]},
+			{"id": "pawn_shop", "n": "The Pawnshop of Things Not Missed", "style": "shop", "rect": Rect2i(61, 38, 10, 7), "door": Vector2i(66, 38),
+				"props": [["counter", Vector2i(65, 41), true], ["shelf", Vector2i(62, 43), true], ["shelf", Vector2i(69, 43), true], ["barrel", Vector2i(62, 40), true], ["rack", Vector2i(69, 40), true], ["lantern", Vector2i(66, 43), false]]},
+		],
+	},
+	"langya": {
+		"n": "Langya, the Wolf-Tooth Pass", "w": 100, "h": 64, "seed": 641, "theme": "langya", "enemies": 20, "races": [], "layer": "lakes", "hill": 1.3,
+		"pool": [["banner_wolf", 138, 138], ["pass_raider", 137, 138], ["tooth_golem", 138, 138]],
+		"portals": [
+			{"to": "heishui", "pos": Vector2i(1, 32), "dest": Vector2i(95, 32), "open": "s_p41_carts"},
+		],
+		"npcs": [
+			{"id": "tuoba_lie", "n": "Banner-Lord Tuoba Lie", "pos": Vector2i(42, 29), "col": Color("8a3a2a"), "asset": "folk_guard"},
+			{"id": "pit_keeper", "n": "Sha, Who Keeps the Pit", "pos": Vector2i(45, 30), "col": Color("6a4a3a"), "asset": "folk_porter"},
+			{"id": "wolf_mother", "n": "Mother Lang of the Kennels", "pos": Vector2i(28, 36), "col": Color("7a6a5a"), "asset": "folk_grandma"},
+			{"id": "ransom_clerk", "n": "Clerk Shu, Who Prices Travellers", "pos": Vector2i(70, 35), "col": Color("5a5a6a"), "asset": "folk_scholar"},
+			{"id": "deserter_qi", "n": "Qi, Who Left the Banner", "pos": Vector2i(56, 35), "col": Color("6a6a4a"), "asset": "folk_farmer"},
+			{"id": "toll_boy", "n": "The Boy at the Toll-Rope", "pos": Vector2i(41, 35), "col": Color("9a7a5a"), "asset": "folk_boy"},
+		],
+		"bosses": [],
+		"pickups": [
+			{"id": "cache_ly1", "item": "stones", "n": 9800, "pos": Vector2i(78, 14), "always": true},
+			{"id": "sense_ly1", "item": "stones", "n": 8400, "pos": Vector2i(14, 52), "always": true, "sense": true},
+		],
+		"pickup_vis": "",
+		"springs": [Vector2i(22, 46)],
+		"steles": [Vector2i(46, 33)],
+		"roads": [[Vector2i(2, 32), Vector2i(13, 32), Vector2i(28, 33), Vector2i(38, 32), Vector2i(48, 31), Vector2i(60, 32), Vector2i(74, 33), Vector2i(84, 32), Vector2i(97, 32)],
+			[Vector2i(38, 27), Vector2i(38, 32)], [Vector2i(52, 27), Vector2i(52, 31)], [Vector2i(66, 28), Vector2i(66, 32)], [Vector2i(36, 37), Vector2i(36, 33)], [Vector2i(48, 37), Vector2i(48, 32)], [Vector2i(61, 37), Vector2i(61, 33)], [Vector2i(74, 37), Vector2i(74, 33)]],
+		"buildings": [
+			{"id": "banner_hall", "n": "The Hall of the Wolf Banner", "style": "hall", "rect": Rect2i(32, 18, 13, 9), "door": Vector2i(38, 26),
+				"props": [["desk", Vector2i(37, 20), true], ["bookshelf", Vector2i(33, 19), true], ["bookshelf", Vector2i(43, 19), true], ["scroll", Vector2i(35, 19), false], ["scroll", Vector2i(41, 19), false], ["cushion", Vector2i(35, 23), false], ["lantern", Vector2i(41, 24), false]]},
+			{"id": "split_skull_inn", "n": "The Inn of the Split Skull", "style": "inn", "rect": Rect2i(48, 19, 10, 8), "door": Vector2i(52, 26),
+				"props": [["table", Vector2i(50, 22), true], ["stool", Vector2i(51, 22), false], ["counter", Vector2i(55, 21), true], ["barrel", Vector2i(56, 24), true], ["stove", Vector2i(49, 20), true], ["lantern", Vector2i(49, 24), false]]},
+			{"id": "blood_tea", "n": "The Tea-House Where Scores Are Settled", "style": "teahouse", "rect": Rect2i(61, 20, 11, 8), "door": Vector2i(66, 27),
+				"props": [["table", Vector2i(63, 22), true], ["cushion", Vector2i(64, 23), false], ["table", Vector2i(69, 22), true], ["cushion", Vector2i(68, 23), false], ["stove", Vector2i(62, 21), true], ["scroll", Vector2i(66, 21), false], ["lantern", Vector2i(70, 25), false]]},
+			{"id": "kennel_house", "n": "The Kennel-Keeper's House", "style": "farmhouse", "rect": Rect2i(31, 38, 10, 7), "door": Vector2i(36, 38),
+				"props": [["bed", Vector2i(32, 43), true], ["table", Vector2i(35, 41), true], ["stool", Vector2i(36, 41), false], ["stove", Vector2i(39, 43), true], ["loom", Vector2i(39, 40), true], ["lantern", Vector2i(33, 40), false]]},
+			{"id": "ransom_house", "n": "The Ransom-Clerk's House", "style": "house", "rect": Rect2i(43, 38, 10, 7), "door": Vector2i(48, 38),
+				"props": [["bed", Vector2i(44, 43), true], ["cabinet", Vector2i(51, 43), true], ["table", Vector2i(47, 41), true], ["stool", Vector2i(48, 41), false], ["stove", Vector2i(51, 40), true], ["lantern", Vector2i(45, 40), false]]},
+			{"id": "raiders_dorm", "n": "The Long House of the Riders", "style": "dorm", "rect": Rect2i(55, 38, 12, 8), "door": Vector2i(61, 38),
+				"props": [["bed", Vector2i(56, 40), true], ["bed", Vector2i(56, 42), true], ["bed", Vector2i(56, 44), true], ["bed", Vector2i(65, 42), true], ["bed", Vector2i(65, 44), true], ["table", Vector2i(61, 42), true], ["stool", Vector2i(61, 43), false], ["lantern", Vector2i(59, 44), false]]},
+			{"id": "spoils_shop", "n": "The Shop of Spoils", "style": "shop", "rect": Rect2i(69, 38, 10, 7), "door": Vector2i(74, 38),
+				"props": [["counter", Vector2i(73, 41), true], ["shelf", Vector2i(70, 43), true], ["shelf", Vector2i(77, 43), true], ["barrel", Vector2i(70, 40), true], ["rack", Vector2i(77, 40), true], ["lantern", Vector2i(74, 43), false]]},
+		],
+	},
 }
 
-const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden", "dunes", "fungal", "aurora", "chaos", "maple", "karst", "springs", "wheel", "village", "terraces", "silk", "loom", "starferry", "magpie", "starpalace", "jasper", "yanggu", "millet", "fusang", "guanghan", "longmen", "drowned", "tushan", "buzhou", "juntian", "changhe", "ninesprings", "youdu", "penglai", "fangzhang", "yingzhou", "guixu", "huaxu", "zhongbei", "gumang", "fuluo"]
+const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden", "dunes", "fungal", "aurora", "chaos", "maple", "karst", "springs", "wheel", "village", "terraces", "silk", "loom", "starferry", "magpie", "starpalace", "jasper", "yanggu", "millet", "fusang", "guanghan", "longmen", "drowned", "tushan", "buzhou", "juntian", "changhe", "ninesprings", "youdu", "penglai", "fangzhang", "yingzhou", "guixu", "huaxu", "zhongbei", "gumang", "fuluo", "yunmeng", "hanshan", "heishui", "langya"]
 
 ## The towns of the Unbroken Land, marked on the world map: the area they stand in, a tile of that
 ## area's own map at their heart, and what they are.
@@ -3799,6 +4000,15 @@ const TOWNS := [
 		"lore": "The town of Huaxu under the mooring of the arks. Its people have no headman and want none, walk on the air above a puddle rather than go round it, and build cloud-keeled ships because somebody once asked whether it could be done. The Hall of Moorings keeps the roster; nobody keeps anything else."},
 	{"id": "fourstreams", "n": "Fourstreams", "area": "zhongbei", "pos": Vector2i(37, 31),
 		"lore": "The town under Mount Huling in the Utmost North, where the Divine Spring comes out of the jar's neck and parts into four streams. There is no wind here and no frost; people drink the spring when they are hungry, sing when they are not, and have been meaning to elect somebody to something for nine hundred years."},
+	# ---- the Rivers and Lakes release: the four towns of the sects (sects.gd), two upright and two crooked (sides.gd)
+	{"id": "reedhaven", "n": "Reedhaven", "area": "yunmeng", "pos": Vector2i(41, 32),
+		"lore": "The town of the Listening Reeds, on piles over the shallows of Yunmeng, where the river-boat from Longmen puts in. Every child is given a flute before a name, the fleet goes out at dusk and is sung home at dawn, and no stranger has ever paid for a first meal. The Fleet-Mother answers for it, and says she only steers."},
+	{"id": "clearbell", "n": "Clearbell", "area": "hanshan", "pos": Vector2i(47, 32),
+		"lore": "The town under the Hermitage of Cold Mountain, named for a bell that is rung late every morning by whichever novice overslept. Woodmen, copyists and a kitchen that feeds whoever climbs up. The hermits write their poems on rocks and trees and walk away; the town copies them down and argues about the handwriting."},
+	{"id": "ashmarket", "n": "Ashmarket", "area": "heishui", "pos": Vector2i(37, 32),
+		"lore": "The market on the Black Water where everything is for sale that is for sale nowhere else, and nobody is asked a name. The Black Water Gate keeps the ledger: every debt in the Rivers and Lakes is written in it, and is collected. The lanterns are red, the water does not reflect them, and the fortune-teller is always right."},
+	{"id": "knifegate", "n": "Knifegate", "area": "langya", "pos": Vector2i(45, 32),
+		"lore": "The stronghold in the Wolf-Tooth Pass, built across the only road east, where the Wolf Banner prices every traveller and takes its toll in whatever he has. Whoever is strongest is right until somebody stronger comes through the gate. It is, the riders say, the only honest town in the world."},
 ]
 
 ## What the land remembers of each region: shown beside the world map, and kept in the Annals once
@@ -3859,6 +4069,10 @@ const REGION_LORE := {
 	"zhongbei": "Zhongbei, the Utmost North, where Yu the Great lost his way while he was measuring the floods. No wind, no rain, no frost, no bird or beast or tree that is not gentle. In its middle stands Mount Huling, shaped like a jar, and from the ring at its neck runs the Divine Spring in four streams that water the whole country. King Mu of Zhou stayed three years and forgot to go home.",
 	"gumang": "Gumang, at the far corner of the west, where the breath of yin and yang does not meet, so there is no cold or heat, and the light of sun and moon does not reach, so there is no day or night. Its people neither eat nor dress; they sleep fifty days and wake once, and hold that what they do in dreams is real and what they see awake is not.",
 	"fuluo": "Fuluo, at the far corner of the east, where the sun and the moon never leave the sky. The ground is always hot and grows nothing gentle; its people eat roots and fruit raw, are strong and hard and always awake, and have never slept. They think the people of Gumang a story told to children, and the people of Gumang have dreamt of them.",
+	"yunmeng": "Yunmeng, the Marsh of Cloud and Dream: nine hundred li of reed, shallows and standing mist south of the last gorge, which the kings of Chu hunted and no king has ever taxed. The Listening Reeds live on the water in boats, cut their flutes from the marsh, and can tell from the sound a reed makes in the wind what the weather will be and who is coming.",
+	"hanshan": "Hanshan, the Cold Mountain. \"People ask the way to Cold Mountain: no road goes through. The ice does not melt in summer; the sun comes up into fog.\" A madman in a birch-bark hat wrote three hundred poems on its rocks and walked into a cleft that shut behind him. His friend Shide swept the kitchen below, and sweeps it still.",
+	"heishui": "Heishui, the Black Water, which the Classic of Mountains and Seas says runs out of the north-west and will not float a goose feather. Nothing is reflected in it. The Gate that takes its name keeps every debt of the Rivers and Lakes in one ledger, and holds that a debt is the only promise anybody has ever been known to keep.",
+	"langya": "Langya, the Wolf-Tooth Pass: two ridges of broken rock like the two jaws of a wolf, and between them the only road east. The Wolf Banner has held it for nine generations by the plain rule that the strongest takes first. Travellers are priced at the toll-rope, by weight, bearing and the look in the eye.",
 }
 
 ## The ways between the realms (Part XI): each joins a tile of one region to a tile of another in a
@@ -3873,9 +4087,14 @@ const LADDERS := [
 	# Part XII: Mazu's boat, from the pool of the suns at Fusang out to the Isles of the Eastern Sea
 	{"id": "sea_boat", "a": ["fusang", Vector2i(72, 49), Vector2i(0, -1)], "b": ["penglai", Vector2i(12, 32), Vector2i(1, 0)],
 		"na": "Sail with Mazu to the Isles of the Eastern Sea", "nb": "Sail home to Fusang", "open": "s_p12_shore", "style": "sail"},
+	# the Rivers and Lakes release (Part XLI): the river-boat of Longmen, down the Yellow River past the last
+	# gorge to Reedhaven in Yunmeng.  Its end in the land is "late": stood by Atlas last of all, on open
+	# ground near the tile written here, so that nothing of any older map moves for it
+	{"id": "river_boat", "a": ["longmen", Vector2i(30, 42), Vector2i(0, -1)], "b": ["yunmeng", Vector2i(12, 32), Vector2i(1, 0)],
+		"na": "Take the river-boat down to the Rivers and Lakes", "nb": "Take the river-boat home to Longmen", "open": "s_p41_roads", "style": "sail", "late": "a"},
 ]
 
-## The realm a region lies in: "surface" (the Unbroken Land), "heaven", "under" or "sea".
+## The realm a region lies in: "surface" (the Unbroken Land), "heaven", "under", "sea", "far" or "lakes".
 static func layer_of(id: String) -> String:
 	return str(AREAS[id].get("layer", "surface")) if AREAS.has(id) else "surface"
 
@@ -5437,6 +5656,36 @@ const STEPS := [
 	{"id": "s_p40_stands", "kind": "marks", "n": 1, "new": true, "t": "Something has been stood among the tea terraces for what was answered. Go and look at 1 thing that stands (Esc > Crossroads)", "stones": 104600},
 	{"id": "s_p40_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The steps have been swept. Nobody will say by whom. The Elder is sitting on the top one with a pack of leaves. Go to Elder Qing Xuan", "stones": 104800},
 	{"id": "s_break45", "kind": "breakthrough", "to": 135, "t": "The sage rests at the hinge of the wheel: Walking Two Roads"},
+	# ---- Part XLI: Forgetting One Another in the Rivers and Lakes (the Rivers and Lakes release).  A dry year: the
+	# springs are low, what lived by them has come down to the roads (raids.gd), and four sects down the river
+	# that had ignored one another for three hundred years have each written to Azure Cloud for help against
+	# the other three.  A sixth realm (atlas.gd STRATA "lakes"), four towns, two upright and two crooked
+	# (sides.gd), four sects with halls of tasks (sects.gd), carts on every road (traffic.gd), and one
+	# question: whether fish on the mud should be bound together, or given back the water
+	{"id": "s_p41_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "The spring under the pine is a hand lower than it has ever been, and four letters have come up the river under four seals. Speak to Elder Qing Xuan", "stones": 105000},
+	{"id": "s_p41_roads", "kind": "rescue", "n": 2, "t": "What lived by the springs has come down to where the people are. Break 2 raids on the roads or at the camp fires of the land", "stones": 105200},
+	{"id": "s_p41_boat", "kind": "talk", "npc": "lu_ting", "area": "yunmeng", "sect": "reed", "t": "The river-boat is in, east of Longmen Ferry. Take it down to Reedhaven in Yunmeng, and speak to Fleet-Mother Lu Ting", "stones": 105400},
+	{"id": "s_p41_marsh", "kind": "hunt", "area": "yunmeng", "n": 40, "of": ["gasping_carp", "reed_reaver", "spit_wisp"], "t": "The marsh is a third of what it was, and everything in it is on the banks with the reavers behind. Clear 40 packs from Yunmeng", "stones": 105600},
+	{"id": "s_p41_reed", "kind": "sect", "sect": "reed", "n": 2, "area": "yunmeng", "t": "\"We do not know you until you have done a thing we asked.\" Do 2 tasks for the Listening Reeds (Oar-Steward Pu, in their hall at Reedhaven)", "stones": 105800},
+	{"id": "s_p41_flutes", "kind": "collect", "item": "reed_flute", "n": 4, "area": "yunmeng", "t": "A flute is cut for every child before it is born, and the reavers burn them. Find the 4 Flutes Cut for Nobody Yet in Yunmeng", "stones": 106000},
+	{"id": "s_p41_cold", "kind": "talk", "npc": "shide", "area": "hanshan", "sect": "cold", "t": "The road east goes up into fog. The Hermitage of Cold Mountain has no master: ask in the kitchen. Speak to Shide, who sweeps it, at Clearbell", "stones": 106200},
+	{"id": "s_p41_poems", "kind": "collect", "item": "rock_poem", "n": 4, "area": "hanshan", "t": "\"He wrote where the water was. Read him.\" Find the 4 Rubbings of a Rock Poem on Cold Mountain", "stones": 106400},
+	{"id": "s_p41_hermit", "kind": "sect", "sect": "cold", "n": 2, "area": "hanshan", "t": "The mountain pays nobody and feeds everybody. Do 2 tasks for the Hermitage (Guest-Monk Fenggan, in the Guest Hall at Clearbell)", "stones": 106600},
+	{"id": "s_p41_peak", "kind": "summit", "peak": "hanshan", "k": 0, "area": "hanshan", "t": "\"People ask the way to Cold Mountain: no road goes through.\" Stand on the top of it, and look at where the four waters used to part", "stones": 106800},
+	{"id": "s_p41_cliff", "kind": "hunt", "area": "hanshan", "n": 40, "of": ["uncopied_poem", "cliff_gibbon", "pine_laughter"], "t": "The poems nobody copied have come off their rocks, and the gibbons have learned his laugh. Clear 40 packs from Cold Mountain", "stones": 107000},
+	{"id": "s_p41_black", "kind": "talk", "npc": "mo_chou", "area": "heishui", "sect": "black", "t": "East of the mountain the water is black and shows no face. In Ashmarket nobody will ask his name. Speak to Ledger-Mistress Mo Chou of the Black Water Gate", "stones": 107200},
+	{"id": "s_p41_water", "kind": "hunt", "area": "heishui", "n": 40, "of": ["owed_ledger", "blackwater_leech", "gate_collector"], "t": "A ledger has got loose that owes more than it holds, and the Gate's own collectors have begun to collect for themselves. Clear 40 packs from the Black Water", "stones": 107400},
+	{"id": "s_p41_gate", "kind": "sect", "sect": "black", "n": 2, "area": "heishui", "t": "\"Some of it is clean. I shall tell you which.\" Do 2 tasks for the Black Water Gate (Counting-Master Qian, in their hall at Ashmarket)", "stones": 107600},
+	{"id": "s_p41_slips", "kind": "collect", "item": "debt_slip", "n": 4, "area": "heishui", "t": "Somebody has been cutting the names out of the ledger: four debts that are owed by nobody now, and so by everybody. Find the 4 Slips from the Black Ledger", "stones": 107800},
+	{"id": "s_p41_carts", "kind": "rescue", "n": 3, "layer": "lakes", "t": "No sect will guard a road it shares with the other three. Break 3 raids on the roads and camps of the Rivers and Lakes", "stones": 108000},
+	{"id": "s_p41_wolf", "kind": "talk", "npc": "tuoba_lie", "area": "langya", "sect": "wolf", "t": "The only road east goes between two ridges like a wolf's jaws, and is priced at the rope. Speak to Banner-Lord Tuoba Lie at Knifegate", "stones": 108200},
+	{"id": "s_p41_pass", "kind": "hunt", "area": "langya", "n": 40, "of": ["banner_wolf", "pass_raider", "tooth_golem"], "t": "Wolves that slipped the kennel, riders who left the Banner and kept its name, and the rock itself has grown teeth. Clear 40 packs from the Wolf-Tooth Pass", "stones": 108400},
+	{"id": "s_p41_banner", "kind": "sect", "sect": "wolf", "n": 2, "area": "langya", "t": "\"You were priced high. Prove the price.\" Do 2 tasks for the Wolf Banner (Gate-Captain Hu, in their hall at Knifegate)", "stones": 108600},
+	{"id": "s_p41_convoy", "kind": "rescue", "n": 3, "layer": "lakes", "t": "Four sects, four roads, and every cart on them alone. Break 3 more raids on the roads and camps of the Rivers and Lakes, and see who notices", "stones": 108800},
+	{"id": "s_p41_moot", "kind": "talk", "npc": "lu_ting", "area": "yunmeng", "sect": "reed", "t": "The four have come to Reedhaven, since it is the only landing all of them will eat at. They have a covenant drawn up, and three pens. Go to Fleet-Mother Lu Ting", "stones": 109000},
+	{"id": "s_p41_stands", "kind": "marks", "n": 1, "new": true, "t": "Something has been stood in the marsh for what was answered. Go and look at 1 thing that stands (Esc > Crossroads)", "stones": 109200},
+	{"id": "s_p41_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The river-boat goes home on the evening water. The spring under the pine wants looking at. Go to Elder Qing Xuan", "stones": 109400},
+	{"id": "s_break46", "kind": "breakthrough", "to": 138, "t": "Better to forget one another in the rivers and lakes: Forgotten in the Lakes"},
 ]
 
 ## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
@@ -5680,6 +5929,13 @@ const ITEMS := {
 	# ---- Part XL (the Two Roads release): what is found in the three caves, and the leaves the masters painted
 	"keeper_acorn": {"n": "Acorn of the Seven", "desc": "An acorn with a small notch cut in its cap, as a keeper marks the day's seven so that nobody is given yesterday's. It has been thrown at a wall, hard, by somebody with very long arms and a strong sense of what three is"},
 	"pricked_leaf": {"n": "Pricked Leaf", "desc": "A leaf of the pack with a pin-hole in one corner, raised a hair on the back, where a thumb finds it in the dark. It is a fire eight. Whoever dealt it always knew where it was, and has never once had to pour"},
+	"reed_flute": {"n": "Flute Cut for Nobody Yet", "desc": "A reed flute of the Listening Reeds, cut and bored but not yet given: every child of Reedhaven has one before it has a name. These were left on the mud banks for children who have not been born, and the reavers have been burning them for kindling"},
+	"rock_poem": {"n": "Rubbing of a Rock Poem", "desc": "Ink on thin paper, taken from a rock on Cold Mountain: five characters to the line, in a hand that leans as if the writer were walking past while he wrote. \"My heart is like the autumn moon.\" The last line is under the lichen"},
+	"debt_slip": {"n": "Slip from the Black Ledger", "desc": "A slip of black paper with a red thumbprint and a sum. The name has been cut out, carefully, with a small knife. Whoever owes it is still owed-for; the Gate's collectors can smell one of these through a wall"},
+	"token_reed": {"n": "A Flute with His Tune in It", "desc": "A reed flute of the Listening Reeds, given to kin. It plays one tune, which the pipers made of how he walks, and which he is assured is flattering. Keepsake of the Reeds: it weighs nothing"},
+	"token_cold": {"n": "A Chipped Gruel Bowl", "desc": "The bowl with a chip in it from the kitchen of Cold Mountain, which is his now, and was the madman's before. There is a line of a poem scratched under the foot. Keepsake of the Hermitage: it weighs nothing"},
+	"token_black": {"n": "A Blank Black Slip", "desc": "A slip of the Black Ledger with a thumbprint that is his own and no sum written on it. A partner's slip: whatever he writes there, the Gate will honour. He has not written anything. Keepsake of the Gate: it weighs nothing"},
+	"token_wolf": {"n": "A Wolf's Tooth on a Thong", "desc": "A tooth as long as a finger, on a leather thong, given without a word by somebody who did not look at him while he gave it. Riders of the Banner step aside for it. Keepsake of the Wolf Banner: it weighs nothing"},
 	"fork_stone": {"n": "Stone from a Fork", "desc": "A flat river stone of the kind a traveller sets at a parting of the ways to say: I went left. This one was set at a fork where another just like it sat on the right. Whoever it was is presumably still deciding"},
 	"leaf_du_outer": {"n": "Hall Master Du's Earth Nine", "desc": "A ninth leaf of earth, painted in the ochre the sect's rice ledgers are ruled with, a little crooked. Painted leaf: it takes the place of the least leaf he is dealt (Esc > Leaves)"},
 	"leaf_zhen_lantern": {"n": "Auntie Zhen's Fire Nine", "desc": "A ninth leaf of fire, painted by lantern before dawn, so that the red is a shade towards orange by day. Painted leaf: it takes the place of the least leaf he is dealt (Esc > Leaves)"},
@@ -11857,6 +12113,140 @@ const DIALOGUE := {
 		["Yue Ling", "Write something on it."],
 		["Lin Feng", "No. I shall keep it as it is. If I am ever asked what I am, I shall take it out and show them, and then I shall do whatever is in front of me, and they can fill it in."],
 		["Elder Qing Xuan", "The Way that can be told is not the constant Way. The name that can be named is not the constant name. I have read that out for seventy years as if it were hard. Give me the broom, child. I want to do the top ten.", "nod"],
+	],
+	# ---------------------------------------------------------------- Part XLI: Forgetting One Another in the Rivers and Lakes
+	"recall39": [
+		["Narrator", "The Lotus Seal sets Lin Feng down in the courtyard, by the spring under the pine. He looks into it out of habit, for his face. He has to bend. The water is a hand lower than the stone lip, and there is a dry line on the moss where it used to stand."],
+		["Yue Ling", "It dropped in the night. Bao says the well at Cloudfoot is the same. And a carter came up the steps this morning with no cart. Something took it on the road, he says. On the road. In daylight."],
+		["Elder Qing Xuan", "Child. Come and sit. Four letters have come up the river under four seals I have not seen in sixty years, and each of them asks me for the same thing, against the other three."],
+	],
+	"s_p41_home": [
+		["Elder Qing Xuan", "South of the last gorge is the country we call the Rivers and Lakes. The Son of Heaven's calendar is read there and nothing else of his. Four sects answer for four towns, and have ignored one another, most peaceably, for three hundred years."],
+		["Elder Qing Xuan", "The Listening Reeds, on the marsh. The hermits of Cold Mountain. The Black Water Gate, which keeps every debt in that country in one book. And the Wolf Banner, in the pass, which takes what it is strong enough to take. Two upright towns, child, and two crooked."],
+		["Lin Feng", "And the springs are dry there too."],
+		["Elder Qing Xuan", "When the springs dry up, the fish find themselves lying together on the mud. They wet one another with their spit. It looks like love. Each of the four has written to ask me to stand with it. It is the first time any of them has needed anybody.", "nod"],
+		["Yue Ling", "The beasts are on the roads here as well. They go for the carts and the camp fires now. They used to wait to be walked into."],
+		["Elder Qing Xuan", "Then begin with the roads, since they are nearer. And then take the river-boat. Do not sign anything until you have eaten at all four tables. I am too old to go, and too well thought of to be told the truth."],
+	],
+	"done:s_p41_roads": [
+		["Narrator", "Two raids broken, and two sets of people who had been sure, a moment before, of how the afternoon would end. One of them presses a string of spirit stones on him with both hands, and will not have it back."],
+		["Yue Ling", "They looked at the road behind us as if more of you might be coming. There is only one of you. I did not like to tell them."],
+		["Lin Feng", "The boat is in at Longmen. A flat thing with a mat sail and an eye painted on the bow. The boatman says he has not been asked for a passage south in eleven years."],
+	],
+	"s_p41_boat": [
+		["Narrator", "Reedhaven stands on piles over the shallows. Somebody puts a bowl into Lin Feng's hands before the boat has stopped moving. It is fish, and rice, and too hot. Nobody asks his name until it is empty."],
+		["Fleet-Mother Lu Ting", "Now. Who are you? No: I know who. I mean what are you like, and I have seen that. You ate all of it, and you looked at who had not got one yet. Sit down."],
+		["Fleet-Mother Lu Ting", "Forty boats go out at dusk and forty come home. That is all the law we have. This year the marsh is a third what it was, the fish are on the mud, and the reavers come along the banks to where our children sleep.", "grieve"],
+		["Lin Feng", "You wrote to the mountain for help against the other three."],
+		["Fleet-Mother Lu Ting", "I wrote because the hermits sit on the top of our water and the Gate has bought the middle of it and the wolves hold the road it leaves by. I do not hate them. I had simply never had to think of them. Clear my banks, and then ask Pu what the fleet wants."],
+	],
+	"done:s_p41_marsh": [
+		["Narrator", "Forty packs. The carp on the mud do not so much fight as thrash at whatever is nearest and wet. Behind them the reavers work the banks in threes, methodically, like men bringing in a harvest."],
+		["Yue Ling", "The fish were lying in heaps. Mouth to gill. Keeping one another damp. I thought it was the kindest thing I had ever seen, until I saw that none of them could move."],
+	],
+	"done:s_p41_reed": [
+		["Narrator", "Oar-Steward Pu unties two knots from the wall behind his counter and drops them in a jar. That, it appears, is the record. He says the Fleet-Mother will know by the sound."],
+		["Lin Feng", "They fed me again. I had not said I was hungry. I am beginning to think it is not about hunger."],
+	],
+	"done:s_p41_flutes": [
+		["Narrator", "Four flutes, cut and bored and laid on the banks to season for children who are not born yet. One is scorched at the end. Old Yan turns each to the light, blows a single note through it, and nods, and then weeps a little, and is not ashamed of it."],
+		["Fleet-Mother Lu Ting", "Go up to Cold Mountain. Their kitchen will feed you too, though it is gruel. Ask them where our water went. Ask kindly. They are not unkind. They are only very far up.", "bow"],
+	],
+	"s_p41_cold": [
+		["Narrator", "The Hermitage has a gate with no door in it and a kitchen with no cook. An old man in a patched robe is sweeping the kitchen floor toward the stove, in long strokes, with his whole back. Lin Feng knows the stroke. He has made it a thousand mornings."],
+		["Shide, Who Sweeps the Kitchen", "You hold a broom. No. You have held one. It is in how you stood in the door and looked at the corners first. Good. Then I need not explain myself to you. Everybody else thinks I am the servant."],
+		["Lin Feng", "Are you not?"],
+		["Shide, Who Sweeps the Kitchen", "Of course I am. That is why they do what I say. The Reeds wrote to your mountain? So did we. I did not write it. I swept toward the door one morning, and Fenggan took it to mean a letter.", "shrug"],
+		["Shide, Who Sweeps the Kitchen", "Hanshan wrote on the rocks where the water came out. Four springs, four poems. He walked into a cleft and it shut. Find what he wrote and you will know where the water was. I cannot read. I have always meant to learn."],
+	],
+	"done:s_p41_poems": [
+		["Narrator", "Four rubbings, ink on thin paper. Copyist Bo reads them out in the kitchen. \"I climb the road to Cold Mountain. The road to Cold Mountain never ends.\" The fourth is half under lichen, and stops in the middle of a line about water."],
+		["Yue Ling", "They are not about water. They are all about water. He stood at each spring and wrote about something else, and the something else was always running downhill."],
+	],
+	"done:s_p41_hermit": [
+		["Narrator", "Guest-Monk Fenggan does not write anything down. He goes into the kitchen and comes back. Shide, he reports, has swept twice toward the door. He says it as another man would say: the abbot is very pleased."],
+		["Lin Feng", "I was not paid. I know more than I did this morning and I could not tell you what. I think that was the wage."],
+	],
+	"done:s_p41_peak": [
+		["Narrator", "From the top of Cold Mountain the whole country is one piece. West, the grey shine of the marsh. East, a water that gives back no light. Further east, two ridges like a jaw. And under his feet four dry beds, parting, each going down to one of them."],
+		["Lin Feng", "It is one water. The Reeds drink it, the Gate counts it and the wolves tax it, and it starts here, where nobody owns anything."],
+		["Yue Ling", "And none of them has ever climbed up to look. Why would they? It always came."],
+	],
+	"done:s_p41_cliff": [
+		["Narrator", "Forty packs. The gibbons laugh as he did, three notes and a drop. The poems come off the rock faces in long grey strips and wrap round whatever passes, reciting themselves. One gets as far as its last line before it is cut, and seems content."],
+		["Shide, Who Sweeps the Kitchen", "Go down the east side. It is a crooked town. They will rob you, a little, and tell you so. I find I prefer it to towns that rob you and bow. Ask the woman with the book what the water is worth. She will have a figure.", "nod"],
+	],
+	"s_p41_black": [
+		["Narrator", "Ashmarket hangs red lanterns over a water that does not reflect them. Nobody asks Lin Feng his name. Somebody tries his sleeve before he has gone ten steps, deftly, and looks him in the eye while doing it, and smiles."],
+		["Ledger-Mistress Mo Chou", "You were robbed at the gate. Good. Now you have been greeted, and we can talk as people who know what the other is. I am Mo Chou. I keep the book. Every debt in the Rivers and Lakes is in it, and I have never once failed to collect."],
+		["Lin Feng", "You wrote to the mountain."],
+		["Ledger-Mistress Mo Chou", "I wrote to the mountain because the Reeds owe me nine years of water-rent they do not know they owe, the hermits sit on the source and will not sell, and the wolves charge my carts twice. I want it written down. All of it. In one book. Mine.", "point"],
+		["Ledger-Mistress Mo Chou", "I am crooked, sweeper, not false. I will tell you which of my work is foul before you take it. But first: there is a ledger loose in the reeds that has learned to lend, and my own collectors have gone after it on their own account. Clear my water."],
+	],
+	"done:s_p41_water": [
+		["Narrator", "Forty packs. The loose ledger opens to whatever page a man is afraid of. The collectors come on politely, hats in hand, and present a slip before they strike. In the black water the leeches do not swim so much as arrive."],
+		["Yue Ling", "One of them showed me a page with my name on it. A hundred years asleep, it said, at interest. I asked who I owed it to. It did not know. It had only been told to collect."],
+	],
+	"done:s_p41_gate": [
+		["Narrator", "Counting-Master Qian counts out the sum twice, once for Lin Feng and once for the book. It is exactly double what anybody else in that country would have paid. He waits to see whether Lin Feng will count it too, and is visibly pleased when he does."],
+		["Lin Feng", "He told me which of the tasks on his wall was foul, and why, and what it paid. I have been lied to more politely than that in upright towns."],
+	],
+	"done:s_p41_slips": [
+		["Narrator", "Four slips of black paper, each with a red thumbprint and a sum, and a small neat hole where the name was. Mo Chou lays them on the counter in a row and looks at them for a long time without touching the brush."],
+		["Ledger-Mistress Mo Chou", "A debt with no name on it. Do you know what that is? It is owed by whoever is nearest. That is not a debt. That is a famine. Somebody has been making famine out of my book. Go and look at the east road, and then at who is on it.", "think"],
+	],
+	"done:s_p41_carts": [
+		["Narrator", "Three raids. A salt wagon, a pedlar's handcart, the camp under the black hill. The carters of the Gate do not thank him, having been told not to. One of them leaves a jar of something on a milestone, and walks off very fast, and does not look back."],
+		["Yue Ling", "Every cart on this road is alone. The Reeds will not ride with the Gate's, the Gate will not pay the wolves, and the hermits do not own a cart. Four sects. One road. And everything that comes down off the hills knows it."],
+	],
+	"s_p41_wolf": [
+		["Narrator", "At Knifegate a rope is stretched across the road at the height of a man's chest. A boy sits beside it with a slate. He looks Lin Feng up and down, slowly, writes a figure, and shows it to the gate. The gate is opened. Nobody says why."],
+		["Banner-Lord Tuoba Lie", "The boy priced you higher than me. He is seldom wrong; I shall have to think about that. Sit. We say things to faces here. I wrote to your mountain because I am strong enough to hold this pass and not strong enough to make it rain."],
+		["Lin Feng", "You take a toll of every cart."],
+		["Banner-Lord Tuoba Lie", "I do. And for it nobody robs them between the two ridges. That was the bargain for nine generations. Now things come down off the rock that I did not send, and they take from carts that have paid me. That makes me a thief. I will not be a thief.", "point"],
+		["Banner-Lord Tuoba Lie", "The upright towns think me a beast. Perhaps. But a wolf does not pretend the lamb agreed. Clear my pass. Then ask Hu what the Banner wants. You will not be thanked. You will be paid at once, which is better."],
+	],
+	"done:s_p41_pass": [
+		["Narrator", "Forty packs. The kennel-wolves fight in silence, shoulder to shoulder. The riders who left the Banner still wear it, turned inside out. And twice a ridge of rock that had been a ridge of rock opens along its length and bites."],
+		["Yue Ling", "The riders who left him. I asked one why. He said: the Banner-Lord stopped taking from people who could not spare it. He said it as if it were a betrayal."],
+	],
+	"done:s_p41_banner": [
+		["Narrator", "Gate-Captain Hu slides the sum across the table without counting it and without looking up. Somebody in the long house moves along the bench to make room, an inch, also without looking up. In Knifegate this is a feast in his honour."],
+		["Lin Feng", "Nobody thanked me. I had not known how much of the day I spend being thanked. It is quieter without it."],
+	],
+	"done:s_p41_convoy": [
+		["Narrator", "Three more. By the third, a cart of the Reeds is drawn up behind a wagon of the Gate, and neither driver has remarked on it. A rider of the Banner sits his horse on the ridge above, where he can be seen, and does nothing, most carefully, for an hour."],
+		["Yue Ling", "They are riding together. They have not agreed to. They have each noticed that the others were going the same way. I do not think anybody will ever admit it happened."],
+		["Lin Feng", "The four of them are at Reedhaven. They have drawn something up. I am to sign it, I gather. Three of them brought pens."],
+	],
+	"s_p41_moot": [
+		["Narrator", "The landing at Reedhaven. Four bowls have been put into four pairs of hands. Mo Chou has counted the rice in hers. Tuoba Lie has finished his standing up. Shide is sweeping the far end of the landing, toward the water. On the table is a scroll with three seals and a gap."],
+		["Fleet-Mother Lu Ting", "It is a covenant. One league of the four gates. One roll of oaths, and every road kept by all four in turn. The Reeds would sign. We count people home; we should like more people to count them with us."],
+		["Ledger-Mistress Mo Chou", "The Gate would sign. A league is a ledger with a banner on it. Everything owed by anybody to anybody, written once, in a hand everybody has agreed to read. I have wanted it for thirty years."],
+		["Banner-Lord Tuoba Lie", "The Banner would rather keep the roads itself, all of them, for a toll, as it keeps the pass. One strong hand. You know what you are paying and who you are paying it to. But I will sign theirs if I am beaten to it.", "shrug"],
+		["Shide, Who Sweeps the Kitchen", "I cannot sign. I cannot write. But I climbed up to the top last night with a boy to carry the lamp. The four springs are not dry, sweeper. They are stopped. A slide of rock, at the cleft where he went in. It could be dug."],
+		["Narrator", "Nobody on the landing speaks. Three hundred years of ignoring one another, a covenant drawn up in a month, and all of it because of a rock. They look at the scroll. Then, all four, they look at Lin Feng."],
+	],
+	"done:s_p41_stands": [
+		["Narrator", "It stands on a bank of the marsh where the boats pass, and the boats slow to look at it. An old piper is sitting beside it with her feet in the water. She says it has only been there a week and already nobody can remember the bank without it."],
+		["Yue Ling", "The marsh is deeper than when we came. I can tell by where the reeds are wet. Whatever you answered, the water does not seem to have minded."],
+	],
+	"s_p41_end": [
+		["Narrator", "The river-boat comes in to Longmen on the evening water with her mat sail down. Up the nine hundred and ninety-nine steps, the spring under the pine is standing at the stone lip again, and Lin Feng does not need to bend to see his face in it."],
+		["Elder Qing Xuan", "It came back in the night. I heard it. I had forgotten the sound, child; one does not hear a thing that is always there. Four letters came by the same boat as you. I have not opened them. I should like you to tell me first."],
+		["Lin Feng", "Two upright towns and two crooked. I was fed in one before I was asked my name, and robbed in another, and told so to my face. I could not always have said which of them was the honest one."],
+		["Elder Qing Xuan", "No. I never could either. An upright town tells you what it wishes it were. A crooked one tells you what it is. A sect, child, is only a spring that people have agreed to stand round. Ours as well.", "nod"],
+		["Yue Ling", "They did not see us off. Not one of the four. We looked back from the boat and the landing was empty. I minded, for about a mile."],
+		["Elder Qing Xuan", "Then it was well done. When the water is in the lake again, the fish do not turn to thank the rain. Sit down, both of you. The pine wants looking at. It has had a dry year too, and never wrote to anybody."],
+	],
+	"pre:s_break46": [
+		["Narrator", "The cloud comes up the river, low, the colour of the marsh at dusk. It does not gather over the peak. It lies down over the whole mountain like water coming back into a bed, and the first bolt falls so softly that the disciples in the yard hold out their hands."],
+		["Lin Feng", "It is only rain. No. It is not only rain. Very well. I have been needed for a month. Let me see what it is like not to be."],
+	],
+	"post:s_break46": [
+		["Narrator", "The tribulation falls as rain falls on a lake, everywhere at once and on nothing in particular. When it is over nobody in the yard can say which bolt was the last. Lin Feng is standing in the spring to his ankles: Forgotten in the Lakes."],
+		["Yue Ling", "Forty-seven. I think. I lost count in the middle, and found I had stopped being afraid for you, and those two things happened at the same time."],
+		["Lin Feng", "Good. Forget the number. I should like to be somebody you do not have to count."],
 	],
 	"pre:s_break44": [
 		["Narrator", "The cloud that gathers over the peak has no colour to speak of. It is not black, or gold, or the violet of the last one. The disciples in the yard look up and cannot agree what to call it, and are still arguing when it begins."],

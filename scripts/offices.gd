@@ -89,6 +89,24 @@ const OFFICES := {
 		"I am the Reeve. There is nothing to reeve. I was chosen nine hundred years ago, by my grandfather's grandfather's lot, to see that the four streams stay four. They have.",
 		"We have no winter, so no granary; no thieves, so no watch; no quarrels over water, there being more than anybody wants. I keep a register of visitors. You are the fourth line.",
 		"Yu the Great stood where you are standing, wet to the knee and very cross, and asked the way to the flood. We told him. He said that it could not be so pleasant here and also true."]},
+	# ---- the Rivers and Lakes release: in the country of the sects a sect answers for its town, and whoever keeps
+	# its hall of tasks sits at the counter (sects.gd: what the sect wants done is asked for here)
+	"hall_reed": {"n": "Oar-Steward Pu of Reedhaven", "area": "yunmeng", "in": "reed_hall", "asset": "folk_fisher", "lines": [
+		"The Fleet-Mother steers. I count the oars. Forty boats went out last night and forty came home, which is the only sum this town has ever cared for.",
+		"You came down on the river-boat. Then you have eaten: nobody gets past the landing here without a bowl put in his hands. It is not charity. It is how we find out what a stranger is like.",
+		"What the Listening Reeds want done is on the wall behind me, in knots, since half the fleet cannot read. I will say them to you. Take one, do it, come and tell me, and we shall know your name."]},
+	"hall_cold": {"n": "Guest-Monk Fenggan of Clearbell", "area": "hanshan", "in": "guoqing_hall", "asset": "folk_monk", "lines": [
+		"I am the guest-monk. I rode in on a tiger once and have never been allowed to forget it. The tiger is in the kitchen. Shide feeds it gruel; it has given up meat out of embarrassment.",
+		"The Hermitage has no master. It has a kitchen, and a man who sweeps it, and when something must be decided everybody waits to see what he sweeps toward.",
+		"We pay nobody in spirit stones: there are none on this mountain. Do a thing the mountain wants and you will find you know something you did not. That is the wage. Some people are quite cross about it."]},
+	"hall_black": {"n": "Counting-Master Qian of Ashmarket", "area": "heishui", "in": "ledger_hall", "asset": "folk_merchant", "lines": [
+		"Name? No. We do not ask it and I advise you not to offer it. A name is the first thing a man pledges, and you would be surprised how little it fetches.",
+		"The Ledger-Mistress keeps the book. I keep the counter. Everything in Ashmarket has a price and every price is fair, because both parties agreed to it, and one of them was not hurried.",
+		"The Gate has work for hands that do not shake. Some of it is clean, and pays. Some of it is the other kind, and pays better. I shall tell you which is which. We are crooked here, not dishonest."]},
+	"hall_wolf": {"n": "Gate-Captain Hu of Knifegate", "area": "langya", "in": "banner_hall", "asset": "folk_guard", "lines": [
+		"You were priced at the rope. High. That is why you are in here talking and not out there paying. Do not be flattered: a price is only what it would cost us to take it.",
+		"The Banner-Lord is Banner-Lord because nobody has put him on his back. When somebody does, there will be another, and we shall follow that one. There is no law in Knifegate you could not learn in a morning.",
+		"The Banner gives work to the strong, pays at once, and does not say thank you. If you want thanks, go back west to the reed-pipers. If you want to be told the truth to your face, sit down."]},
 	# ---- the Son of Heaven and his Empress, where the Nine Cauldrons are
 	"emperor": {"n": "The Son of Heaven", "area": "tushan", "in": "cauldron_hall", "asset": "folk_scholar", "lines": [
 		"We are the Son of Heaven. You need not kneel; the floor is cold, and the last man who knelt had to be helped up by the Empress. Whoever holds the Nine Cauldrons holds the Mandate, and nobody has wanted them moved.",
@@ -102,7 +120,7 @@ const OFFICES := {
 		"If you want a thing done, child, ask a hearth. If you want it remembered, come to us. We are very good at remembering; it is all we have been let do."]},
 }
 const ORDER := ["master_discipline", "master_outer", "treasurer", "head_qingshi", "post_cloudfoot", "reeve_well", "harbour_longmen", "guild_tushan", "warden_yanggu",
-	"speaker_featherfall", "reeve_tearwater", "registrar_youdu", "reeve_landfall", "moorer_lightfoot", "reeve_fourstreams", "emperor", "empress"]
+	"speaker_featherfall", "reeve_tearwater", "registrar_youdu", "reeve_landfall", "moorer_lightfoot", "reeve_fourstreams", "hall_reed", "hall_cold", "hall_black", "hall_wolf", "emperor", "empress"]
 
 ## The trades of a town, by what the ground floor of a house is used for (rooms.gd USES): what the
 ## shift is, how many hours of the day it takes, what it pays (a share of `wage`), and what is said

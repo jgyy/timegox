@@ -321,6 +321,10 @@ static func outlaw(g) -> bool:
 
 ## How he stands in town `tid`: 0 a clean name there, 1 wanted, 2 an outlaw.
 static func standing(g, tid: String) -> int:
+	# (the Rivers and Lakes release, sides.gd: nobody in a crooked town reads a bill: no price hangs at its gate,
+	# no watch comes, and nothing a wanted man is shut out of is shut there)
+	if Sides.lawless(tid):
+		return 0
 	if outlaw(g):
 		return 2
 	return 1 if price(g, tid) > 0 else 0
@@ -448,6 +452,9 @@ static func watch_due(g, area: String) -> Dictionary:
 		return {}
 	var tid := Weal.town_of(area)
 	if tid == "" or str(Weal.TOWNS[tid].area) != area or int(g.watch_day.get(tid, -1)) == int(g.day):
+		return {}
+	# (the Rivers and Lakes release, sides.gd: a crooked town keeps no watch)
+	if Sides.lawless(tid):
 		return {}
 	var owed := price(g, tid)
 	if outlaw(g):

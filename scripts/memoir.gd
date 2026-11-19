@@ -258,6 +258,19 @@ const PAGES := {
 		"The child played me at leaves on the top step, and I lost, and I swept. It took me until dusk. I am told the corners are better than last month. I am told this by Du, who has no right to an opinion on corners.",
 		"I made a rule seventy years ago: one heart, one road. I made it because I had seen a boy tear himself in two trying to be a swordsman for his father and a healer for his mother. I did not make it because it was true.",
 		"The child walks two, and is whole, and slower, and does not ask me which is the road. An old keeper of monkeys says it is seven acorns either way. I have been furious about three in the morning for most of my life. I should like, tonight, to be delighted."]},
+	# Part XLI (the Rivers and Lakes release)
+	"p41_bowl": {"n": "The Bowl at the Landing", "who": "lin", "after": "s_p41_boat", "lines": [
+		"They put a bowl in my hands before the boat had stopped. I looked for whoever I was to thank, and there was nobody: only a landing full of people getting on with it.",
+		"I have been fed by Granny Wen because I was hers, and by the mountain because I swept it. I had never been fed by people who did not yet know whether I was worth it. They were finding out by watching me eat.",
+		"I ate all of it. I looked at who had not got one. I did not know I was being read. I should like to think I would have done the same if I had."]},
+	"p41_crooked": {"n": "Robbed, and Told So", "who": "yue", "after": "s_p41_black", "lines": [
+		"You were robbed at the gate of Ashmarket and you laughed. I want that written down by somebody other than you. The boy looked you in the eye with his hand in your sleeve, and you laughed, and he gave some of it back.",
+		"I have slept a hundred years in an upright sect, and been lied to by it every one of them, kindly, for my own good. Nobody in that black town told me anything that was not so. I did not like it there. I should not like you to think that I did.",
+		"But I shall tell you what I learned in it. I had thought upright and honest were one word. They are two. You are both. Most places manage one."]},
+	"p41_last": {"n": "Not Seen Off", "who": "lin", "after": "s_break46", "lines": [
+		"Nobody saw us off. Four sects, a month of my life, and the landing was empty when the boat pulled out. Yue Ling minded for a mile. I minded for about as long as it takes to say so.",
+		"I have wanted to be needed since I was six years old with a broom too tall for me. This month I was needed by everybody at once. It is like being the only dry stone in a ford. Everything stands on you, and nothing stays.",
+		"The water is back. They have forgotten me already; I could see them doing it from the boat. I think that is the best work I have done. I should not like to have to do it often."]},
 	"p38_last": {"n": "In My Own Hand", "who": "lin", "after": "s_break43", "lines": [
 		"These pages were her idea. She said a story told only from over somebody's shoulder is a story about a back. So here is the front of it.",
 		"I am Lin Feng. I swept steps. I was handed a root I did not earn and a companion I did not deserve, and I climbed until there was nobody above me, and then three people walked down a mountain and there was.",
@@ -267,7 +280,7 @@ const ORDER := ["p01_post", "p01_broom", "p01_gate", "p02_emperor", "p03_hollow"
 	"p13_gates", "p14_karma", "p15_woven", "p16_year", "p17_spring", "p18_fire", "p19_works", "p20_hollow", "p21_arms", "p22_roads", "p23_host", "p24_horse", "p25_town", "p26_springs", "p27_sack",
 	"p28_grass", "p29_chimney", "p30_net", "p31_shoe", "p32_mirror", "p33_pestle", "p34_road", "p35_block", "p36_fish", "p37_round",
 	"p38_word", "p38_fuchai_down_lin", "p38_fuchai_down_yue", "p38_fuchai_up_lin", "p38_pang_down_lin", "p38_pang_down_yue", "p38_pang_up_lin",
-	"p38_lian_down_lin", "p38_lian_down_yue", "p38_lian_up_lin", "p38_lian_won_lin", "p38_low", "p38_last", "p39_ring", "p39_paper", "p39_last", "p40_leaves", "p40_two", "p40_last"]
+	"p38_lian_down_lin", "p38_lian_down_yue", "p38_lian_up_lin", "p38_lian_won_lin", "p38_low", "p38_last", "p39_ring", "p39_paper", "p39_last", "p40_leaves", "p40_two", "p40_last", "p41_bowl", "p41_crooked", "p41_last"]
 
 static var _by_step := {}
 

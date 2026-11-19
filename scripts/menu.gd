@@ -28,10 +28,10 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Root & Rites", "In Their Own Words", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "The Land", "The Way", "The Law", "The Wild", "The Almanac", "Bestiary", "World Map", "Annals", "Seals & Lists", "Leaves", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "rites", "words", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "land", "way", "law", "wild", "almanac", "bestiary", "map", "annals", "seals", "leaves", "resume"]
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Root & Rites", "In Their Own Words", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "The Land", "The Way", "The Law", "The Wild", "The Almanac", "Bestiary", "World Map", "Annals", "Seals & Lists", "Leaves", "The Sects", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "rites", "words", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "land", "way", "law", "wild", "almanac", "bestiary", "map", "annals", "seals", "leaves", "sects", "resume"]
 		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, true, true, Game.companion or Game.bond > 0,
-			Game.dao != "" or not Game.met.is_empty(), Game.prologue == "", not Game.pages.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, Game.done(Seals.OPEN), Game.prologue == "", true]
+			Game.dao != "" or not Game.met.is_empty(), Game.prologue == "", not Game.pages.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, Game.done(Seals.OPEN), Game.prologue == "", Game.prologue == "", true]
 	elif mode == "bestiary":
 		labels = []
 		ids = []
@@ -67,7 +67,7 @@ func _build() -> void:
 		labels.append("Back")
 		ids.append("back")
 		enabled.append(true)
-	elif mode == "way" or mode == "almanac" or mode == "wild" or mode == "seals":
+	elif mode == "way" or mode == "almanac" or mode == "wild" or mode == "seals" or mode == "sects":
 		# creed.gd, almanac.gd, wilds.gd: a page to read
 		labels = ["Back"]
 		ids = ["back"]
@@ -267,7 +267,7 @@ func press(act: String) -> void:
 				var k := ls.find(map_layer)
 				map_layer = ls[(k + (1 if act == "right" else -1) + ls.size()) % ls.size()]
 		"cancel":
-			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words", "seals", "leaves"]:
+			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words", "seals", "leaves", "sects"]:
 				mode = "root"
 				cursor = 0
 				_build()
@@ -361,7 +361,7 @@ func press(act: String) -> void:
 				"forbidden":
 					main.pop()
 					main.open_forbidden()
-				"works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words", "seals", "leaves":
+				"works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words", "seals", "leaves", "sects":
 					mode = id
 					cursor = 0
 					msg = ""
@@ -751,6 +751,42 @@ func _draw_rites() -> void:
 			UI.text(self, Vector2(r.position.x + 660, y), "performed%s" % ("" if times == 1 else " %d times" % times), 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, 120.0)
 
 ## The Wild (wilds.gd): how the countries he has hunted in stand, and what that is doing to the towns.
+## The Sects (the Rivers and Lakes release, sects.gd, sides.gd): his own and the four down the river: what each
+## is called, which side its town is on, how he stands with it, its three sayings and its way, and how much of
+## what hangs on its wall he has done; and, under them, how the roads stand (raids.gd, traffic.gd).
+func _draw_sects() -> void:
+	UI.text(self, Vector2(60, 70), "The Sects", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 16)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	UI.text(self, r.position + Vector2(24, 40), "The sects of the land and of the Rivers and Lakes", 20, UI.C_GOLD)
+	var y := r.position.y + 62.0
+	for pg in Sects.page(Game):
+		var known: bool = not (pg.creed as Array).is_empty()
+		draw_rect(Rect2(r.position.x + 24, y + 2, 6, 78), pg.col if known else UI.C_DIM.darkened(0.3))
+		UI.text(self, Vector2(r.position.x + 40, y + 18), str(pg.n), 17, pg.col if known else UI.C_DIM)
+		if known:
+			var side := str(Sides.NAMES.get(str(pg.side), ""))
+			UI.text(self, Vector2(r.position.x + 330, y + 18), side if str(pg.id) != "azure" else "His own", 13, UI.C_JADE if str(pg.side) == "upright" else UI.C_RED)
+			UI.text(self, Vector2(r.position.x + 470, y + 18), main.told(str(pg.rank)), 13, UI.C_TEXT)
+			if int(pg.of) > 0:
+				UI.text(self, Vector2(r.position.x + 680, y + 18), "%d of %d tasks" % [int(pg.done), int(pg.of)], 13, UI.C_GOLD if int(pg.done) > 0 else UI.C_DIM)
+			UI.text(self, Vector2(r.position.x + 40, y + 38), "  ".join((pg.creed as Array).map(func(c): return "\"%s\"" % str(c))), 12, UI.C_DIM.lightened(0.3), HORIZONTAL_ALIGNMENT_LEFT, 740)
+		UI.wrapped(self, Vector2(r.position.x + 40, y + 48), main.told(str(pg.custom)), 12, UI.C_DIM.lightened(0.15) if known else UI.C_DIM, r.size.x - 70)
+		y += 92.0
+	y += 6.0
+	UI.text(self, Vector2(r.position.x + 24, y + 10), "The roads", 17, UI.C_GOLD)
+	var lay := str(main.world.layer)
+	var road := "No raid has been seen on any road yet." if not Raids.open(Game) else "%d raids broken (%d of them by his coming alone). In this realm %d stand now, at the camp fires and where the high road leaves the towns behind." % [Game.raids_broken, Game.raids_fled, Raids.standing(Game, lay) if lay in Atlas.LAYERS else 0]
+	if lay in Atlas.LAYERS:
+		var cs: Dictionary = Traffic.census(lay)
+		var bits: Array = []
+		for k in Traffic.ORDER:
+			if cs.has(k):
+				bits.append("%d %s" % [int(cs[k]), str(Traffic.KINDS[k].n).trim_prefix("a ").trim_prefix("an ").trim_prefix("the ")])
+		road += " On its roads: %s." % (", ".join(bits) if not bits.is_empty() else "nothing, for it has no road")
+	UI.wrapped(self, Vector2(r.position.x + 24, y + 20), main.told(road), 13, UI.C_TEXT, r.size.x - 48)
+
 func _draw_wild() -> void:
 	UI.text(self, Vector2(60, 70), "The Wild", 22, UI.C_GOLD)
 	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 16)
@@ -1267,6 +1303,7 @@ const MAP_NAMES := {
 	"juntian": "Juntian", "changhe": "Changhe", "ninesprings": "The Nine Springs", "youdu": "Youdu",
 	"penglai": "Penglai", "fangzhang": "Fangzhang", "yingzhou": "Yingzhou", "guixu": "Guixu",
 	"huaxu": "Huaxu", "zhongbei": "Zhongbei", "gumang": "Gumang", "fuluo": "Fuluo",
+	"yunmeng": "Yunmeng", "hanshan": "Cold Mountain", "heishui": "Black Water", "langya": "Wolf-Tooth Pass",
 }
 
 ## The whole open world, the Unbroken Land within the Four Seas: every region in its own colours and
@@ -1712,6 +1749,9 @@ func _draw() -> void:
 		return
 	if mode == "leaves":
 		_draw_leaves()
+		return
+	if mode == "sects":
+		_draw_sects()
 		return
 	if mode == "rites":
 		_draw_rites()

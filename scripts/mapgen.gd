@@ -30,6 +30,7 @@ const DENSITY := {
 	"juntian": 0.22, "changhe": 0.22, "ninesprings": 0.26, "youdu": 0.2,
 	"penglai": 0.2, "fangzhang": 0.24, "yingzhou": 0.26, "guixu": 0.22,
 	"huaxu": 0.2, "zhongbei": 0.22, "gumang": 0.24, "fuluo": 0.24,
+	"yunmeng": 0.2, "hanshan": 0.26, "heishui": 0.24, "langya": 0.26,
 }
 
 ## themes with scattered water (noise threshold: lower = rarer)
@@ -279,7 +280,9 @@ static func ladder_ends(id: String) -> Array:
 	var out: Array = []
 	for ld in Data.LADDERS:
 		for e in ["a", "b"]:
-			if ld[e][0] == id:
+			# (the Rivers and Lakes release: an end that is "late" is stood by Atlas last of all, on whatever open
+			# ground is left near the tile written for it: nothing of its region's own map is made for it)
+			if ld[e][0] == id and str(ld.get("late", "")) != e:
 				out.append([ld[e][1], ld[e][2], ld, e])
 	return out
 

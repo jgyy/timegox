@@ -151,6 +151,15 @@ const ECO := {
 		"ground": [["spiderlily", 0.8], ["deadbush", 0.4]], "land": 0.35, "rocks": ["slab", "spire"], "rock_p": 0.06, "grass": 0.25, "cover": 0.06},
 	"fuluo": {"canopy": [["acacia", 3], ["cactus", 1], ["dead", 1]], "under": [["agave", 2], ["deadbush", 2]],
 		"ground": [["agave", 1], ["deadbush", 1]], "land": 0.4, "rocks": ["boulder", "spire", "scree"], "rock_p": 0.12, "grass": 0.2, "cover": 0.05},
+	# the Rivers and Lakes release
+	"yunmeng": {"canopy": [["willow", 4], ["marsh_dead", 1], ["mangrove", 1], ["bamboo", 1]], "under": [["reeds", 5], ["bush", 1], ["fern", 1]],
+		"ground": [["reeds", 3], ["flowers", 0.5]], "land": 0.55, "rocks": ["boulder"], "rock_p": 0.03, "grass": 0.7, "cover": 0.1},
+	"hanshan": {"canopy": [["snowpine", 4], ["pine", 2], ["fir", 1], ["bonsai", 1]], "under": [["snowbush", 3], ["round_bush", 1]],
+		"ground": [["snowbush", 1]], "land": 0.5, "rocks": ["boulder", "slab", "spire"], "rock_p": 0.1, "grass": 0.3, "cover": 0.08},
+	"heishui": {"canopy": [["dead", 3], ["marsh_dead", 2], ["cypress", 1]], "under": [["deadbush", 3], ["spiderlily", 1]],
+		"ground": [["spiderlily", 0.8], ["deadbush", 0.6]], "land": 0.4, "rocks": ["slab", "boulder"], "rock_p": 0.06, "grass": 0.25, "cover": 0.06},
+	"langya": {"canopy": [["pine", 2], ["dead", 2], ["acacia", 1], ["cypress", 1]], "under": [["deadbush", 3], ["agave", 1]],
+		"ground": [["deadbush", 1], ["agave", 0.5]], "land": 0.4, "rocks": ["boulder", "spire", "scree"], "rock_p": 0.14, "grass": 0.25, "cover": 0.05},
 }
 
 static var _grass := {}

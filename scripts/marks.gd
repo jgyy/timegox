@@ -287,6 +287,15 @@ const MARKS := {
 		"ask": {"area": "terraces", "m": ["roads", "ask"], "k": 3, "n": "The Tables of Seven", "desc": "A low stone table at a turn of the path between the tea, with seven acorns on it in two heaps. Whoever passes moves one from heap to heap, as they please. It has been three and four, and four and three, and nobody has yet found a way to make it eight.",
 			"who": ["Mian, Guest of the Heart", "folk_youth", Color("6a8a4a"), "I am the one who missed, Senior. I am a guest on the Heart until autumn. In autumn I must lay one down or ask again. I find I practise both as if I were to lose them.", "The pickers move an acorn every time they pass. I asked one why. She said: so that it is mine for the morning. Then her sister moved it back.", "Hall Master Shen says the rule has not changed. I have a second road, Senior, and the rule has not changed. I have stopped trying to see how. I think that is the lesson."]},
 	},
+	# Part XLI (the Rivers and Lakes release): what four sects on the mud did when one hand was offered them
+	"the_covenant": {
+		"bind": {"area": "yunmeng", "m": ["covenant", "bind"], "k": 3, "n": "The Oath-Posts", "desc": "A post of marsh oak driven into the bank, with four cords knotted round it in four colours: green for the Reeds, grey for the mountain, black for the Gate, red for the Banner. Each sect's riders retie their own cord as they pass, tighter than the last.",
+			"who": ["Clerk Wen of the Covenant", "folk_scholar", Color("5a6a8a"), "I am the clerk of the league. There was no clerk a month ago, and no league, and I was a copyist of rock poems who was owed two months' gruel.", "Four colours on one post. The hermits tie theirs loose, on purpose. The Banner's is tied so tight the oak is cut. Nobody has untied anybody else's. I check every morning.", "I have a roll with nine hundred oaths on it. I do not know yet whether that is a great many people who trust one another, or a great many who do not."]},
+		"dig": {"area": "yunmeng", "m": ["covenant", "dig"], "k": 3, "n": "The Four Spades", "desc": "Four spades stood upright in the bank where a stream comes back into the marsh: a boatman's, a kitchen shovel, a small one with a lacquered handle, and one with a blade like an axe. Nobody has come back for them. The stream runs between.",
+			"who": ["Old Diver Cen", "folk_fisher", Color("4a7a7a"), "I heard it come back. Four in the morning; I thought it was rain, and it was the stream. I have not heard that bed speak since I was a girl.", "They left their spades. All four. Walked off down four roads and did not look round. I asked the hermit should I send them on. He said: to whom?", "The Gate's woman dug in silk gloves. I found one in the reeds. I have kept it. I do not suppose she will write for it."]},
+		"toll": {"area": "yunmeng", "m": ["covenant", "toll"], "k": 3, "n": "The Toll-Ropes", "desc": "Two posts either side of the track along the bank, a rope between them at the height of a man's chest, and a stool beside it with a slate. The rope has a strip of red cloth tied at the middle so that carters see it by dusk. The grass is worn bare on both sides.",
+			"who": ["The Girl with the Slate", "folk_maiden", Color("b85a3a"), "Four coppers. No, that is your price. I have looked at you. It is not for arguing; if it were for arguing it would be a market.", "I price everybody. The Fleet-Mother was three. She gave me a bowl of fish and I still wrote three. She laughed. Nobody at home laughs when I write it.", "Nothing has been taken on this bank since the rope went up. Not a hen. I am told to say so to people who complain. I would say so anyway. It is true."]},
+	},
 	# Part XXXVIII (the Higher Sky release): what the sect teaches about those above it
 	"the_higher_sky": {
 		"gall": {"area": "mountain", "m": ["sky", "gall"], "k": 3, "n": "The Galls of the Outer Court", "desc": "A post as high as a seated man's head with a crossbar, and on the crossbar a dried gall on a loop of hemp, at exactly the height of a mouth. A board under it has three names on it, and room left for more.",
@@ -929,6 +938,40 @@ static func model(sp: Dictionary, i: int = 0) -> Node3D:
 						var k40 := r40 if left else r40 - morn
 						b.ball(Vector3((-0.22 if left else 0.2) + 0.07 * float(k40 % 2), 0.425, -0.06 + 0.065 * float(k40 / 2)), 0.03, MB.tag(Color("8a6a34"), MB.WOOD), true)
 						b.ball(Vector3((-0.22 if left else 0.2) + 0.07 * float(k40 % 2), 0.45, -0.06 + 0.065 * float(k40 / 2)), 0.022, MB.tag(Color("4a3a20"), MB.WOOD), true)
+		"covenant":
+			# what four sects on the mud did (the Rivers and Lakes release): a post with four cords, four spades by a
+			# stream that has come back, or a rope across the track with a stool and a slate
+			match str(a[1]):
+				"bind":
+					b.cyl(Vector3(0, 0.75, 0), 0.09, 1.5, wd, Vector3.ZERO, 8)
+					b.cone(Vector3(0, 1.56, 0), 0.1, 0.14, w, Vector3.ZERO, 8)
+					var cords := [Color("5a9a5a"), Color("9aa0b0"), Color("2a262c"), Color("b8382a")]
+					for c41 in 4:
+						var cy := 0.55 + 0.2 * float((c41 + i) % 4)
+						b.torus(Vector3(0, cy, 0), 0.1, 0.018, MB.tag(cords[c41], MB.CLOTH), Vector3.ZERO)
+						b.limb(Vector3(0.1, cy, 0.02 * float(c41)), Vector3(0.14 + 0.02 * float(c41), cy - 0.22, 0.04 * float(c41)), 0.012, 0.008, MB.tag(cords[c41], MB.CLOTH), 4)
+				"dig":
+					var blades := [Color("6a6a70"), Color("4a4a50"), Color("8a8a90"), Color("5a5a60")]
+					var hafts := [Color("8a6a3a"), Color("6a5a40"), Color("7a2a22"), Color("4a3a2a")]
+					for c41 in 4:
+						var sx := -0.5 + 0.34 * float(c41)
+						var lean := 0.08 * float((c41 + i) % 3 - 1)
+						b.limb(Vector3(sx, 0.1, 0.25 * float(c41 % 2) - 0.1), Vector3(sx + lean, 1.15 - 0.1 * float(c41 % 2), 0.25 * float(c41 % 2) - 0.1), 0.022, 0.02, MB.tag(hafts[c41], MB.WOOD), 5)
+						b.box(Vector3(sx, 0.08, 0.25 * float(c41 % 2) - 0.1), Vector3(0.16 + 0.04 * float(c41 % 2), 0.22, 0.02), MB.tag(blades[c41], MB.METAL))
+					# the stream between them
+					g.disc(Vector3(0, 0.02, 0.5), 0.5, Color(0.5, 0.75, 0.85, 0.5), 12, Color(0.5, 0.75, 0.85, 0.0))
+				_:
+					for sx2 in [-0.8, 0.8]:
+						b.cyl(Vector3(sx2, 0.7, 0), 0.06, 1.4, wd, Vector3.ZERO, 6)
+						b.cone(Vector3(sx2, 1.46, 0), 0.07, 0.1, w, Vector3.ZERO, 6)
+					b.limb(Vector3(-0.8, 1.22, 0), Vector3(0, 1.14, 0), 0.016, 0.016, MB.tag(Color("b8a070"), MB.CLOTH), 4)
+					b.limb(Vector3(0, 1.14, 0), Vector3(0.8, 1.22, 0), 0.016, 0.016, MB.tag(Color("b8a070"), MB.CLOTH), 4)
+					b.box(Vector3(0, 1.02, 0), Vector3(0.06, 0.22, 0.01), MB.tag(Color("b8382a"), MB.CLOTH))
+					# the stool, and the slate on it
+					b.cyl(Vector3(1.15, 0.2, 0.2), 0.14, 0.04, w, Vector3.ZERO, 8)
+					for lg in 3:
+						b.limb(Vector3(1.15 + cos(lg * 2.1) * 0.1, 0.18, 0.2 + sin(lg * 2.1) * 0.1), Vector3(1.15 + cos(lg * 2.1) * 0.14, 0.0, 0.2 + sin(lg * 2.1) * 0.14), 0.015, 0.012, wd, 4)
+					b.box(Vector3(1.15, 0.24, 0.2), Vector3(0.16, 0.012, 0.12), MB.tag(Color("3a3a40"), MB.STONE), Vector3(0, 0.3 * float(i % 3), 0))
 		"seal":
 			# what the column beside the Roll is for (the Red Seal release): a desk with its red cloth and what the
 			# last sitter left, a post with one sentence and its cuts, or washed leaves pegged on a line

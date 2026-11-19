@@ -639,7 +639,7 @@ func _init() -> void:
 	check(Data.layer_of("juntian") == "heaven" and Data.layer_of("changhe") == "heaven" and Data.layer_of("ninesprings") == "under" and Data.layer_of("youdu") == "under", "two regions float in the Nine Heavens and two lie in the Nine Springs")
 	check(Atlas.layer_y("heaven") > 60.0 and Atlas.layer_y("under") < -40.0, "the Nine Heavens are drawn high above the land and the Nine Springs deep below it")
 	var ladders_seen := {}
-	for lid in ["heaven", "under", "sea"]:
+	for lid in ["heaven", "under", "sea", "lakes"]:
 		var lw := Atlas.world_of(lid)
 		var lreach := MapGen.flood(lw.grid, lw.w, lw.h, lw.start)
 		var lcut := 0
@@ -1222,6 +1222,10 @@ func _init() -> void:
 			var marching8 := {}
 			for pe8 in band8.get("pool", []):
 				marching8[pe8[0]] = true
+			# (the Rivers and Lakes release: in a country that was made for its chapter the hunt is for what lives there)
+			if Data.layer_of(str(st8.area)) == "lakes" and not st8.has("cave"):
+				for pe8l in Data.AREAS[st8.area].get("pool", []):
+					marching8[pe8l[0]] = true
 			# (Part XXII: a region's second band, for a later chapter)
 			if not st8.has("cave"):
 				for pe8b in Data.AREAS[st8.area].get("warband2", {}).get("pool", []):
@@ -5264,7 +5268,7 @@ func _thundering_pots() -> void:
 		check(Feats.need(f.test) >= 1.0 and Feats.value(MG, f.test) >= 0.0 and (str(f.test[0]) != "step" or Data.step_index(str(f.test[1])) >= 0), "feat %s measures something that can be counted" % fid)
 	check(Feats.FEATS.size() >= 75 and kinds_f.size() == Feats.KIND_ORDER.size() and Feats.order().size() == Feats.FEATS.size(), "%d feats of nine kinds" % Feats.FEATS.size())
 	# what a feat asks for is there to be done
-	check(Feats.need(Feats.FEATS.two_roads.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
+	check(Feats.need(Feats.FEATS.in_the_lakes.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
 		and Feats.need(Feats.FEATS.every_thread.test) == Fashion.OUTFIT_ORDER.size() and Feats.need(Feats.FEATS.her_dresses.test) <= Fashion.YUE_ORDER.size() and Feats.need(Feats.FEATS.egg_all.test) == Eggs.ORDER.size()
 		and Feats.need(Feats.FEATS.war_all.test) == War.BATTLE_ORDER.size() and Feats.need(Feats.FEATS.heard_all.test) <= Music.count() and Feats.need(Feats.FEATS.host_full.test) <= War.ORDER.size()
 		and Feats.need(Feats.FEATS.airs_six.test) == Music.AIRS.size() and Feats.need(Feats.FEATS.works_twelve.test) < Works.ORDER.size() and Feats.need(Feats.FEATS.arms_eight.test) == Arms.ORDER.size()
@@ -6410,7 +6414,7 @@ func _answering_land() -> void:
 	var G = load("res://scripts/game.gd").new()
 	G.reset()
 	G.started = true
-	check(Weal.ORDER.size() == 13 and Weal.ORDER.size() == Weal.TOWNS.size(), "thirteen towns are weighed")
+	check(Weal.ORDER.size() == 17 and Weal.ORDER.size() == Weal.TOWNS.size(), "seventeen towns are weighed")
 	var heard := {}
 	for tid in Weal.ORDER:
 		var t: Dictionary = Weal.TOWNS[tid]
@@ -7626,7 +7630,7 @@ func _open_net() -> void:
 					check(str(fp31.n).begins_with("Big Brother ") or str(fp31.n).begins_with("Big Sister "), "%s is called as the Great People are" % fp31.n)
 					check(bool(fp31.fem) == (str(fp31.body) == "folk_giantess"), "%s: a woman of theirs is a woman" % fp31.n)
 					check(not Folk.day_of(Atlas.world_of(layer31), fp31).is_empty(), "%s has a day" % fp31.n)
-	check(giants_n == 16, "sixteen of the Great People live in the towns (%d)" % giants_n)
+	check(giants_n == 21, "twenty-one of the Great People live in the towns (%d)" % giants_n)
 	check(Folk.ROLES.has("giant") and Folk.LINES.giant.size() >= 4 and Folk.TITLES.has("giant") and Crime.ARMED.has("giant"), "the giant: a day, a title, six things to say, and nobody's easy mark")
 	for ln31 in Giants.LINES + Giants.LINES_SMALL:
 		check(fits.call(str(ln31).replace("%s", "Daoist friend")), "a line of the Great People fits the box")
@@ -8119,7 +8123,7 @@ func _open_net() -> void:
 	check(Crime.is_child({"kind": "npc", "id": "li_bai", "n": "Li Bai", "asset": "li_bai"}), "nobody draws on a schoolboy")
 	for fid33 in ["practised_hand", "same_length", "by_the_door", "told_true", "parted_whole"]:
 		check(Feats.FEATS.has(fid33), "the feat %s is kept" % fid33)
-	check(not str(Feats.FEATS.parted_whole.desc).contains("last realm") and not str(Feats.FEATS.practised_hand.desc).contains("last realm") and not str(Feats.FEATS.sleeves_of_wind.desc).contains("last realm") and not str(Feats.FEATS.uncarved_block.desc).contains("last realm") and not str(Feats.FEATS.light_hand.desc).contains("last realm") and not str(Feats.FEATS.five_in_one.desc).contains("last realm") and not str(Feats.FEATS.low_as_sea.desc).contains("last realm") and not str(Feats.FEATS.no_name.desc).contains("last realm") and str(Feats.FEATS.two_roads.desc).contains("last realm"), "only the last realm is called the last")
+	check(not str(Feats.FEATS.parted_whole.desc).contains("last realm") and not str(Feats.FEATS.practised_hand.desc).contains("last realm") and not str(Feats.FEATS.sleeves_of_wind.desc).contains("last realm") and not str(Feats.FEATS.uncarved_block.desc).contains("last realm") and not str(Feats.FEATS.light_hand.desc).contains("last realm") and not str(Feats.FEATS.five_in_one.desc).contains("last realm") and not str(Feats.FEATS.low_as_sea.desc).contains("last realm") and not str(Feats.FEATS.no_name.desc).contains("last realm") and not str(Feats.FEATS.two_roads.desc).contains("last realm") and str(Feats.FEATS.in_the_lakes.desc).contains("last realm"), "only the last realm is called the last")
 	for src33 in ["Fangyu Shenglan", "Miscellaneous Records of the Western Capital", "Ouyang Xiu", "Book of Jin"]:
 		check(FileAccess.get_file_as_string("res://scripts/lore.gd").contains(src33), "the chapter's tales are told from where they are written: %s" % src33)
 
@@ -8375,7 +8379,7 @@ func _open_net() -> void:
 	check(Trials.need_met(["rites", 2], TN35) and not Trials.need_met(["rites", 3], TN35) and Trials.KINDS.has("rite") and Trials.need_text(["rites", 2], TN35).contains("2"), "trials can be passed by the rite")
 	TN35.free()
 	var c35: Dictionary = Echoes.CROSSROADS.get("the_stone", {})
-	check(not c35.is_empty() and str(c35.step) == "s_p35_gate" and str(c35.part) == "XXXV" and Echoes.ORDER[Echoes.ORDER.size() - 6] == "the_stone" and fits.call(str(c35.ask)), "what the stone is for is asked last of its chapter")
+	check(not c35.is_empty() and str(c35.step) == "s_p35_gate" and str(c35.part) == "XXXV" and Echoes.ORDER[Echoes.ORDER.size() - 7] == "the_stone" and fits.call(str(c35.ask)), "what the stone is for is asked last of its chapter")
 	check((c35.options as Array).size() == 3 and c35.after.size() == 3 and c35.end.size() == 3 and c35.echo.has("s_p35_end") and c35.echo.s_p35_end.size() == 3 and Data.step_index("s_p35_end") > Data.step_index("s_p35_gate"), "the_stone: three answers, each answered, echoed and told at the end")
 	var scales35 := {}
 	for o35 in c35.options:
@@ -8548,7 +8552,7 @@ func _open_net() -> void:
 	check(Trials.need_met(["cooked", 2], TN36) and not Trials.need_met(["cooked", 3], TN36) and Trials.need_met(["light", 3], TN36) and not Trials.need_met(["light", 4], TN36) and Trials.KINDS.has("pot") and Trials.KINDS.has("light") and Trials.need_text(["cooked", 2], TN36).contains("2"), "trials can be passed by the pot and by the light hand")
 	TN36.free()
 	var c36: Dictionary = Echoes.CROSSROADS.get("the_ladle", {})
-	check(not c36.is_empty() and str(c36.step) == "s_p36_table" and str(c36.part) == "XXXVI" and Echoes.ORDER[Echoes.ORDER.size() - 5] == "the_ladle" and fits.call(str(c36.ask)), "what a strong hand is for is asked last of its chapter")
+	check(not c36.is_empty() and str(c36.step) == "s_p36_table" and str(c36.part) == "XXXVI" and Echoes.ORDER[Echoes.ORDER.size() - 6] == "the_ladle" and fits.call(str(c36.ask)), "what a strong hand is for is asked last of its chapter")
 	check((c36.options as Array).size() == 3 and c36.after.size() == 3 and c36.end.size() == 3 and c36.echo.has("s_p36_end") and c36.echo.s_p36_end.size() == 3 and Data.step_index("s_p36_end") > Data.step_index("s_p36_table"), "the_ladle: three answers, each answered, echoed and told at the end")
 	var scales36 := {}
 	for o36 in c36.options:
@@ -8718,7 +8722,7 @@ func _open_net() -> void:
 		and Trials.need_text(["phases", 3], TNq7).contains("3") and Trials.need_text(["quelled", 2], TNq7).contains("2"), "trials can be passed by the round and by the measure")
 	TNq7.free()
 	var cq7: Dictionary = Echoes.CROSSROADS.get("the_round", {})
-	check(not cq7.is_empty() and str(cq7.step) == "s_p37_council" and str(cq7.part) == "XXXVII" and Echoes.ORDER[Echoes.ORDER.size() - 4] == "the_round" and fits.call(str(cq7.ask)), "what is done before the next dry wind is asked last of its chapter")
+	check(not cq7.is_empty() and str(cq7.step) == "s_p37_council" and str(cq7.part) == "XXXVII" and Echoes.ORDER[Echoes.ORDER.size() - 5] == "the_round" and fits.call(str(cq7.ask)), "what is done before the next dry wind is asked last of its chapter")
 	check((cq7.options as Array).size() == 3 and cq7.after.size() == 3 and cq7.end.size() == 3 and cq7.echo.has("s_p37_end") and cq7.echo.s_p37_end.size() == 3 and Data.step_index("s_p37_end") > Data.step_index("s_p37_council"), "the_round: three answers, each answered, echoed and told at the end")
 	var scalesq7 := {}
 	for oq7 in cq7.options:
@@ -9588,6 +9592,7 @@ func _open_net() -> void:
 	_iron_pestle_wits()
 	_higher_sky()
 	_red_seal()
+	_rivers_and_lakes()
 
 ## The Cloud Keel release: the spirit arks and the Far Countries (arks.gd), a storey divided into apartments
 ## with somebody living in each (rooms.gd), and what the audit of shared ground learned to see (clash.gd).
@@ -9599,7 +9604,7 @@ func _cloud_keel() -> void:
 		par.add_string(text, dfont, 22)
 		par.width = 1100
 		return par.get_line_count() <= 4
-	check(Atlas.LAYERS.size() == 5 and Atlas.STRATA.has("far") and Atlas.LAYER_NAMES.has("far") and Atlas.LAYERS.slice(0, 4) == ["surface", "heaven", "under", "sea"], "the world is five realms, and the first four are where they were")
+	check(Atlas.LAYERS.size() == 6 and Atlas.LAYERS[4] == "far" and Atlas.STRATA.has("far") and Atlas.LAYER_NAMES.has("far") and Atlas.LAYERS.slice(0, 4) == ["surface", "heaven", "under", "sea"], "the world is six realms, the fifth is the Far Countries, and the first four are where they were")
 	var far: Dictionary = Atlas.world_of("far")
 	var far_ids := ["huaxu", "zhongbei", "gumang", "fuluo"]
 	var asked: Array = []
@@ -10190,7 +10195,7 @@ func _higher_sky() -> void:
 		for sp in Memoir.lines(null, pid):
 			check(str(sp[0]) in ["Lin Feng", "Yue Ling", "Elder Qing Xuan"], "%s is said by its writer, under the name they stand by" % pid)
 	check(by.size() == 3 and int(by.lin) >= 15 and int(by.yue) >= 12 and int(by.elder) >= 9, "the three people the story is about each write (%s)" % str(by))
-	check(parts.size() == 40, "every part of the story has a page (%d)" % parts.size())
+	check(parts.size() == 41, "every part of the story has a page (%d)" % parts.size())
 	G = new_game.call()
 	G.step = Data.step_index("s_break1") + 1
 	check(Memoir.written(G) == 1 and G.pages.has("p01_broom") and G.page_due == ["p01_broom"] and Memoir.written(G) == 0 and Memoir.book(G) == ["p01_broom"], "a page is written when its step is done, once")
@@ -10322,7 +10327,7 @@ func _higher_sky() -> void:
 	check((tr.paths as Array).size() == 4 and open_n >= 2 and fits.call(str(tr.why)) and Data.step_index("s_p38_slips") < Data.step_index("s_p38_maling"), "Pang Juan under the tree has four ways through, two of them open to a wanted man")
 	# the crossroads
 	var c8: Dictionary = Echoes.CROSSROADS.get("the_higher_sky", {})
-	check(not c8.is_empty() and str(c8.step) == "s_p38_low" and str(c8.part) == "XXXVIII" and Echoes.ORDER[Echoes.ORDER.size() - 3] == "the_higher_sky" and fits.call(str(c8.ask)) and Marks.AFTER_BANDS.has("the_higher_sky"), "what a sect teaches about those above it is asked last of all")
+	check(not c8.is_empty() and str(c8.step) == "s_p38_low" and str(c8.part) == "XXXVIII" and Echoes.ORDER[Echoes.ORDER.size() - 4] == "the_higher_sky" and fits.call(str(c8.ask)) and Marks.AFTER_BANDS.has("the_higher_sky"), "what a sect teaches about those above it is asked last of all")
 	check((c8.options as Array).size() == 3 and c8.after.size() == 3 and c8.end.size() == 3 and c8.echo.has("s_p38_end") and c8.echo.s_p38_end.size() == 3 and Data.step_index("s_p38_end") > Data.step_index("s_p38_low") and bsrc.contains("\"the_higher_sky\": [\"ditch\"]"), "the_higher_sky: three answers, each answered, echoed and told at the end, and the bot has one")
 	var scales := {}
 	for o8 in c8.options:
@@ -10979,15 +10984,16 @@ func _red_seal() -> void:
 	hl.free()
 
 	print("== Part XL: Three in the Morning ==")
-	check(Data.REALMS.size() == 46 and Data.REALMS[45] == "Walking Two Roads" and Data.MAX_LEVEL == 135 and Data.level_name(135).ends_with("Walking Two Roads") and Data.REALM_INFO.size() == 46
+	check(Data.REALMS.size() >= 46 and Data.REALMS[45] == "Walking Two Roads" and Data.MAX_LEVEL >= 135 and Data.level_name(135).ends_with("Walking Two Roads") and Data.REALM_INFO.size() == Data.REALMS.size()
 		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XL adds the realm of Walking Two Roads")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break45" and int(Data.STEPS[Data.STEPS.size() - 1].to) == Data.MAX_LEVEL and Data.DIALOGUE.has("recall38") and msrc.contains("\"s_break44\": \"recall38\"") and Data.DIALOGUE.has("pre:s_break45") and Data.DIALOGUE.has("post:s_break45"),
-		"Part XL follows Hidden and Nameless (recall38) and ends the game")
+	var e40 := Data.step_index("s_break45")
+	check(e40 > p40 and int(Data.STEPS[e40].to) == 135 and Data.DIALOGUE.has("recall38") and msrc.contains("\"s_break44\": \"recall38\"") and Data.DIALOGUE.has("pre:s_break45") and Data.DIALOGUE.has("post:s_break45"),
+		"Part XL follows Hidden and Nameless (recall38) and ends at Walking Two Roads")
 	var kinds40 := {}
 	var n40 := 0
 	var kills40 := 0
 	var names40b := ["Narrator", "Lin Feng", "Yue Ling", "Elder Qing Xuan", "Ju Gong"]
-	for i40 in range(p40, Data.STEPS.size()):
+	for i40 in range(p40, e40 + 1):
 		var s0: Dictionary = Data.STEPS[i40]
 		n40 += 1
 		kinds40[str(s0.kind)] = int(kinds40.get(str(s0.kind), 0)) + 1
@@ -11034,7 +11040,7 @@ func _red_seal() -> void:
 	check(n40 == 25 and kills40 == 234 and int(kinds40.get("cards", 0)) == 5 and int(kinds40.get("braid", 0)) == 1 and kinds40.size() >= 9 and not kinds40.has("kill"),
 		"the chapter is twenty-five steps of nine kinds: five tables, a second road, and no lord (%d, %d, %d)" % [n40, kinds40.size(), kills40])
 	var said_masters := {}
-	for i41 in range(p40, Data.STEPS.size()):
+	for i41 in range(p40, e40 + 1):
 		if str(Data.STEPS[i41].kind) == "cards":
 			said_masters[str(Data.STEPS[i41].of)] = true
 	check(said_masters.size() == Yezi.MASTER_ORDER.size(), "the story sits him down with every master of the leaves")
@@ -11053,7 +11059,7 @@ func _red_seal() -> void:
 		check(Data.DIALOGUE.has(k40b), "%s is said" % k40b)
 	check(firsts40 >= 14, "he speaks for himself in his own chapter (%d lines in the first person)" % firsts40)
 	var c0: Dictionary = Echoes.CROSSROADS.get("the_two_roads", {})
-	check(not c0.is_empty() and str(c0.step) == "s_p40_court" and str(c0.part) == "XL" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_two_roads" and fits.call(str(c0.ask)) and Marks.AFTER_BANDS.has("the_two_roads"), "whether a heart may walk two roads is asked last of all")
+	check(not c0.is_empty() and str(c0.step) == "s_p40_court" and str(c0.part) == "XL" and Echoes.ORDER[Echoes.ORDER.size() - 2] == "the_two_roads" and fits.call(str(c0.ask)) and Marks.AFTER_BANDS.has("the_two_roads"), "whether a heart may walk two roads is asked last of all")
 	check((c0.options as Array).size() == 3 and c0.after.size() == 3 and c0.end.size() == 3 and c0.echo.has("s_p40_end") and c0.echo.s_p40_end.size() == 3 and Data.step_index("s_p40_end") > Data.step_index("s_p40_court") and bsrc.contains("\"the_two_roads\": [\"ask\"]"), "the_two_roads: three answers, each answered, echoed and told at the end, and the bot has one")
 	var scales40 := {}
 	for o0 in c0.options:
@@ -11207,3 +11213,478 @@ func _red_seal() -> void:
 	check(not asked_deed and not FileAccess.get_file_as_string("res://scripts/trials.gd").contains("deeds_bad") and plsrc.contains("Crime.record(g, \"wrong\""), "no step or trial asks for a deed of either kind")
 	for fid9 in ["ten_kindnesses", "every_kindness", "a_hard_name"]:
 		check(Feats.FEATS.has(fid9), "the feat %s" % fid9)
+
+## The Rivers and Lakes release: a sixth realm down the river, four towns that a sect answers for, two upright
+## and two crooked (sides.gd), the sects and their halls of tasks (sects.gd), raids on the roads and the camps
+## (raids.gd), what goes along the roads (traffic.gd, wagons.gd), and Part XLI.
+func _rivers_and_lakes() -> void:
+	var bsrc := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	var msrc := FileAccess.get_file_as_string("res://scripts/main.gd")
+	var dfont := ThemeDB.fallback_font
+	var fits := func(text: String) -> bool:
+		var par := TextParagraph.new()
+		par.add_string(text, dfont, 22)
+		par.width = 1100
+		return par.get_line_count() <= 4
+	var new_game := func():
+		var g = load("res://scripts/game.gd").new()
+		g.reset()
+		g.started = true
+		g.prologue = ""
+		return g
+	print("== the sixth realm: the Rivers and Lakes (atlas.gd) ==")
+	var LAKES := ["yunmeng", "hanshan", "heishui", "langya"]
+	check(Atlas.LAYERS.size() == 6 and Atlas.LAYERS[5] == "lakes" and Atlas.STRATA.has("lakes") and Atlas.STRATA.lakes.has("at") and Atlas.LAYER_NAMES.lakes == "The Rivers and Lakes", "the world is six realms, and the sixth says where it lies itself")
+	var lw: Dictionary = Atlas.world_of("lakes")
+	check(lw.ids.size() == 4 and LAKES.all(func(a): return lw.ids.has(a) and Data.layer_of(a) == "lakes" and Data.AREA_CHAIN.has(a) and Data.REGION_LORE.has(a)), "four countries lie in it, each with its story")
+	check((lw.peaks as Array).size() >= 8 and (lw.camps as Dictionary).size() == 4 and LAKES.all(func(a): return lw.floors.has(Caves.fid(a, -1))), "every one of them has peaks, a camp of the road and a cave (%d peaks)" % (lw.peaks as Array).size())
+	for a41 in LAKES:
+		var sp41: Dictionary = Data.AREAS[a41]
+		check(Look.THEMES.has(str(sp41.theme)) and Look.EXTRA.has(str(sp41.theme)) and MapGen.DENSITY.has(str(sp41.theme)) and Scatter.ECO.has(str(sp41.theme)) and Arch.DRESS_OF.has(a41) and Arch.DRESS.has(str(Arch.DRESS_OF[a41])) and Caves.LOOK_OF.has(a41) and Music.OF_THEME.has(a41), "%s has a look, a wood, a dress, a cave and a tune of its own" % a41)
+		check((sp41.pool as Array).size() == 3 and (sp41.pool as Array).all(func(pe): return Data.ENEMIES.has(str(pe[0])) and Lore.BEAST.has(str(pe[0])) and Tactics.WIT.has(str(Data.ENEMIES[str(pe[0])].shape)) and int(pe[2]) <= Data.MAX_LEVEL), "%s: three kinds of foe live there, each with a story and wits" % a41)
+		check((sp41.bosses as Array).is_empty() and not sp41.has("warband"), "%s has no lord: the chapter's foes are the land's own, and the raids" % a41)
+		var tw41 := Weal.town_of(a41)
+		check(tw41 != "" and Weal.hears(a41) == [tw41] and Folk.TOWNS.has(tw41) and Folk.MORE.has(tw41) and int(Giants.TOWNS.get(tw41, 0)) >= 1 and Offices.OFFICES.has(str(Weal.TOWNS[tw41].office)) and Data.TOWNS.any(func(t): return str(t.id) == tw41 and str(t.area) == a41), "%s has a town that hears of it, with people, somebody who answers and a place on the road" % a41)
+		for np41 in sp41.npcs:
+			check(Folk.POSTS.has(str(np41.id)) and Assets.has("characters/" + str(np41.asset)), "%s has a body of the towns and something to do all day" % np41.n)
+	check(Weal.ORDER.all(func(t): return Offices.OFFICES.has(str(Weal.TOWNS[t].office)) or t == "sect"), "every town of the seventeen has somebody who answers for it")
+	# the river-boat: its end in the land was stood last of all
+	var boat: Dictionary = {}
+	for ld41 in Data.LADDERS:
+		if str(ld41.id) == "river_boat":
+			boat = ld41
+	var sw41: Dictionary = Atlas.world()
+	var ba: Array = sw41.ents.filter(func(e): return e.kind == "ladder" and str(e.id) == "river_boat:a")
+	var bb: Array = lw.ents.filter(func(e): return e.kind == "ladder" and str(e.id) == "river_boat:b")
+	check(not boat.is_empty() and str(boat.late) == "a" and str(boat.style) == "sail" and Data.step_index(str(boat.open)) >= Data.step_index("s_p41_home") and MapGen.ladder_ends("longmen").is_empty() and MapGen.ladder_ends("yunmeng").size() == 1, "the river-boat of Longmen opens in Part XLI, and nothing of Longmen's own map is made for it")
+	check(ba.size() == 1 and bb.size() == 1, "it has an end in the land and an end in Yunmeng")
+	if ba.size() == 1 and bb.size() == 1:
+		var pa: Vector2i = ba[0].pos
+		var out_a: Vector2i = ba[0].out
+		var clear := true
+		for e41 in sw41.ents:
+			# (whoever is at home in a house nearby was seated after it, indoors, and is in nobody's way)
+			if e41.has("pos") and str(e41.id) != "river_boat:a" and maxi(absi(e41.pos.x - pa.x), absi(e41.pos.y - pa.y)) <= 3 and sw41.grid[e41.pos.y * sw41.w + e41.pos.x] != MapGen.INTERIOR:
+				clear = false
+		for dy41 in range(-1, 2):
+			for dx41 in range(-1, 2):
+				clear = clear and sw41.grid[(pa.y + dy41) * sw41.w + pa.x + dx41] in [MapGen.FLOOR, MapGen.PATH, MapGen.DECOR]
+		check(Atlas.owner_id(sw41, pa) == "longmen" and sw41.grid[pa.y * sw41.w + pa.x] == MapGen.FLOOR and sw41.grid[(pa.y + out_a.y) * sw41.w + pa.x + out_a.x] == MapGen.FLOOR and clear and bool(ba[0].late), "its landing stands on open ground of Longmen, open all round, with nothing within three tiles")
+		check(bb[0].to_tile == pa + out_a and str(bb[0].to_layer) == "surface" and str(ba[0].to_layer) == "lakes" and MapGen.is_walkable_tile(lw.grid[ba[0].to_tile.y * lw.w + ba[0].to_tile.x]) and Atlas.late_ladder_out("river_boat") == pa + out_a, "each end comes out beside the other")
+		check(not Roads.of("surface").tiles.has(pa), "and the high road does not run over it")
+	check(Data.next_hop("sect", "yunmeng") != "" and Data.next_hop("longmen", "yunmeng") == "yunmeng" and Data.next_hop("langya", "sect") == "heishui" and Data.next_hop("yunmeng", "sect") == "longmen", "the way there and back is known")
+	var wg41 = new_game.call()
+	check(Weal.towns(wg41).size() == 11 and not Weal.towns(wg41).has("reedhaven"), "a town down the river counts for nothing until he has stood in its country")
+	wg41.seen["yunmeng"] = true
+	check(Weal.towns(wg41).size() == 12 and Weal.towns(wg41).has("reedhaven"), "and is weighed once he has")
+	wg41.free()
+	check(not bsrc.contains("\"far\"") and not bsrc.contains("Atlas.LAYERS") and bsrc.contains("REALMS_WALKED := [\"surface\", \"heaven\", \"under\", \"sea\", \"lakes\"]"), "the bot walks five realms, and still not the Far Countries")
+
+	print("== upright towns and crooked ones (sides.gd) ==")
+	check(Sides.TOWNS.size() == 4 and Sides.towns_of("upright").size() == 2 and Sides.towns_of("crooked").size() == 2 and Sides.TOWNS.keys().all(func(t): return Weal.TOWNS.has(t) and Data.layer_of(str(Weal.TOWNS[t].area)) == "lakes"), "two towns are upright and two crooked, all four down the river")
+	check(Weal.ORDER.filter(func(t): return Sides.of(t) == "plain").size() == 13 and Sides.of("qingshi") == "plain" and Sides.of("sect") == "plain" and Sides.of_area("bamboo") == "plain", "every town that was there before is plain: nothing here touches it")
+	var SG = new_game.call()
+	for tid41 in Weal.ORDER:
+		if Sides.of(tid41) == "plain":
+			check(Sides.mod(SG, tid41, "price") == 1.0 and not Sides.lawless(tid41) and Sides.purse_due(SG, tid41) == 0 and not Sides.alms_due(SG, tid41) and Sides.line(tid41, 3) == "", "%s is as it was" % tid41)
+	for sd41 in ["upright", "crooked"]:
+		check((Sides.LINES[sd41] as Array).size() >= 6 and (Sides.LINES[sd41] as Array).all(func(l): return str(l).length() <= 64 and not str(l).contains(" sir")) and fits.call(str(Sides.WORD[sd41])) and str(Sides.DESC[sd41]).length() > 40 and (Sides.PRICE[sd41] as Array).size() == 3 and float(Sides.PRICE[sd41][1]) == 1.0, "a %s town has its words for the street, and somebody between the two roads pays as anywhere" % sd41)
+		for pk41 in Sides.PRICE[sd41]:
+			check(float(pk41) >= 0.8 and float(pk41) <= 1.3, "what a %s town asks stays within a quarter of the price" % sd41)
+	check(float(Sides.PRICE.upright[0]) < 1.0 and float(Sides.PRICE.upright[2]) > 1.0 and float(Sides.PRICE.crooked[0]) > 1.0 and float(Sides.PRICE.crooked[2]) < 1.0, "an upright town is kinder to the Righteous and a crooked one to the Demonic")
+	SG.seen["heishui"] = true
+	SG.seen["yunmeng"] = true
+	SG.stones = 100000
+	SG.level = 135
+	check(Sides.mod(SG, "ashmarket", "price") == 1.0 and Sides.mod(SG, "ashmarket", "mend") == 1.0, "somebody with no Way to speak of pays the plain price")
+	SG.creed = {"virtue": Creed.SIDE + 2}
+	check(Creed.side(SG, "virtue") > 0 and Sides.mod(SG, "ashmarket", "price") > 1.0 and Sides.mod(SG, "reedhaven", "price") < 1.0 and Weal.mod(SG, "heishui", "price") > Weal.mod(SG, "yunmeng", "price"), "the Righteous pay more in Ashmarket and less in Reedhaven")
+	SG.creed = {"virtue": -(Creed.SIDE + 2)}
+	check(Creed.side(SG, "virtue") < 0 and Sides.mod(SG, "ashmarket", "price") < 1.0 and Sides.mod(SG, "reedhaven", "price") > 1.0 and Sides.purse_due(SG, "ashmarket") == 0, "the Demonic the other way about, and nobody tries the purse of one of their own")
+	SG.creed = {}
+	var due41 := Sides.purse_due(SG, "ashmarket")
+	check(due41 > 0 and due41 <= Sides.PURSE_REALM * (SG.realm() + 1) and due41 < Raids.gift(SG) and due41 * 200 < int(Data.STEPS[Data.step_index("s_p41_black")].stones), "a cutpurse of a crooked town lifts a little, and less than the road pays (%d)" % due41)
+	var st41: int = SG.stones
+	var said41 := Sides.take_purse(SG, "ashmarket")
+	check(said41.contains(str(due41)) and SG.stones == st41 - due41 and SG.purses_cut == 1 and Sides.purse_due(SG, "ashmarket") == 0 and Sides.take_purse(SG, "ashmarket") == "" and SG.stones == st41 - due41, "once a day, and it is told")
+	SG.day += 1
+	check(Sides.purse_due(SG, "ashmarket") > 0 and Sides.purse_due(SG, "reedhaven") == 0 and Sides.purse_due(SG, "qingshi") == 0, "again the next morning, and never in an upright or a plain town")
+	SG.sect_q = {"black_leech": "done"}
+	check(Sects.rank(SG, "black") >= 1 and Sides.purse_due(SG, "ashmarket") == 0 and Sides.purse_due(SG, "knifegate") > 0, "a guest of the Gate is not robbed in Ashmarket (and still is in Knifegate)")
+	SG.sect_q = {}
+	SG.heal_full()
+	check(not Sides.alms_due(SG, "reedhaven"), "nobody whole is mended")
+	SG.hp[0] = 1
+	check(Sides.alms_due(SG, "reedhaven") and not Sides.alms_due(SG, "ashmarket") and not Sides.alms_due(SG, "qingshi"), "a wounded traveller is seen to in an upright town, and nowhere else for nothing")
+	var al41 := Sides.take_alms(SG, "reedhaven")
+	check(al41.contains("Reedhaven") and SG.hp[0] == SG.max_hp(0) and SG.alms_taken == 1 and not Sides.alms_due(SG, "reedhaven"), "he is mended, once a day")
+	# nobody in a crooked town reads a bill
+	SG.bounty = {"ashmarket": 500, "reedhaven": 500}
+	check(Crime.standing(SG, "ashmarket") == 0 and Crime.standing(SG, "reedhaven") >= 1 and Crime.shut(SG, "heishui", "work") == "" and Crime.shut(SG, "yunmeng", "work") != "" and Crime.watch_due(SG, "heishui").is_empty() and Sides.lawless("knifegate") and not Sides.lawless("clearbell"), "a price on his head hangs at no gate of a crooked town, and at an upright one's as anywhere")
+	SG.free()
+	for dn41 in ["reed", "hermit", "ash", "fang"]:
+		check(Arch.DRESS.has(dn41) and Arch.DRESS[dn41].has("wall") and Arch.DRESS[dn41].has("roof"), "the dress %s is a dress" % dn41)
+	check(Color(str(Arch.DRESS.ash.wall)).v < 0.4 and Color(str(Arch.DRESS.reed.wall)).v > 0.8 and Arch.DRESS.ash.has("glow"), "a crooked town is dark with red in its windows, and an upright one pale")
+
+	print("== the sects, and their halls of tasks (sects.gd) ==")
+	check(Sects.ORDER.size() == 5 and Sects.SECTS.size() == 5 and Sects.ORDER[0] == "azure" and Sects.TASK_ORDER.size() == 16 and Sects.TASKS.size() == 16, "five sects, his own among them, and sixteen tasks")
+	var creeds41 := {}
+	for sid41 in Sects.ORDER:
+		var sc41: Dictionary = Sects.SECTS[sid41]
+		check((sc41.creed as Array).size() == 3 and (sc41.ranks as Array).size() == Sects.RANK_AT.size() and fits.call(str(sc41.custom)) and str(sc41.n).begins_with("The ") and Weal.TOWNS.has(str(sc41.town)), "%s has three sayings, a way of its own and four names for how he stands" % sc41.n)
+		for cr41 in sc41.creed:
+			check(not creeds41.has(str(cr41)) and str(cr41).length() <= 56, "%s: \"%s\" is a saying of its own" % [sid41, cr41])
+			creeds41[str(cr41)] = true
+		if sid41 == "azure":
+			check(Sects.tasks_of(sid41).is_empty() and str(sc41.office) == "" and Sects.price(null, "sect") == 1.0, "his own sect keeps no hall of tasks: what it wants of him is the story")
+			continue
+		check(Sides.of(str(sc41.town)) == str(sc41.side) and Offices.OFFICES.has(str(sc41.office)) and str(Offices.OFFICES[str(sc41.office)].area) == str(sc41.area) and Sects.of_office(str(sc41.office)) == sid41 and Sects.of_town(str(sc41.town)) == sid41 and Sects.of_area(str(sc41.area)) == sid41 and str(Weal.TOWNS[str(sc41.town)].office) == str(sc41.office), "%s answers for %s, and is what its town is" % [sc41.n, sc41.town])
+		check((Data.AREAS[str(sc41.area)].npcs as Array).any(func(n): return str(n.id) == str(sc41.master)) and Closeup.SIGNATURE.values().size() > 0 and fits.call(str(sc41.pay)) and (Sects.GREET[sid41] as Array).size() == Sects.RANK_AT.size() and Data.ITEMS.has(str(Sects.TOKENS[sid41])) and Load.weight_of(str(Sects.TOKENS[sid41])) == 0.0, "%s has a master who stands in its country, a word for every rank and a keepsake that weighs nothing" % sc41.n)
+		var ts41: Array = Sects.tasks_of(sid41)
+		check(ts41.size() == 4 and str(Sects.TASKS[ts41[0]].need[0]) == "kills" and str(Sects.TASKS[ts41[1]].need[0]) == "raids" and not ts41.slice(0, 2).any(func(t): return bool(Sects.TASKS[t].get("foul", false))), "%s: four tasks, and the first two are a hunt and a road kept, neither foul" % sid41)
+		var fouls41: int = ts41.filter(func(t): return bool(Sects.TASKS[t].get("foul", false))).size()
+		check(fouls41 == (1 if str(sc41.side) == "crooked" else 0), "%s: %s" % [sid41, "a crooked sect has one foul task, and says so" if str(sc41.side) == "crooked" else "an upright sect asks for nothing foul"])
+		for kf41 in Sects.TASKS[ts41[0]].need[1]:
+			check((Data.AREAS[str(sc41.area)].pool as Array).any(func(pe): return str(pe[0]) == str(kf41)), "%s: %s can be hunted in its own country" % [ts41[0], kf41])
+	var names41 := {}
+	for t41 in Sects.TASK_ORDER:
+		var tk41: Dictionary = Sects.TASKS[t41]
+		check(Sects.SECTS.has(str(tk41.sect)) and not names41.has(str(tk41.n)) and fits.call(str(tk41.ask)) and fits.call(str(tk41.thanks)) and not str(tk41.ask).contains(" sir") and not str(tk41.thanks).contains("young man"), "task %s: a name of its own, and words that fit and read of anybody" % t41)
+		names41[str(tk41.n)] = true
+		match str(tk41.need[0]):
+			"have":
+				for it41 in tk41.need[1]:
+					check(Data.ITEMS.has(str(it41)), "task %s asks for something there is" % t41)
+			"more", "reach":
+				var FG = new_game.call()
+				check(Feats.value(FG, [str(tk41.need[1]), 0]) >= 0.0, "task %s counts something that can be counted" % t41)
+				FG.free()
+			"folk":
+				check(Folk.of_role(str(Sects.SECTS[str(tk41.sect)].town), str(tk41.need[1])) >= int(tk41.need[2]), "task %s: there are that many of them in the sect's own town" % t41)
+		if bool(tk41.get("foul", false)):
+			check(str(tk41.ask).to_lower().contains("foul") and str(tk41.need[0]) == "more" and str(tk41.need[1]) == "deeds_bad", "task %s is foul, is said to be, and is a wrong done in the street" % t41)
+	for st5 in Data.STEPS:
+		check(not Sects.TASKS.has(str(st5.get("task", ""))) and (str(st5.kind) != "sect" or (Sects.SECTS.has(str(st5.sect)) and int(st5.n) <= 2 and str(st5.sect) != "azure")), "%s names no task, and asks no sect for more than its two plain ones" % st5.id)
+	var TG = new_game.call()
+	TG.level = 135
+	TG.step = Data.step_index("s_p41_boat")
+	check(not Sects.open(TG, "reed") and Sects.rank(TG, "reed") == 0 and Sects.rep(TG, "reed") == 0 and Sects.rank_name(TG, "reed") == "a stranger on the landing" and Sects.price(TG, "reedhaven") == 1.0, "a stranger is a stranger, and pays as one")
+	TG.seen["yunmeng"] = true
+	check(Sects.open(TG, "reed") and not Sects.open(TG, "azure") and not Sects.open(TG, "cold") and Sects.next(TG, "reed") == "reed_banks", "its hall is open to somebody who has stood in its country, and the first task is the first on the wall")
+	Sects.take(TG, "reed_banks")
+	check(Sects.state(TG, "reed_banks") == "taken" and Sects.progress(TG, "reed_banks") == [0, 10] and not Sects.ready(TG, "reed_banks") and not Sects.finish(TG, "reed_banks") and Sects.next(TG, "reed") == "reed_banks" and Sects.label(TG, "reed_banks").contains("0/10"), "a task taken says how far along it is")
+	TG.record_kills("yunmeng", 3, ["reed_reaver", "reed_reaver", "gasping_carp"])
+	TG.record_kills("hanshan", 2, ["cliff_gibbon", "cliff_gibbon"])
+	check(Sects.progress(TG, "reed_banks") == [3, 10], "what falls of the kinds it names is counted, and nothing else")
+	TG.record_kills("yunmeng", 8, ["spit_wisp", "spit_wisp", "spit_wisp", "spit_wisp", "reed_reaver", "reed_reaver", "reed_reaver", "reed_reaver"])
+	TG.hp[0] = 1
+	var ts0: int = TG.stones
+	var rn0: int = TG.renown
+	check(Sects.ready(TG, "reed_banks") and Sects.finish(TG, "reed_banks") and Sects.is_done(TG, "reed_banks") and TG.stones == ts0 + 9000 and TG.renown == rn0 + 3 and TG.hp[0] == TG.max_hp(0), "the Reeds pay as written, and whoever reports is fed")
+	check(Sects.done_count(TG, "reed") == 1 and Sects.done_count(TG) == 1 and Sects.rep(TG, "reed") == Sects.REP_TASK and Sects.rank(TG, "reed") == 1 and Sects.price(TG, "reedhaven") < 1.0 and Sects.next(TG, "reed") == "reed_home" and Weal.acts(TG, "reedhaven", "errand") == 1, "one task done: a guest of the fleet, who pays a little less, and the town has heard")
+	Sects.take(TG, "reed_home")
+	TG.raids_broken += 2
+	check(Sects.ready(TG, "reed_home") and Sects.finish(TG, "reed_home") and Sects.done_count(TG, "reed") == 2, "two raids broken since it was taken: the second is done")
+	TG.step = Data.step_index("s_p41_reed")
+	TG.poll_steps()
+	check(TG.cur_step().id == "s_p41_flutes", "and a step that asked the Reeds for two is done")
+	# the Hermitage pays no stones; the Gate pays double; the Banner pays by what he is
+	TG.seen["hanshan"] = true
+	TG.seen["heishui"] = true
+	TG.seen["langya"] = true
+	check(int(Sects.pay(TG, "cold_cliff").stones) == 0 and float(Sects.pay(TG, "cold_cliff").exp) > 0.0 and Sects.tasks_of("cold").all(func(t): return int(Sects.pay(TG, t).stones) == 0 and int(Sects.pay(TG, t).renown) >= 4), "the Hermitage pays no spirit stones: understanding, and renown")
+	check(int(Sects.pay(TG, "black_leech").stones) == 2 * int(Sects.TASKS.black_leech.stones) and Sects.tasks_of("black").all(func(t): return int(Sects.pay(TG, t).stones) == 2 * int(Sects.TASKS[t].stones)), "the Gate pays double")
+	var low41 := int(Sects.pay(TG, "wolf_strays").stones)
+	TG.level = 30
+	check(int(Sects.pay(TG, "wolf_strays").stones) < low41 and Sects.tasks_of("wolf").all(func(t): return int(Sects.pay(TG, t).renown) == 0), "the Banner pays the strong more than the weak, and nobody says thank you")
+	TG.level = 135
+	for t42 in Sects.TASK_ORDER:
+		check(int(Sects.pay(TG, t42).stones) * 4 < int(Data.STEPS[Data.step_index("s_p41_end")].stones), "task %s pays less than the road" % t42)
+	Sects.take(TG, "cold_cliff")
+	TG.record_kills("hanshan", 10, ["cliff_gibbon", "cliff_gibbon", "cliff_gibbon", "cliff_gibbon", "cliff_gibbon", "pine_laughter", "pine_laughter", "pine_laughter", "pine_laughter", "pine_laughter"])
+	var ex0: float = TG.exp
+	var ts1: int = TG.stones
+	check(Sects.finish(TG, "cold_cliff") and TG.stones == ts1 and (TG.exp > ex0 or TG.level > 135), "a task done for the mountain leaves his purse as it was, and him knowing more")
+	# foul work is taken or left; the bot leaves it
+	check(Sects.next(TG, "black") == "black_leech", "the bot begins the Gate's wall at the top")
+	TG.sect_q["black_leech"] = "done"
+	TG.sect_q["black_carts"] = "done"
+	TG.sect_q["black_jar"] = "done"
+	check(Sects.next(TG, "black") == "" and Sects.state(TG, "black_call") == "" and Sects.text(TG, "black_call").contains("FOUL WORK"), "with only the foul task left on a wall, the bot takes nothing: and the wall says what it is")
+	# rank, and the token
+	check(Sects.rank(TG, "black") == 2 and int(TG.inv.get("token_black", 0)) == 0, "three tasks: a hand of the Gate, and no token yet")
+	Sects.take(TG, "black_call")
+	TG.sect_base["black_call"]["v"] = Feats.value(TG, ["deeds_bad", 0]) - 1.0
+	check(Sects.finish(TG, "black_call") and Sects.rank(TG, "black") == 3 and int(TG.inv.get("token_black", 0)) == 1 and Sects.rank_name(TG, "black") == "a partner in the book", "all four: a partner in the book, and its keepsake in his hand")
+	var pg41: Array = Sects.page(TG)
+	check(pg41.size() == 5 and str(pg41[0].id) == "azure" and int(pg41[3].done) == 4 and (pg41[4].creed as Array).size() == 3, "the page of the sects lists all five")
+	TG.seen.erase("langya")
+	check((Sects.page(TG)[4].creed as Array).is_empty() and str(Sects.page(TG)[4].n) != str(Sects.SECTS.wolf.n), "and says nothing of one whose country he has not stood in")
+	# folk tasks count the people spoken with
+	Sects.take(TG, "reed_pipers")
+	Sects.folk_talked(TG, {"id": "folk:reedhaven:1", "role": "musician"})
+	Sects.folk_talked(TG, {"id": "folk:reedhaven:1", "role": "musician"})
+	Sects.folk_talked(TG, {"id": "folk:reedhaven:2", "role": "fisher"})
+	check(Sects.progress(TG, "reed_pipers") == [1, 3], "a task among the people of a town counts each of them once")
+	TG.free()
+	check(msrc.contains("func offer_sect(") and msrc.contains("\"Nothing today\"") and msrc.contains("\"sect:tasks\"") and msrc.contains("\"side:alms\"") and msrc.contains("\"side:ask\""), "the hall of tasks is at the counter, with \"Nothing today\" first; and what kind of town it is can be asked")
+	check(bsrc.contains("func _sect_step(") and bsrc.contains("Sects.next(Game") and bsrc.contains("\"sect:tasks\"") and not bsrc.contains("black_call") and not bsrc.contains("wolf_tribute"), "the bot takes a sect's tasks in order, and never a foul one")
+	check(FileAccess.get_file_as_string("res://scripts/menu.gd").contains("func _draw_sects(") and FileAccess.get_file_as_string("res://scripts/menu.gd").contains("\"The Sects\""), "Esc > The Sects is a page")
+
+	print("== raids on the roads and the camps (raids.gd) ==")
+	var RG = new_game.call()
+	RG.level = 135
+	RG.step = Data.step_index("s_p41_home") - 1
+	for a42 in Atlas.all_region_ids():
+		RG.seen[a42] = true
+	check(not Raids.open(RG) and Raids.on(RG, "surface").is_empty() and Raids.nearest(RG, "surface", Vector2i(520, 460)).is_empty() and Raids.news(RG, "bamboo", 1) == "", "before Part XLI nothing comes down to the roads: every older journey is as it was")
+	RG.step = Data.step_index("s_p41_roads")
+	check(Raids.open(RG) and Data.step_index(Raids.OPEN) == Data.step_index("s_p41_home"), "from the Elder's word on, they do")
+	var total41 := 0
+	for lid41 in ["surface", "heaven", "under", "sea", "lakes"]:
+		var ss41: Dictionary = Raids.sites(lid41)
+		var w41: Dictionary = Atlas.world_of(lid41)
+		var taken41 := {}
+		for e42 in w41.ents:
+			if e42.has("pos"):
+				taken41[e42.pos] = true
+		var ok41 := true
+		for a43 in ss41:
+			var s43: Dictionary = ss41[a43]
+			ok41 = ok41 and not (Data.AREAS[a43].pool as Array).is_empty() and a43 != "sect"
+			var ts43: Array = s43.get("road", []).duplicate()
+			if s43.has("camp"):
+				ts43.append(s43.camp)
+				ok41 = ok41 and maxi(absi(s43.camp.x - w41.camps[a43].x), absi(s43.camp.y - w41.camps[a43].y)) <= 7
+			for p43 in ts43:
+				ok41 = ok41 and MapGen.is_walkable_tile(w41.grid[p43.y * w41.w + p43.x]) and not taken41.has(p43) and Atlas.owner_id(w41, p43) == a43
+			for p44 in s43.get("road", []):
+				ok41 = ok41 and Roads.on(lid41, p44)
+				for ft41 in (Roads.of(lid41).at as Dictionary).values():
+					ok41 = ok41 and maxi(absi(ft41.x - p44.x), absi(ft41.y - p44.y)) >= Raids.OFF_TOWN
+		total41 += ss41.size()
+		check(ok41 and not ss41.is_empty(), "%s: a raid stands on open ground of its own region with nothing on it, by the camp or on the high road out of sight of a town (%d regions)" % [lid41, ss41.size()])
+		check(Raids.sites(lid41) == ss41, "%s: and stands where it stood when asked again" % lid41)
+	check(Raids.sites("lakes").size() == 4 and LAKES.all(func(a): return Raids.sites("lakes")[a].has("camp") and not (Raids.sites("lakes")[a].get("road", []) as Array).is_empty()), "every country of the Rivers and Lakes has a camp to be set on and a road")
+	check(Raids.sites("f:village:inn:1").is_empty(), "nothing is raided under a roof")
+	var on41: Array = Raids.on(RG, "lakes")
+	check(on41.size() == 8 and on41 == Raids.on(RG, "lakes") and on41.all(func(r): return not r.broken and str(r.kind) in Raids.KINDS and int(r.watch) == Raids.watch(RG)), "on every watch one raid stands at the camp and one on the road of each (%d)" % on41.size())
+	var RG2 = new_game.call()
+	RG2.step = RG.step
+	RG2.seen["yunmeng"] = true
+	check(Raids.on(RG2, "lakes").size() == 2 and Raids.on(RG2, "lakes").all(func(r): return str(r.area) == "yunmeng"), "only in the regions the journey has walked into")
+	RG2.free()
+	var keys41 := {}
+	for r41 in on41:
+		keys41[str(r41.key)] = true
+		var gp41: Array = Raids.group(r41)
+		check(gp41.size() >= 2 and gp41.size() <= 3 and gp41 == Raids.group(r41) and gp41.all(func(f): return (Data.AREAS[str(r41.area)].pool as Array).any(func(pe): return str(pe[0]) == str(f.id) and int(f.lv) >= int(pe[1]) and int(f.lv) <= int(pe[2]))), "%s: the raiders are two or three of the region's own, the same whenever asked" % r41.key)
+		check(fits.call(Raids.seen_line(r41)) and Raids.named(r41).length() > 8, "%s: what is seen fits the box" % r41.key)
+	check(keys41.size() == 8, "every raid has a key of its own")
+	var r0: Dictionary = on41[0]
+	check(Raids.at(RG, "lakes", r0.tile) == r0 and Raids.at(RG, "lakes", r0.tile + Vector2i(1, 1)) == r0 and Raids.at(RG, "lakes", r0.tile + Vector2i(3, 0)).is_empty() and Raids.nearest(RG, "lakes", r0.tile + Vector2i(2, 0)) == r0, "he has come up to one when he is within a tile of it")
+	check(Raids.gift(RG) > 0 and Raids.gift(RG) * 20 < int(Data.STEPS[Data.step_index("s_p41_carts")].stones), "what is pressed on him afterwards is worth less than the road (%d)" % Raids.gift(RG))
+	RG.step = Data.step_index("s_p41_carts")
+	var rs0: int = RG.stones
+	var pc0: int = Weal.acts(RG, Raids.town(str(r0.area)), "rescued")
+	var th41: Array = Raids.broke(RG, r0)
+	check(th41.size() == 1 and fits.call(str(th41[0][1])) and RG.raids_broken == 1 and RG.step_raids == 1 and RG.stones == rs0 + Raids.gift(RG) and RG.raid_done.has(str(r0.key)) and Weal.acts(RG, Raids.town(str(r0.area)), "rescued") == pc0 + 1, "a raid broken is counted, thanked for, and felt in the town that hears of that country")
+	check(Raids.broke(RG, r0).is_empty() and RG.raids_broken == 1 and Raids.at(RG, "lakes", r0.tile).is_empty() and Raids.on(RG, "lakes").filter(func(r): return r.broken).size() == 1 and Raids.standing(RG, "lakes") == 7, "and is not broken twice")
+	var r1: Dictionary = Raids.nearest(RG, "lakes", r0.tile)
+	var rs1: int = RG.stones
+	Raids.broke(RG, r1, true)
+	check(RG.raids_fled == 1 and RG.raids_broken == 2 and RG.stones == rs1 + Raids.gift(RG) / 2, "raiders who run from his realm are a raid broken too, for half the thanks")
+	check(RG.step_raids == 2 and RG.cur_step().id == "s_p41_carts", "two since the step began, and it wants three")
+	Raids.broke(RG, Raids.nearest(RG, "lakes", r0.tile))
+	check(RG.raids_broken == 3 and RG.cur_step().id != "s_p41_carts", "three since the step began: a step that asked for three is done")
+	check(Weal.ACTS.has("rescued") and str(Weal.ACTS.rescued.m) == "peace" and int(Weal.ACTS.rescued.per) > 0, "the peace of a town is the better for it")
+	# the next watch: new raids, and nothing is held against him for the ones he was not at
+	var peace0 := 0
+	for c41 in Weal.causes(RG, "reedhaven"):
+		peace0 += int(c41.get("d", 0)) if str(c41.get("m", "")) == "peace" else 0
+	var w0 := Raids.watch(RG)
+	Clock.advance(RG, Raids.WATCH * 60.0 / Clock.DAY_RATE + 5.0)
+	check(Raids.watch(RG) > w0 and Raids.standing(RG, "lakes") == 8, "when the watch changes there are raids again")
+	var peace1 := 0
+	for c42 in Weal.causes(RG, "reedhaven"):
+		peace1 += int(c42.get("d", 0)) if str(c42.get("m", "")) == "peace" else 0
+	check(peace1 >= peace0, "and no number of any town has fallen because he was elsewhere")
+	check(Raids.news(RG, str(r0.area), 5) == "" or Raids.NEWS.has(Raids.news(RG, str(r0.area), 5)), "the people of the road say what a raid cost them")
+	for nl41 in Raids.NEWS:
+		check(str(nl41).length() <= 90 and fits.call(str(nl41)), "news of a raid is short")
+	for kd41 in Raids.KINDS:
+		check((Raids.SEEN[kd41] as Array).size() >= 2 and (Raids.THANKS[kd41] as Array).size() >= 2 and (Raids.THANKS[kd41] as Array).all(func(l): return fits.call(str(l[1]))), "a raid on a %s has its words" % kd41)
+	check((Raids.THANKS.fled as Array).all(func(l): return fits.call(str(l[1])) and not str(l[1]).contains(" he ") and not str(l[1]).contains(" him ")), "and so has one that ran, in words that read of anybody")
+	var blk41: Dictionary = Raids.blocked(RG, "lakes")
+	check(blk41.size() == 4 and blk41.keys().all(func(p): return Roads.on("lakes", p)), "a raid on the road stands on the road")
+	RG.free()
+	check(msrc.contains("func start_raid(") and msrc.contains("Raids.broke(Game, ctx.raid)") and msrc.contains("Game.scatters(grp)") and FileAccess.get_file_as_string("res://scripts/world.gd").contains("func _raid_check()"), "walking up to a raid begins it: fought in earnest, or scattered by his coming")
+	check(bsrc.contains("func _rescue_step(") and bsrc.contains("Raids.nearest(Game"), "the bot goes to the nearest raid by itself")
+	var FR = new_game.call()
+	FR.raids_broken = 12
+	check(Feats.value(FR, ["raids", 0]) == 12.0 and Feats.FEATS.has("forty_home") and Feats.need(Feats.FEATS.forty_home.test) == 12.0, "raids broken can be a feat")
+	FR.free()
+
+	print("== what goes along the roads (traffic.gd, wagons.gd) ==")
+	check(Traffic.ORDER.size() == 10 and Traffic.KINDS.size() == 10 and Traffic.ORDER.all(func(k): return Traffic.KINDS.has(k) and Traffic.SAID.has(k) and str(Traffic.SAID[k]).length() <= 64 and float(Traffic.KINDS[k].pace) > 0.5 and float(Traffic.KINDS[k].pace) < 4.0 and not (Traffic.KINDS[k].crew as Array).is_empty()), "ten kinds of vehicle, each with a pace, a crew and a word")
+	for k41 in Traffic.ORDER:
+		for cw41 in Traffic.KINDS[k41].crew:
+			check(Assets.has("characters/" + str(cw41[0])) and str(cw41[2]) in ["sit_bench", "walk"], "%s: its crew have bodies of the towns" % k41)
+		if Traffic.KINDS[k41].has("ride"):
+			check(Fashion.RIDES.has(str(Traffic.KINDS[k41].ride)) and str(Fashion.RIDES[str(Traffic.KINDS[k41].ride)].kind) == "carriage", "%s is one of the carriages, driven by somebody else" % k41)
+		var vm: Node3D = Wagons.build(k41, 7)
+		var tris41 := 0
+		for mi41 in vm.find_children("*", "MeshInstance3D", true, false):
+			if (mi41 as MeshInstance3D).mesh != null:
+				for sf41 in (mi41 as MeshInstance3D).mesh.get_surface_count():
+					tris41 += 1
+		check(vm.get_child_count() > 0 and tris41 > 0 and str(vm.get_meta("vehicle")) == k41 and (vm.get_meta("crew") as Array).size() == (Traffic.KINDS[k41].crew as Array).size(), "%s is built from code, with its crew aboard" % k41)
+		Wagons.animate(vm, 1.5, true)
+		Wagons.animate(vm, 1.5, false)
+		vm.free()
+	var kinds41 := {}
+	var fleet_n := 0
+	for lid42 in Atlas.LAYERS:
+		var fl41: Array = Traffic.fleet(lid42)
+		fleet_n += fl41.size()
+		var lines41: Array = Roads.of(lid42).get("lines", [])
+		check((fl41.is_empty()) == (lines41.filter(func(l): return (l.pts as Array).size() >= Traffic.LEAST).is_empty()) and fl41 == Traffic.fleet(lid42), "%s: a realm has traffic if it has a road long enough, the same whenever asked (%d)" % [lid42, fl41.size()])
+		var ids41 := {}
+		for v41 in fl41:
+			ids41[str(v41.id)] = true
+			kinds41[str(v41.kind)] = true
+			var ln41: Dictionary = lines41[int(v41.line)]
+			check(int(v41.len) == (ln41.pts as Array).size() and (str(Traffic.KINDS[str(v41.kind)].get("only", lid42)) == lid42) and not (bool(ln41.get("lane", false)) and bool(Traffic.KINDS[str(v41.kind)].get("high", false))), "%s keeps to a road it may be on" % v41.id)
+		check(ids41.size() == fl41.size(), "%s: every vehicle has a name of its own" % lid42)
+	check(kinds41.size() == 10 and fleet_n >= 100 and Traffic.fleet("surface").size() >= 60 and Traffic.fleet("lakes").size() >= 10 and Traffic.census("lakes").has("banner_cart") and not Traffic.census("surface").has("banner_cart"), "all ten kinds are on the roads somewhere, a sect's banner-cart only down the river (%d vehicles)" % fleet_n)
+	check(Traffic.fleet("f:village:inn:1").is_empty(), "nothing drives about indoors")
+	# where a vehicle is: on its road, moving smoothly, standing at night unless it is the post
+	var noon := 12.0 * 60.0
+	var net41: Dictionary = Roads.of("surface")
+	var smooth := true
+	var on_road := true
+	for v42 in Traffic.fleet("surface").slice(0, 24):
+		var prev: Vector2 = Traffic.where(v42, noon, 1000.0).pos
+		for q41 in 40:
+			var w42: Dictionary = Traffic.where(v42, noon + q41 * 0.5, 1000.0 + q41 * 0.5)
+			on_road = on_road and net41.tiles.has(w42.tile) and absf((w42.dir as Vector2).length() - 1.0) < 0.01
+			smooth = smooth and (w42.pos as Vector2).distance_to(prev) <= float(v42.pace) * 0.5 * 1.5 + 0.01
+			prev = w42.pos
+	check(on_road and smooth, "a vehicle is on a tile of its road, facing along it, and does not jump")
+	var night := 23.0 * 60.0
+	var stood := true
+	var post_runs := false
+	for v43 in Traffic.fleet("surface"):
+		var a43: Dictionary = Traffic.along(v43, night, 5000.0)
+		var b43: Dictionary = Traffic.along(v43, night + 30.0, 5015.0)
+		if bool(Traffic.KINDS[str(v43.kind)].night):
+			post_runs = post_runs or float(a43.k) != float(b43.k)
+		else:
+			stood = stood and float(a43.k) == float(b43.k) and not bool(a43.moving) and not bool(b43.moving)
+	check(stood and post_runs, "at night everything stands where it had got to, lantern lit, but the coach and the courier")
+	check(Traffic.daylight(Clock.DAWN * 60.0) == 0.0 and Traffic.daylight(Clock.DUSK * 60.0) == (Clock.DUSK - Clock.DAWN) * 60.0 and Traffic.daylight(Clock.DAY + Clock.DAWN * 60.0 + 60.0) == (Clock.DUSK - Clock.DAWN) * 60.0 + 60.0 and Traffic.daylight(23.0 * 60.0) == Traffic.daylight(Clock.DAY + 2.0 * 60.0), "the day-vehicles go by the hours of daylight: none pass between dusk and dawn")
+	# a cart does not drive into a raid
+	var held41 := 0
+	for v44 in Traffic.fleet("lakes"):
+		var pts44: Array = Roads.of("lakes").lines[int(v44.line)].pts
+		var a44: Dictionary = Traffic.along(v44, noon, 2000.0)
+		var bi44 := clampi(int(float(a44.k)) + (1 if bool(a44.fwd) else -1), 1, pts44.size() - 2)
+		var blk44 := {pts44[bi44]: true}
+		var h44: Dictionary = Traffic.along(v44, noon, 2000.0, blk44)
+		if not bool(h44.moving) and absf(float(h44.k) - float(bi44)) >= float(Traffic.HELD) - 0.01 or float(h44.k) == 0.0 or float(h44.k) == float(pts44.size() - 1):
+			held41 += 1
+	check(held41 == Traffic.fleet("lakes").size(), "with a raid on the road just ahead, every vehicle is held short of it (%d of %d)" % [held41, Traffic.fleet("lakes").size()])
+	var nr41: Array = Traffic.near("lakes", Vector2(250, 100), 600.0, noon, 0.0)
+	check(nr41.size() == Traffic.fleet("lakes").size() and Traffic.near("lakes", Vector2(-5000, -5000), 10.0, noon, 0.0).is_empty(), "the world asks for the ones near him")
+	var rs41: Node3D = Wagons.raid_scene({"area": "heishui", "kind": "road", "tile": Vector2i(1, 1), "watch": 3, "key": "heishui|road|3"})
+	check(rs41.get_child_count() >= 3 and (rs41.get_meta("raiders") as Array).size() == Raids.group({"area": "heishui", "key": "heishui|road|3"}).size() and rs41.has_meta("cart"), "a raid on the road is drawn: the raiders, and a cart slewed across it")
+	rs41.free()
+	var wsrc := FileAccess.get_file_as_string("res://scripts/world.gd")
+	check(wsrc.contains("func _traffic_tick(") and wsrc.contains("if not headless() and player != null:\n\t\t_fans_tick(d)\n\t\t_arks_tick(d)\n\t\t_traffic_tick(d)") and not bsrc.contains("Traffic."), "traffic is drawn only with a window, and the bot knows nothing of it")
+	var tsrc := FileAccess.get_file_as_string("res://scripts/traffic.gd") + FileAccess.get_file_as_string("res://scripts/raids.gd")
+	check(not tsrc.contains("randi") and not tsrc.contains("randf") and not tsrc.contains("RandomNumberGenerator"), "nothing on the roads is thrown for")
+
+	print("== Part XLI: Forgetting One Another in the Rivers and Lakes ==")
+	var p41 := Data.step_index("s_p41_home")
+	check(p41 == Data.step_index("s_break45") + 1 and Data.STEPS[Data.STEPS.size() - 1].id == "s_break46" and int(Data.STEPS[Data.STEPS.size() - 1].to) == Data.MAX_LEVEL and Data.MAX_LEVEL == 138, "Part XLI follows Walking Two Roads and ends the game")
+	check(Data.REALMS.size() == 47 and Data.REALMS[46] == "Forgotten in the Lakes" and Data.level_name(138).ends_with("Forgotten in the Lakes") and Data.REALM_INFO.size() == 47 and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "and adds the realm of Forgotten in the Lakes")
+	check(Data.DIALOGUE.has("recall39") and msrc.contains("\"s_break45\": \"recall39\"") and Data.DIALOGUE.has("pre:s_break46") and Data.DIALOGUE.has("post:s_break46"), "he is brought home to begin it (recall39), and it closes on a tribulation")
+	var kinds42 := {}
+	var n41 := 0
+	var names41b := ["Narrator", "Lin Feng", "Yue Ling", "Elder Qing Xuan", "Fleet-Mother Lu Ting", "Shide, Who Sweeps the Kitchen", "Ledger-Mistress Mo Chou", "Banner-Lord Tuoba Lie"]
+	var sects_met := {}
+	var sides_met := {}
+	for i41 in range(p41, Data.STEPS.size()):
+		var s1: Dictionary = Data.STEPS[i41]
+		n41 += 1
+		kinds42[str(s1.kind)] = int(kinds42.get(str(s1.kind), 0)) + 1
+		check(str(s1.id).begins_with("s_p41_") or str(s1.id) == "s_break46", "%s is a step of the chapter" % s1.id)
+		check(not str(s1.kind) in ["slay", "crime", "taboo", "kill", "fall"] and not s1.has("if"), "%s asks for nothing the law forbids, has no lord, and is everybody's" % s1.id)
+		check(not s1.has("stones") or int(s1.stones) > 104800, "%s pays as the road has come to pay" % s1.id)
+		if s1.has("sect"):
+			sects_met[str(s1.sect)] = true
+			sides_met[str(Sects.SECTS[str(s1.sect)].side)] = true
+			check(str(s1.get("area", "")) == str(Sects.SECTS[str(s1.sect)].area), "%s is done in its sect's own country" % s1.id)
+		if str(s1.kind) == "talk":
+			check(Trials.npc_area(str(s1.npc)) == str(s1.area) and (Data.DIALOGUE.has(str(s1.id))), "%s: somebody who stands there, with something to say" % s1.id)
+		elif str(s1.kind) != "breakthrough":
+			check(Data.DIALOGUE.has("done:" + str(s1.id)), "%s: something is said when it is done" % s1.id)
+		if str(s1.kind) == "hunt":
+			check(Data.layer_of(str(s1.area)) == "lakes" and int(s1.n) <= 60 and not s1.has("first") and not s1.has("cave"), "%s is a hunt in the open country of the Rivers and Lakes" % s1.id)
+		if str(s1.kind) == "collect":
+			var have41: int = (Data.AREAS[str(s1.area)].pickups as Array).filter(func(pk): return str(pk.item) == str(s1.item) and str(pk.vis[0]) == str(s1.id)).size()
+			check(have41 == int(s1.n) and Data.ITEMS.has(str(s1.item)) and Look.PICKUP_COLORS.has(str(s1.item)), "%s: there are as many to find as it asks for (%d)" % [s1.id, have41])
+		if str(s1.kind) == "rescue":
+			check(int(s1.n) <= 3 and i41 > p41, "%s asks for raids once they have begun, and no more than a watch or two has" % s1.id)
+		if str(s1.kind) == "summit":
+			check((lw.peaks as Array).any(func(pk): return str(pk.id) == "peak:%s:%d" % [str(s1.peak), int(s1.k)]), "%s: the peak it names is there" % s1.id)
+	check(n41 == 24 and kinds42.size() == 8 and int(kinds42.get("sect", 0)) == 4 and int(kinds42.get("rescue", 0)) == 3 and int(kinds42.get("hunt", 0)) == 4 and sects_met.size() == 4 and sides_met.size() == 2,
+		"the chapter is twenty-four steps of eight kinds: four sects, upright and crooked, three roads kept, and no lord (%d, %d)" % [n41, kinds42.size()])
+	var keys41b := ["recall39", "pre:s_break46", "post:s_break46"]
+	var firsts41 := 0
+	for dk1 in Data.DIALOGUE:
+		if str(dk1).contains("s_p41_") or str(dk1) in keys41b:
+			for ln1 in Data.DIALOGUE[dk1]:
+				check(fits.call(str(ln1[1])) and not str(ln1[1]).contains("—"), "%s: a line that fits the box, with no dash in it" % dk1)
+				check((ln1 as Array).size() == 2 or Data.EMOTES.has(str(ln1[2])), "%s: its gesture is one everybody has" % dk1)
+				check(not str(ln1[1]).contains(", sir") and not str(ln1[1]).contains("young man") and not str(ln1[1]).contains("Sir"), "%s: nobody calls the hero sir" % dk1)
+				check(str(ln1[0]) in names41b, "%s: %s is somebody of the chapter, under the name they stand by" % [dk1, ln1[0]])
+				if str(ln1[0]) == "Lin Feng" and (" " + str(ln1[1])).contains(" I "):
+					firsts41 += 1
+	check(firsts41 >= 8, "he speaks for himself in his own chapter (%d lines in the first person)" % firsts41)
+	for mn41 in names41b.slice(4):
+		check(Closeup.SIGNATURE.has(mn41) and Closeup.CLIPS.has(str(Closeup.SIGNATURE[mn41])), "%s has a gesture of their own" % mn41)
+	var c1: Dictionary = Echoes.CROSSROADS.get("the_covenant", {})
+	check(not c1.is_empty() and str(c1.step) == "s_p41_moot" and str(c1.part) == "XLI" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_covenant" and fits.call(str(c1.ask)), "what is done with fish on the mud is asked last of all")
+	check((c1.options as Array).size() == 3 and c1.after.size() == 3 and c1.end.size() == 3 and c1.echo.has("s_p41_end") and c1.echo.s_p41_end.size() == 3 and Data.step_index("s_p41_end") > Data.step_index("s_p41_moot") and bsrc.contains("\"the_covenant\": [\"dig\"]"), "the_covenant: three answers, each answered, echoed and told at the end, and the bot has one")
+	check(Echoes.CROSSROADS.the_two_roads.echo.has("s_p41_home") and Echoes.CROSSROADS.the_two_roads.echo.s_p41_home.size() == 3, "and what was answered about a second road is remembered when four sects ask for one covenant")
+	var tilts41 := {}
+	for o1 in c1.options:
+		var mk1: Dictionary = Marks.MARKS.the_covenant.get(str(o1.id), {})
+		check(not mk1.is_empty() and mk1.has("who") and fits.call(str(mk1.desc)) and fits.call(str(mk1.who[3])) and fits.call(str(mk1.who[4])) and Assets.has("characters/" + str(mk1.who[1])) and not Weal.hears(str(mk1.area)).is_empty() and int(mk1.get("k", 1)) >= 3 and Data.layer_of(str(mk1.area)) == "lakes", "the_covenant/%s leaves a row of things standing in the marsh, and somebody by it" % o1.id)
+		var mm1: Node3D = Marks.model(mk1, 1)
+		check(mm1 != null and mm1.get_child_count() > 0, "the_covenant/%s: what stands is built from code" % o1.id)
+		mm1.free()
+		for tk1 in o1.tilt:
+			tilts41[str(tk1)] = true
+		for ck1 in o1.get("creed", {}):
+			check(Creed.AXES.has(str(ck1)) and absi(int(o1.creed[ck1])) < Creed.SIDE, "the_covenant/%s leans on the Way, and does not by itself decide it" % o1.id)
+		check(fits.call(str(o1.desc)) and fits.call(str(c1.end[str(o1.id)])), "the_covenant/%s: what it means, and what is told of it, fit" % o1.id)
+		for al1 in c1.after[str(o1.id)]:
+			check(fits.call(str(al1[1])), "the_covenant/%s: what follows fits the dialogue box" % o1.id)
+		check(Mail.ORDER.any(func(l): return Mail.LETTERS[l].get("needs", []) == ["the_covenant", str(o1.id)]), "the_covenant/%s brings a letter from somebody who lives with it" % o1.id)
+		check(Weal.FATES.any(func(f): return str(f.when[0]) == "the_covenant" and str(o1.id) in f.when[1]), "the_covenant/%s turns somebody's life" % o1.id)
+	check(tilts41.size() == 3, "its answers tip all three scales between them")
+	check(lw.ents.filter(func(e): return e.kind == "mark" and str(e.id).begins_with("mark:the_covenant:yunmeng")).size() == 3, "and its answers found room in Yunmeng: a row of three, whichever is chosen")
+	for lt41 in ["covenant_bind_reed", "covenant_dig_cold", "covenant_toll_wolf"]:
+		check(Mail.LETTERS.has(lt41) and (Mail.LETTERS[lt41].lines as Array).all(func(l): return fits.call(str(l)) and not str(l).contains(" sir") and not str(l).contains("young man") and str(l).begins_with("Lin Feng:")), "the letter %s fits the box and is said to anybody" % lt41)
+	for ft41b in Weal.FATES:
+		if str(ft41b.when[0]) == "the_covenant":
+			check(str(ft41b.npc) == "deserter_qi" and fits.call(str(ft41b.line)) and str(ft41b.tag).length() <= 40, "a fate of the covenant is Qi's, and fits")
+	for pid41 in ["p41_bowl", "p41_crooked", "p41_last"]:
+		check(Memoir.PAGES.has(pid41) and Memoir.ORDER.has(pid41) and Data.step_index(str(Memoir.PAGES[pid41].after)) >= p41, "the page %s is of the chapter" % pid41)
+	check(str(Memoir.PAGES.p41_last.after) == "s_break46" and str(Memoir.PAGES.p41_last.who) == "lin", "the chapter closes on a page in his own hand")
+	# the bot's road through it
+	var BG41 = new_game.call()
+	check(bsrc.contains("\"rescue\":") and bsrc.contains("\"sect\":") and bsrc.contains("if str(st4.kind) == \"sect\":"), "the bot knows both new kinds of step, and a journey begun past them has done them")
+	BG41.free()

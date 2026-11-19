@@ -572,6 +572,10 @@ const REGION := {
 	"zhongbei": "No wind at all. I keep waiting for my hair to move. And listen: somebody is singing, and nobody told them to.",
 	"gumang": "They are all asleep. Every one. ...Walk softly. I know we cannot wake them. Walk softly anyway.",
 	"fuluo": "Two lights in the sky and neither of them going anywhere. I have never wanted an evening so much in my life.",
+	"yunmeng": "Listen. No, the reeds. Somebody is coming from the east in a flat boat and it will rain before dark. I do not know how I know that. I have been here an hour.",
+	"hanshan": "There is a poem on that rock. And that one. And he has written on the tree. Did nobody ever give the man paper?",
+	"heishui": "The water does not show me my face. I looked twice. I should like to leave before I am tempted to look a third time.",
+	"langya": "They weighed us at the rope. With their eyes. I was priced rather high, I think. I am trying not to be pleased.",
 	"guixu": "The Returning Ruins. Everything that was ever lost ends up here. I keep looking at the sea floor for my winter.",
 }
 ## when she has nothing to say about where they are (or is somewhere upstairs or in a cellar)
