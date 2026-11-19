@@ -608,7 +608,10 @@ static func restore(g, id: String, door: bool = false) -> Dictionary:
 		var stones := 0
 		if str(q.cls) == "lost":
 			g.restored += 1
-			g.step_restore += 1
+			# (the Sea Floor release: a step that asks for the roads of one region counts what was lost in them)
+			var rs: Dictionary = g.cur_step()
+			if rs.is_empty() or str(rs.get("kind", "")) != "restore" or not rs.has("area") or str(rs.area) == str(q.area):
+				g.step_restore += 1
 			stones = THANKS + THANKS_REALM * int(g.realm())
 			g.stones += stones
 			Weal.act(g, Weal.town_of(str(q.area)), "restored")

@@ -89,12 +89,19 @@ const FEATS := {
 	"the_hammer": {"n": "Wanted It When He Did", "kind": "road", "pts": 10, "test": ["step", "s_p39_room"], "desc": "Win a lot in an auction room."},
 	# the Two Roads release: the last realm, the leaves and the roads (Part XL)
 	"two_roads": {"n": "Seven Either Way", "kind": "road", "pts": 20, "test": ["level", 135], "desc": "Reach Walking Two Roads."},
-	"in_the_lakes": {"n": "Nobody Saw Him Off", "kind": "road", "pts": 20, "test": ["level", 138], "desc": "Reach Forgotten in the Lakes: the last realm there is."},
+	"in_the_lakes": {"n": "Nobody Saw Him Off", "kind": "road", "pts": 20, "test": ["level", 138], "desc": "Reach Forgotten in the Lakes."},
 	"the_loser_pours": {"n": "The Loser Pours", "kind": "road", "pts": 10, "test": ["step", "s_p40_du"], "desc": "Win a hand of leaves from Hall Master Du."},
 	"the_keepers_table": {"n": "Without a Tail", "kind": "road", "pts": 10, "test": ["step", "s_p40_ju"], "desc": "Take the table from the keeper of monkeys, at Three in the Morning."},
 	"down_the_river": {"n": "Fed Before He Was Asked", "kind": "road", "pts": 10, "test": ["step", "s_p41_boat"], "desc": "Take the river-boat down to the Rivers and Lakes, and eat what is put in his hands."},
 	"four_tables": {"n": "All Four Tables", "kind": "road", "pts": 10, "test": ["step", "s_p41_wolf"], "desc": "Sit down with all four sects of the Rivers and Lakes, two upright and two crooked."},
 	"forty_home": {"n": "Forty Out, Forty Home", "kind": "road", "pts": 10, "test": ["raids", 12], "desc": "Break twelve raids on the roads and the camps."},
+	# the Sea Floor release: the last realm, the works, the places of the sea floor and the shaped ground (Part XLII)
+	"joy_of_fish": {"n": "From the Bridge", "kind": "road", "pts": 20, "test": ["level", 141], "desc": "Reach Knows the Joy of Fish: the last realm there is."},
+	"went_down": {"n": "Mind the Step", "kind": "road", "pts": 10, "test": ["step", "s_p42_dive"], "desc": "Go down with the water at the Returning Ruins, and stand on the floor of the sea."},
+	"asked_the_ground": {"n": "Asked, and It Moved", "kind": "road", "pts": 10, "test": ["step", "s_p42_shape"], "desc": "Learn the Dao of Leading Water, and shape the ground with it."},
+	"carried_level": {"n": "Carry It Level", "kind": "odd", "pts": 10, "test": ["crates", 6], "desc": "Carry six crates between the works of the sea floor."},
+	"every_sight": {"n": "Nobody Since It Sank", "kind": "odd", "pts": 20, "test": ["sights", 24], "desc": "Find every place of the sea floor."},
+	"a_pool_of_his_own": {"n": "Perfectly Round", "kind": "odd", "pts": 10, "test": ["shaped", 12], "desc": "Ask twelve things of the ground, and be answered."},
 	"both_at_once": {"n": "Neither Promised the Morning", "kind": "road", "pts": 10, "test": ["step", "s_p40_two"], "desc": "Walk a second road as well as the first."},
 	"leaves_ten": {"n": "Has Not Poured Since the New Year", "kind": "odd", "pts": 10, "test": ["card_wins", 10], "desc": "Win ten hands of leaves."},
 	"five_painted": {"n": "A Hand of Nines", "kind": "odd", "pts": 20, "test": ["masters", 5], "desc": "Win a hand from every master of the leaves."},
@@ -271,6 +278,13 @@ static func value(g, t: Array) -> float:
 			return float(g.raids_broken)
 		"sect_tasks":
 			return float(Sects.done_count(g))
+		"crates":
+			# (the Sea Floor release, mills.gd: crates carried from one works to another)
+			return float(g.crates_done)
+		"sights":
+			return float(g.sights.size())
+		"shaped":
+			return float(g.shaped_n)
 		"masters":
 			return float(Yezi.beaten(g))
 		"roads":

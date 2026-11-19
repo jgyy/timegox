@@ -69,6 +69,13 @@ const TOWNS := {
 		"roles": {"merchant": 5, "porter": 4, "watchman": 2, "youth": 3, "elder": 1, "cook": 1, "waiter": 2, "lamplighter": 1, "giant": 1}},
 	"knifegate": {"n": "Knifegate", "area": "langya", "at": Vector2i(45, 32), "race": "human",
 		"roles": {"guard": 5, "huntsman": 3, "smith": 2, "porter": 3, "youth": 3, "cook": 1, "merchant": 1, "elder": 1, "waiter": 1, "giant": 2}},
+	# (the Sea Floor release: the three towns under the Eastern Sea)
+	"shuttlereef": {"n": "Shuttlereef", "area": "jiaoshi", "at": Vector2i(41, 32), "race": "jiaoren",
+		"roles": {"washer": 4, "porter": 3, "musician": 2, "child": 4, "elder": 2, "youth": 2, "cook": 1, "merchant": 1, "waiter": 1, "giant": 1}},
+	"redbranch": {"n": "Redbranch", "area": "shanhu", "at": Vector2i(47, 32), "race": "human",
+		"roles": {"smith": 3, "porter": 4, "fisher": 3, "child": 3, "elder": 2, "youth": 2, "cook": 1, "merchant": 2, "waiter": 1, "giant": 1}},
+	"lampdeep": {"n": "Lampdeep", "area": "beiming", "at": Vector2i(37, 32), "race": "human",
+		"roles": {"lamplighter": 3, "porter": 3, "cook": 2, "scholar": 2, "child": 3, "elder": 2, "youth": 2, "watchman": 1, "waiter": 1, "giant": 1}},
 }
 
 ## The Two Roads release: the towns are fuller.  Who has come to live in each since, by kind: made after
@@ -96,6 +103,10 @@ const MORE := {
 	"clearbell": {"leafer": 1, "hawker": 1, "storyteller": 1, "monk": 1, "child": 1},
 	"ashmarket": {"leafer": 2, "hawker": 3, "storyteller": 1, "porter": 1},
 	"knifegate": {"leafer": 1, "hawker": 1, "storyteller": 1, "guard": 1, "youth": 1},
+	# (the Sea Floor release: the three towns under the sea were built full)
+	"shuttlereef": {"leafer": 1, "hawker": 1, "storyteller": 1, "washer": 1, "child": 1},
+	"redbranch": {"leafer": 1, "hawker": 2, "storyteller": 1, "porter": 1},
+	"lampdeep": {"leafer": 1, "hawker": 1, "storyteller": 1, "lamplighter": 1, "youth": 1},
 }
 
 ## How many people a town has in all (`TOWNS` and `MORE`).
@@ -1659,6 +1670,14 @@ const POSTS := {
 	"debtor_niu": ["dig|count|think", "", "doze"], "cutpurse_ya": ["peer|stretch|gaze", "", "stargaze"], "blind_teller": ["think|touch|count", "", "meditate"],
 	"tuoba_lie": ["gaze|point|think", "", "stargaze"], "pit_keeper": ["sweep|measure|gaze", "broom", "doze"], "wolf_mother": ["offer|gather|count", "", "doze"],
 	"ransom_clerk": ["write|count|peer", "book", "read"], "deserter_qi": ["gaze|think|stretch", "", "stargaze"], "toll_boy": ["count|peer|point", "", "doze"],
+	# Part XLII (the Sea Floor release): the people of the three towns under the sea, and of the Tail-Gate
+	"loom_mother": ["weave|count|gaze", "", "doze"], "retter_mu": ["count|point|measure", "", "doze"], "loomer_sha": ["count|measure|point", "", "doze"],
+	"gauze_girl": ["gather|gaze|stretch", "", "doze"], "pearl_counter": ["count|peer|think", "", "doze"],
+	"kiln_hong": ["measure|gaze|think", "", "doze"], "limer_shi": ["count|point|peer", "", "doze"], "glazier_liuli": ["count|measure|peer", "", "doze"],
+	"net_hand": ["measure|gather|gaze", "", "doze"], "coral_child": ["pour|gaze|gather", "", "doze"],
+	"sea_turtle": ["think|gaze|doze", "", "doze"], "salter_yan": ["count|point|measure", "", "doze"], "roe_wife": ["count|peer|point", "", "doze"],
+	"lamp_boy": ["pour|peer|stretch", "", "doze"], "kun_watcher": ["gaze|write|peer", "", "stargaze"],
+	"frog_wa": ["gaze|measure|think", "", "stargaze"], "silt_sweeper": ["sweep|gaze|stretch", "broom", "doze"],
 	"goujian": ["think|gaze", "", "doze"], "sun_bin": ["measure|write|think", "", "doze"], "lin_xiangru": ["think|gaze|write", "", "doze"],
 	"yangzi_wife": ["weave|sew|spin", "", "weave"], "yang_zhen": ["read|write|gaze", "", "read"], "bell_thief": ["peer|knock|gaze", "", "doze"], "pei_du": ["gaze|count|read", "", "gaze"],
 	"tai_widow": ["sew|sweep", "needle", "doze"], "xu_qian": ["write|peer", "", "read"], "qian_liu": ["point|peer|count", "", "doze"], "bo_yi": ["dig|peer|point", "", "doze"],

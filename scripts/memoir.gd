@@ -55,8 +55,8 @@ const PAGES := {
 		"I am an old man who was wrong about the size of things. I say so here because the child will not say it for me."]},
 	"p06_maple": {"n": "Two Graves under a Maple", "who": "lin", "after": "s_break11", "lines": [
 		"The Elder told me where he found me: under a maple in the gorge, beside two graves with no names on them. He told me on the night the dead stood in a queue at our gate, which is the kind of timing he has.",
-		"I turned the Wheel so that the dead could go on. I looked for two faces in that queue the whole time. I would not have known them. I looked anyway.",
-		"I do not know who they were. I know somebody dug two graves properly, with a baby to carry. I have decided that is enough to know about a person."]},
+		"I turned the Wheel so that the dead could go on. I looked for two faces in that queue the whole time. I would not have known them. At the bridge they knew me first.",
+		"They walked with me to the Wheel, and we talked on the way. I know their names now. I knew before that somebody dug two graves properly, with a baby to carry, and I had decided that was enough to know about a person. It was. It is better to know more."]},
 	"p07_thread": {"n": "Unpicking", "who": "yue", "after": "s_break12", "lines": [
 		"The Weaver had sewn the world into squares so that each could be harvested by itself. You unpicked one seam and the whole land lay down like a dog that has been let off a chain.",
 		"She was spinning the newly born into thread. Little Wan was on the spindle. I have never seen you angry before or since, and I hope I never do again. You were very quiet.",
@@ -90,7 +90,7 @@ const PAGES := {
 		"There was a boy with a kitchen knife once, and a thief in a storeroom, and a girl calling for her horses. I had done something about each in a hurry and gone on. Each of them had gone on being a person.",
 		"Whatever fed on the debts nobody paid, at the Wheel, it had my face on it for a moment. I did not strike that first. I am told that is why the rest went as it did."]},
 	"p15_woven": {"n": "The Second Cup", "who": "yue", "after": "s_break20", "lines": [
-		"Disciple Han set out the tea and frowned at the second cup and asked who it was for. It had been mine for ten years.",
+		"Disciple Han set out the tea and frowned at the second cup and asked who it was for. It had been mine every morning since the bamboo forest.",
 		"I was woven, not born. The Founder made me out of the Seal's own lotus so that whoever carried the root would not face the end alone. Everything I did went into your column. When nothing was owed any more, the world began to put me away.",
 		"You went and found six things that had happened to me and nobody else, and gave them back, and people remembered my name. I had never had a thread. You tied one. I have not thanked you, and this is not that either."]},
 	"p16_year": {"n": "Red Paper", "who": "lin", "after": "s_break21", "lines": [
@@ -111,7 +111,7 @@ const PAGES := {
 		"There was a dancer out in the sand that somebody had once taken apart in front of a king. It had been building itself a heart out of clockwork. I knew something about being made for a purpose and wanting a heart anyway. She was standing next to me."]},
 	"p20_hollow": {"n": "What a Hollow Is For", "who": "elder", "after": "s_break25", "lines": [
 		"The works ate ore, and the land dug for it, and tipped what it dug into the nearest hole. The wells went dry. A well is a hollow that water comes to. I had read that sentence fifty times and never once been thirsty reading it.",
-		"The child went down into every cave in the land. I am told there is a woodcutter under one hill who has been watching a single game of weiqi since before the sect stood. The child sat and watched a few moves.",
+		"The child went down into every cave in the land. There was a woodcutter under one hill who had watched a single game of weiqi since before the sect stood. The child sat and watched a few moves, and brought him home: he has the room over the wood-store now.",
 		"What is an empty place for? I gave lectures on it. The child came back with wet boots and said: it is for what comes to it. I have stopped giving the lecture."]},
 	"p21_arms": {"n": "Eight Weapons", "who": "lin", "after": "s_break26", "lines": [
 		"What was dug was smelted, what was smelted was cast, and what came out of the moulds was blades. Nobody had ordered them. The racks in our armoury were empty and the boys were shooting at each other's hats.",
@@ -271,6 +271,19 @@ const PAGES := {
 		"Nobody saw us off. Four sects, a month of my life, and the landing was empty when the boat pulled out. Yue Ling minded for a mile. I minded for about as long as it takes to say so.",
 		"I have wanted to be needed since I was six years old with a broom too tall for me. This month I was needed by everybody at once. It is like being the only dry stone in a ford. Everything stands on you, and nothing stays.",
 		"The water is back. They were forgetting me already, or trying to; I could see it from the boat. I think that is the best work I have done. I should not like to have to do it often."]},
+	# Part XLII (the Sea Floor release)
+	"p42_floor": {"n": "Somebody Lived There", "who": "lin", "after": "s_p42_dive", "lines": [
+		"I dug out a spring. I was pleased with myself for a month. The water came back and four sects went home, and I thought that was the end of what I had done, because it was the end of what I could see.",
+		"There was a floor under the sea, and a town on it, and a woman who wrote to thank me before she told me what it had cost her. I do not think I could have done that. I should have led with the cost.",
+		"I have never once asked where a river goes. I have swept a great deal of dust off a great many steps, and I never asked where that went either."]},
+	"p42_hands": {"n": "Frightened the Whole Time", "who": "yue", "after": "s_p42_shape", "lines": [
+		"You put your hand on the ground and it moved, and you looked as you looked the first day in the bamboo, when you did not know whether the sword would come when you called. I had forgotten you could look like that.",
+		"I have watched you break a mountain and think nothing of it. Tonight you raised a piece of sand a hand and a half and could not eat your supper. I want you to know which of the two I trusted more.",
+		"The old turtle says it is the only art that is harder the stronger you are. I think he was describing you, and was too polite to say so. I am not."]},
+	"p42_last": {"n": "From the Bridge", "who": "lin", "after": "s_break47", "lines": [
+		"Zhuangzi stood on a bridge and said the fish were happy. Hui Shi said: you are not a fish. I have argued Hui Shi's side all my life without knowing it had a name. Do not presume. Sweep your own step.",
+		"I went down among them. I ate at their tables and carried their crates and learned the one art they had to teach. I still do not know what a fish enjoys. But I know what I saw, and I said it, and I said where I was standing when I saw it.",
+		"I think that is all the man on the bridge ever claimed. Not that he was a fish. Only that he was there, and looking, and that it would have been a kind of lie to say he had seen nothing."]},
 	"p38_last": {"n": "In My Own Hand", "who": "lin", "after": "s_break43", "lines": [
 		"These pages were her idea. She said a story told only from over somebody's shoulder is a story about a back. So here is the front of it.",
 		"I am Lin Feng. I swept steps. I was handed a root I did not earn and a companion I did not deserve, and I climbed until there was nobody above me, and then three people walked down a mountain and there was.",
@@ -280,7 +293,7 @@ const ORDER := ["p01_post", "p01_broom", "p01_gate", "p02_emperor", "p03_hollow"
 	"p13_gates", "p14_karma", "p15_woven", "p16_year", "p17_spring", "p18_fire", "p19_works", "p20_hollow", "p21_arms", "p22_roads", "p23_host", "p24_horse", "p25_town", "p26_springs", "p27_sack",
 	"p28_grass", "p29_chimney", "p30_net", "p31_shoe", "p32_mirror", "p33_pestle", "p34_road", "p35_block", "p36_fish", "p37_round",
 	"p38_word", "p38_fuchai_down_lin", "p38_fuchai_down_yue", "p38_fuchai_up_lin", "p38_pang_down_lin", "p38_pang_down_yue", "p38_pang_up_lin",
-	"p38_lian_down_lin", "p38_lian_down_yue", "p38_lian_up_lin", "p38_lian_won_lin", "p38_low", "p38_last", "p39_ring", "p39_paper", "p39_last", "p40_leaves", "p40_two", "p40_last", "p41_bowl", "p41_crooked", "p41_last"]
+	"p38_lian_down_lin", "p38_lian_down_yue", "p38_lian_up_lin", "p38_lian_won_lin", "p38_low", "p38_last", "p39_ring", "p39_paper", "p39_last", "p40_leaves", "p40_two", "p40_last", "p41_bowl", "p41_crooked", "p41_last", "p42_floor", "p42_hands", "p42_last"]
 
 static var _by_step := {}
 

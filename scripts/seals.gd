@@ -89,7 +89,8 @@ static func due(g, id: String) -> int:
 		"arm":
 			return clampi(1 + Arms.tier(g, key(id)), 2, 3) if Rites.his(g, id) else 0
 		"taboo":
-			return 1 if Taboo.depth(g, key(id)) == 0 and not Taboo.marked(g) else 0
+			# (the Sea Floor release: nor is it written afresh for somebody who has knelt for the shelf)
+			return 1 if Taboo.depth(g, key(id)) == 0 and not Taboo.marked(g) and not g.taboo.has("atoned") else 0
 	return 0
 
 ## Whether the paper he holds of `id` still says something true.

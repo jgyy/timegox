@@ -31,6 +31,7 @@ const DENSITY := {
 	"penglai": 0.2, "fangzhang": 0.24, "yingzhou": 0.26, "guixu": 0.22,
 	"huaxu": 0.2, "zhongbei": 0.22, "gumang": 0.24, "fuluo": 0.24,
 	"yunmeng": 0.2, "hanshan": 0.26, "heishui": 0.24, "langya": 0.26,
+	"jiaoshi": 0.2, "shanhu": 0.26, "beiming": 0.22, "weilu": 0.24,
 }
 
 ## themes with scattered water (noise threshold: lower = rarer)
@@ -152,6 +153,16 @@ static func build(id: String, size := Vector2i.ZERO, spec_over: Dictionary = {})
 		var st: Vector2i = spec.steles[k]
 		ents.append({"kind": "stele", "id": "stele_%s_%d" % [id, k], "pos": st, "vis": ["s_p11_home", ""]})
 		fixed.append(st)
+	# the Sea Floor release: the stations and the store of a town's works (mills.gd), and the places of the sea
+	# floor that are there to be found (deeps.gd): written where they stand, in a realm made for its chapter
+	for ml in spec.get("mills", []):
+		ents.append({"kind": "mill", "id": ml.id, "works": ml.works, "k": int(ml.k), "pos": ml.pos})
+		fixed.append(ml.pos)
+		# (whoever works a station stands on the tile south of it)
+		fixed.append(ml.pos + Vector2i(0, 1))
+	for sg in spec.get("sights", []):
+		ents.append({"kind": "sight", "id": "sight:" + str(sg.id), "sight": sg.id, "pos": sg.pos})
+		fixed.append(sg.pos)
 	# the ends of the ladders between the realms must be open ground everyone can walk to
 	for le in ladder_ends(id):
 		fixed.append(le[0])

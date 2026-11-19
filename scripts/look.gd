@@ -34,6 +34,17 @@ const THEMES := {
 		"sky_top": Color("2a2030"), "sky_hor": Color("7a5a5a"), "fog": Color("4a3a40"), "fog_d": 0.028, "sun": Color("ffb090"), "sun_e": 0.75, "amb": Color("8a7078"), "amb_e": 0.9, "weather": "ash", "tree": "dead", "decor": "bone"},
 	"langya": {"g1": Color("9a8458"), "g2": Color("a68e60"), "path": Color("d0bc90"), "wall": Color("5a4630"), "water": Color("6a8a9a"), "bg": Color("140e06"),
 		"sky_top": Color("4a78b0"), "sky_hor": Color("f0dcb0"), "fog": Color("d8c8a0"), "fog_d": 0.014, "sun": Color("fff0c8"), "sun_e": 1.3, "amb": Color("c8b088"), "amb_e": 1.0, "weather": "dust", "tree": "spire", "decor": "bone"},
+	# the Sea Floor release: the four countries under the Eastern Sea.  No sky: the "sky" is the water overhead,
+	# green-blue over the weaving-rooms, warm and clear in the coral, black in the Northern Dark with only the
+	# lamps, and the colour of the river's mud at the Tail-Gate
+	"jiaoshi": {"g1": Color("c8c0a0"), "g2": Color("d4ccac"), "path": Color("e8e0c8"), "wall": Color("2a7a6a"), "water": Color("1a4a7a"), "bg": Color("041418"),
+		"sky_top": Color("0a4a6a"), "sky_hor": Color("3aa0b0"), "fog": Color("2a8a9a"), "fog_d": 0.026, "sun": Color("b8fff0"), "sun_e": 1.0, "amb": Color("6ab8c0"), "amb_e": 1.0, "weather": "bubbles_up", "tree": "coral", "decor": "shell"},
+	"shanhu": {"g1": Color("d8c8a8"), "g2": Color("e2d2b2"), "path": Color("f0e4c8"), "wall": Color("c85a4a"), "water": Color("1a5a8a"), "bg": Color("06141a"),
+		"sky_top": Color("0a5a80"), "sky_hor": Color("58c0c8"), "fog": Color("3aa0b0"), "fog_d": 0.02, "sun": Color("d8fff0"), "sun_e": 1.15, "amb": Color("80c8c8"), "amb_e": 1.05, "weather": "bubbles_up", "tree": "coral", "decor": "shell"},
+	"beiming": {"g1": Color("3a4458"), "g2": Color("424c62"), "path": Color("6a7488"), "wall": Color("1a2238"), "water": Color("060a1a"), "bg": Color("020308"),
+		"sky_top": Color("01030a"), "sky_hor": Color("0a1a3a"), "fog": Color("081428"), "fog_d": 0.034, "sun": Color("6a90d8"), "sun_e": 0.45, "amb": Color("4a6aa0"), "amb_e": 0.8, "weather": "bubbles_up", "tree": "crystal", "decor": "starcrystal"},
+	"weilu": {"g1": Color("8a7650"), "g2": Color("96825a"), "path": Color("b8a880"), "wall": Color("4a4030"), "water": Color("1a2a3a"), "bg": Color("080604"),
+		"sky_top": Color("1a2a30"), "sky_hor": Color("6a6a50"), "fog": Color("5a5a40"), "fog_d": 0.03, "sun": Color("d8d0a0"), "sun_e": 0.7, "amb": Color("8a8468"), "amb_e": 0.9, "weather": "bubbles_up", "tree": "spire", "decor": "bone"},
 	"void": {"g1": Color("2a1e4a"), "g2": Color("32245a"), "path": Color("4a3a7a"), "wall": Color("120a2a"), "water": Color("6a2aa8"), "bg": Color("06020e"),
 		"sky_top": Color("08041a"), "sky_hor": Color("4a2a88"), "fog": Color("2a1a52"), "fog_d": 0.020, "sun": Color("b890ff"), "sun_e": 0.8, "amb": Color("7a60b8"), "amb_e": 0.85, "weather": "stars", "tree": "shard", "decor": "starcrystal"},
 	"celestial": {"g1": Color("d8d4e8"), "g2": Color("e4e0f2"), "path": Color("f0d890"), "wall": Color("b8a8d8"), "water": Color("8ab8f0"), "bg": Color("1a2040"),
@@ -210,6 +221,10 @@ const EXTRA := {
 	"hanshan": {"hill": 1.1, "tex": "snow", "tuft": "snow", "horizon": "peaks", "clouds": 0.4, "haze": 0.4, "rays": 0.5},
 	"heishui": {"hill": 0.45, "tex": "mud", "tuft": "deadgrass", "horizon": "hills", "clouds": 0.9, "stars": 0.3, "haze": 0.6},
 	"langya": {"hill": 1.3, "tex": "rock", "tuft": "deadgrass", "horizon": "peaks", "clouds": 0.2, "rays": 0.6, "haze": 0.5},
+	"jiaoshi": {"hill": 0.4, "tex": "sand", "tuft": "kelp", "horizon": "reef", "clouds": 0.0, "rays": 0.9, "haze": 0.5},
+	"shanhu": {"hill": 0.7, "tex": "sand", "tuft": "kelp", "horizon": "reef", "clouds": 0.0, "rays": 1.0, "haze": 0.4},
+	"beiming": {"hill": 0.55, "tex": "underworld", "tuft": "crystal", "horizon": "reef", "clouds": 0.0, "stars": 0.0, "haze": 0.7},
+	"weilu": {"hill": 0.9, "tex": "mud", "tuft": "kelp", "horizon": "reef", "clouds": 0.0, "rays": 0.3, "haze": 0.8},
 }
 
 const PICKUP_COLORS := {
@@ -242,6 +257,8 @@ const PICKUP_COLORS := {
 	# Part XL (the Two Roads release)
 	"keeper_acorn": Color("9a7a3a"), "pricked_leaf": Color("d85a3a"), "fork_stone": Color("a8a498"),
 	"reed_flute": Color("b8c878"), "rock_poem": Color("e8e4d8"), "debt_slip": Color("8a2a30"),
+	# Part XLII (the Sea Floor release)
+	"buried_shuttle": Color("3a3a48"), "net_link": Color("9a9aa8"), "well_rope": Color("c8b078"), "xirang_clod": Color("c89a4a"),
 	# Part XXXVIII (the Higher Sky release)
 	"bed_gall": Color("5a6a3a"), "war_slip": Color("c8b070"), "linchpin": Color("5a5a62"),
 	"charred_shingle": Color("4a3a30"), "crane_feather": Color("f4f4f8"), "furrow_piece": Color("e8c040"),

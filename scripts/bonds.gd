@@ -576,6 +576,10 @@ const REGION := {
 	"hanshan": "There is a poem on that rock. And that one. And he has written on the tree. Did nobody ever give the man paper?",
 	"heishui": "The water does not show me my face. I looked twice. I should like to leave before I am tempted to look a third time.",
 	"langya": "They weighed us at the rope. With their eyes. I was priced rather high, I think. I am trying not to be pleased.",
+	"jiaoshi": "My hair will not lie down. It goes where the water goes. ...Do not look at me like that. Yours is doing it too.",
+	"shanhu": "Nine hundred years to grow that branch, he says. I have been asleep for a tenth of it. I feel I should apologise to it.",
+	"beiming": "I cannot see my hand. I can see yours, by the lamp. That will do. Keep it where it is.",
+	"weilu": "Listen to it. Everything that ever ran downhill is going past us, and it is still not full. I find that restful. Is that strange?",
 	"guixu": "The Returning Ruins. Everything that was ever lost ends up here. I keep looking at the sea floor for my winter.",
 }
 ## when she has nothing to say about where they are (or is somewhere upstairs or in a cellar)

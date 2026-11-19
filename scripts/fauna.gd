@@ -70,6 +70,10 @@ const KINDS := {
 	"hanshan": [["birds", 2], ["cranes", 1]],
 	"heishui": [["bats", 3], ["birds", 1]],
 	"langya": [["birds", 2], ["bats", 1]],
+	"jiaoshi": [["fish", 6]],
+	"shanhu": [["fish", 7]],
+	"beiming": [["fish", 3]],
+	"weilu": [["fish", 3]],
 }
 
 const FLAP := """

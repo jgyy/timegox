@@ -100,6 +100,9 @@ static func sit(g, id: String, seen: int, where: String = "") -> Array:
 		return []
 	var d: Dictionary = DAOS[id]
 	g.taboo[id] = depth(g, id) + 1
+	# (the Sea Floor release, seals.gd: the paper that says he never opened this art is void from this day, and
+	# is not made good again by kneeling: it used to read true once the Hall of Discipline had stripped him)
+	g.seals.erase("t_" + id)
 	g.hp[0] = maxf(1.0, float(g.hp[0]) - float(g.max_hp(0)) * 0.2)
 	if Clock.frozen(g) == "":
 		Clock.set_hour(g, fposmod(Clock.hour(g) + HOURS, 24.0))

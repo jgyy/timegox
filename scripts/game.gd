@@ -412,6 +412,22 @@ var step_cards := 0
 ## the Rivers and Lakes release (sects.gd, raids.gd, sides.gd): the tasks of the sects (task -> "taken" or "done") and
 ## what was so when each was taken; raids broken (in all, by his coming alone, this watch's by key, since the step
 ## began); the day a cutpurse last tried him and the day he was last mended for nothing, by town; and how often
+## the Sea Floor release (mills.gd, deeps.gd, terra.gd): what each works' store held when it was last counted
+## (works -> {n, at}), the crates in his hands, the day each pair of works last had one of him, what he has
+## bought and been paid and brought; the places of the sea floor found (sight -> day); and the ground he has
+## shaped (realm -> tile -> {h, w}), how often, of which kinds, and since the step began
+var mills := {}
+var mill_crates: Array = []
+var mill_runs := {}
+var mill_bought := 0
+var mill_paid := 0
+var crates_done := 0
+var step_supply := 0
+var sights := {}
+var shaped := {}
+var shaped_n := 0
+var shaped_kinds := {}
+var step_terra := 0
 var sect_q := {}
 var sect_base := {}
 var raids_broken := 0
@@ -723,6 +739,18 @@ func reset() -> void:
 	lots_won = 0
 	lot_spent = 0
 	lot_saved = 0
+	mills = {}
+	mill_crates = []
+	mill_runs = {}
+	mill_bought = 0
+	mill_paid = 0
+	crates_done = 0
+	step_supply = 0
+	sights = {}
+	shaped = {}
+	shaped_n = 0
+	shaped_kinds = {}
+	step_terra = 0
 	sect_q = {}
 	sect_base = {}
 	raids_broken = 0
@@ -1193,6 +1221,8 @@ func advance() -> void:
 	# (memoir.gd: and what one of them had to say of it is written down)
 	Memoir.written(self)
 	step_raids = 0
+	step_supply = 0
+	step_terra = 0
 	step_fit = 0
 	step_toil = 0
 	step_restore = 0
@@ -1359,6 +1389,15 @@ func poll_steps() -> void:
 			"sect":
 				# Part XLI (sects.gd): so many tasks done for one of the sects of the Rivers and Lakes
 				ok = Sects.done_count(self, str(s.sect)) >= int(s.n)
+			"supply":
+				# Part XLII (mills.gd): so many crates carried from one works to another since the step began
+				ok = step_supply >= int(s.n)
+			"sights":
+				# Part XLII (deeps.gd): so many places of the sea floor found in the step's country
+				ok = Deeps.found_in(self, str(s.get("area", ""))) >= int(s.n)
+			"terra":
+				# Part XLII (terra.gd): so many askings the ground answered since the step began
+				ok = step_terra >= int(s.n)
 			"weal":
 				# Part XXVIII: so many towns of the land left the better for his coming since the step
 				# began (weal.gd)
@@ -1492,6 +1531,12 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(Braid.count(self), int(s.n)), int(s.n)]
 	elif s.kind == "rescue":
 		t += "  (%d/%d)" % [mini(step_raids, int(s.n)), int(s.n)]
+	elif s.kind == "supply":
+		t += "  (%d/%d)" % [mini(step_supply, int(s.n)), int(s.n)]
+	elif s.kind == "sights":
+		t += "  (%d/%d)" % [mini(Deeps.found_in(self, str(s.get("area", ""))), int(s.n)), int(s.n)]
+	elif s.kind == "terra":
+		t += "  (%d/%d)" % [mini(step_terra, int(s.n)), int(s.n)]
 	elif s.kind == "sect":
 		t += "  (%d/%d)" % [mini(Sects.done_count(self, str(s.sect)), int(s.n)), int(s.n)]
 	elif s.kind == "meet" and Lists.entered(self, str(s.meet)):
@@ -1796,6 +1841,20 @@ func use_item_field(id: String) -> String:
 			return "Everyone's qi is already full."
 		qi[j] = minf(float(max_qi(j)), qi[j] + max_qi(j) * 0.5 * dao_mod("pill", 1.0) * Works.mod(self, "pill"))
 		return "%s recovers qi." % member_name(j)
+	# (the Sea Floor release, mills.gd: a thing made at one of the works of the sea floor: a share of health,
+	# of qi, or of both, for whoever of the party is lowest)
+	if Mills.USES.has(id):
+		var u: Dictionary = Mills.USES[id]
+		var need_hp: bool = u.has("hp") and hp[i] < max_hp(i) - 0.5
+		var need_qi: bool = u.has("qi") and qi[i] < max_qi(i) - 0.5
+		if not need_hp and not need_qi:
+			return "Nobody has any need of it now."
+		inv[id] -= 1
+		if u.has("hp"):
+			hp[i] = minf(float(max_hp(i)), hp[i] + max_hp(i) * float(u.hp))
+		if u.has("qi"):
+			qi[i] = minf(float(max_qi(i)), qi[i] + max_qi(i) * float(u.qi))
+		return "%s is the better for it." % member_name(i)
 	return ""
 
 func respawn() -> void:

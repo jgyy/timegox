@@ -21,9 +21,9 @@ extends RefCounted
 ## The tests run the audit and expect nothing.
 
 ## how far round its own tile a kind of thing is kept clear of scatter (tiles)
-const REACH := {"boss": 1, "hold": 1, "machine": 1, "mark": 1, "npc": 0, "pickup": 0, "prop": 0}
+const REACH := {"boss": 1, "hold": 1, "machine": 1, "mark": 1, "npc": 0, "pickup": 0, "prop": 0, "mill": 1, "sight": 1}
 ## the kinds that stand still on a tile and are drawn there
-const STANDS := ["npc", "boss", "pickup", "prop", "mark", "hold", "machine", "stele", "abode", "spring", "ladder", "obstacle"]
+const STANDS := ["npc", "boss", "pickup", "prop", "mark", "hold", "machine", "stele", "abode", "spring", "ladder", "obstacle", "mill", "sight"]
 ## what stands no higher than this (metres) is what somebody can walk into: a roof's eave or a tree's crown
 ## over a neighbour's head is not a clash
 const HEAD := 1.7
@@ -113,6 +113,11 @@ static func extent(e: Dictionary) -> float:
 			key = "hold:" + (str(e.id) if e.has("seg") else str(e.get("plot", "")))
 		"machine":
 			key = "machine:" + str(e.get("work", ""))
+		"mill":
+			# (the Sea Floor release, mills.gd: a station of a works with whoever works it, or its store)
+			key = "mill:%s:%d" % [str(e.get("works", "")), int(e.get("k", 0))]
+		"sight":
+			key = "sight:" + str(e.get("sight", ""))
 		"prop":
 			key = "prop:" + str(e.get("prop", ""))
 		"mark":
@@ -137,6 +142,10 @@ static func extent(e: Dictionary) -> float:
 				n = Hold.model_of(e, 3, "found") if (e.has("seg") or Hold.PLOTS.has(str(e.get("plot", "")))) else null
 			"machine":
 				n = Machines.model(str(e.work))
+			"mill":
+				n = Mills.model(str(e.works), int(e.k))
+			"sight":
+				n = Deeps.model(str(e.sight))
 			"prop":
 				n = Props.model(str(e.prop), "village") if Props.KINDS.has(str(e.get("prop", ""))) else null
 			"spring":
@@ -294,7 +303,7 @@ static func nudge(key: String, ents: Array, e: Dictionary) -> Vector3:
 ## the stack of wood and the pedlar's boxes of a camp of the road (structures.gd `camp`).  The day of the
 ## people of the towns is laid out on the grid, where all of these are a tile or less; as drawn, a soldier
 ## of the Drum Tower stood in a jar, a hermit in a cairn, and the cook of every camp in the cooking pot.
-const WIDE := ["spring", "stele", "abode", "mark", "machine", "hold", "boss"]
+const WIDE := ["spring", "stele", "abode", "mark", "machine", "hold", "boss", "mill", "sight"]
 ## the parts of a camp somebody can stand in: [metres east of its fire, metres south, how wide]
 const CAMP_PARTS := [[0.0, 0.0, 0.75], [1.3, 0.6, 0.5], [3.1, -0.45, 0.5], [3.7, -0.45, 0.5], [-3.25, -1.4, 0.45], [-3.25, 0.2, 0.45], [-3.3, -0.6, 0.2]]
 static var _things := {}

@@ -836,6 +836,8 @@ static func world_heights(wd: Dictionary, r: Rect2i, aux: Dictionary = {}) -> Pa
 	var rise_a := PackedFloat32Array()
 	if has_peaks:
 		rise_a.resize(out.size())
+	# (the Sea Floor release, terra.gd: what he has asked of the ground, set on the realm by whoever draws it)
+	var shaped: Dictionary = wd.get("shaped", {})
 	for j in r.size.y + 1:
 		for i in r.size.x + 1:
 			var cx := r.position.x + i
@@ -891,6 +893,11 @@ static func world_heights(wd: Dictionary, r: Rect2i, aux: Dictionary = {}) -> Pa
 					hv += pr
 					land_a[ii] = land + pr
 					rise_a[ii] = pr
+			if not shaped.is_empty():
+				var tr := Terra.rise(shaped, float(cx), float(cz))
+				if tr != 0.0:
+					hv += tr
+					land_a[ii] = land_a[ii] + tr
 			out[ii] = hv
 			if not ghm.is_empty():
 				ghm[cz * (W + 1) + cx] = hv

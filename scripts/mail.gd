@@ -317,6 +317,13 @@ const LETTERS := {
 		"lines": ["Lin Feng: I write for Shide, who cannot. He swept toward the west door this morning, which is the way you went, and then leaned the broom by it and left it there. He has not leaned that broom anywhere in forty years. The water is in all four beds. Nobody from below has come up to say so. He says that is how he knows."]},
 	"covenant_toll_wolf": {"from": "Gate-Captain Hu of Knifegate", "needs": ["the_covenant", "toll"], "wait": 1, "gift": {"stones": 700},
 		"lines": ["Lin Feng: forty ropes, forty slates. Nothing taken between any two of them since the new moon. The Banner-Lord has halved the toll on a cart with a child in it. He did not say why. Three riders left over it. The enclosed is your share. We do not say thank you. I am told to say that the share is not small."]},
+	# Part XLII (the Sea Floor release): what three towns under the sea did with a floor that could be asked
+	"joy_shape_hong": {"from": "Kiln-Master Hong of Redbranch", "needs": ["the_joy_of_fish", "shape"], "wait": 1, "gift": {"stones": 560},
+		"lines": ["Lin Feng: the coral has taken on all nine terraces. I burnt nothing on Tuesday. I had not had an idle noon since your river came, and I sat in the yard and did not know where to put my hands. The enclosed is from the town. My mother will not walk on the steps. She goes round. I thought you should know both things."]},
+	"joy_teach_jiao": {"from": "Loom-Mother Jiao Zhu of Shuttlereef", "needs": ["the_joy_of_fish", "teach"], "wait": 1, "gift": {"item": "mill_gauze", "n": 1},
+		"lines": ["Lin Feng: I raised a bank for the kelp today that was nearly where I meant it. Nearly. The children laughed, and then nine of them tried, and we have nine more things on the floor that nobody can name. I enclose an ell from my own loom. I have picked up the shuttle. You may tell the old man on the mountain that I underlined nothing this time."]},
+	"joy_leave_ao": {"from": "Old Ao of Lampdeep", "needs": ["the_joy_of_fish", "leave"], "wait": 1, "gift": {"stones": 480},
+		"lines": ["Lin Feng: the frog has let down eleven ropes into the Tail-Gate and is content. Hong has a red tip on the old arch and pretends he did it. Nobody did it. I have told travellers for nine hundred years how big the sea is, child, and you are the first who looked, and believed me, and took his hand out. The enclosed is from the lamp-trimmers. Do not come back and mend us."]},
 }
 const ORDER := ["ge_satchel", "wen_first", "wen_eaten", "wen_truth", "bandits_mend", "bandits_drive", "garden_study", "garden_burn", "egg_hatch", "egg_sell",
 	"palace_open", "palace_seal", "boon_rain", "boon_sea", "drawings_keep", "drawings_burn", "widow_truth", "widow_kind", "axe_give", "emperor", "yue_note", "ge_arks", "yue_write", "yue_say",
@@ -324,7 +331,7 @@ const ORDER := ["ge_satchel", "wen_first", "wen_eaten", "wen_truth", "bandits_me
 	"horse_keep", "horse_loose", "horse_breed",
 	"tally_burn", "tally_collect", "tally_shares", "door_all", "door_hearth", "door_sweep", "seat_found", "seat_take", "seat_serve",
 	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "mat_cut", "mat_whole", "mat_road", "tian_chimney", "verdict_sword", "verdict_bench", "verdict_field", "fowler_net", "lintel_grow", "lintel_stay", "lintel_each", "kuafu_home", "mirror_rivet", "mirror_recast", "mirror_halves", "bridge_girl", "needle_truth", "needle_finish", "needle_turn", "duke_arrows", "belts_wait", "belts_cry", "belts_lie", "bell_down", "stone_keep", "stone_cut", "stone_bury", "jade_cut", "wen_last", "ladle_bind", "ladle_teach", "ladle_ground", "qi_counts", "round_break", "round_watch", "round_leave", "cai_qin", "sky_gall", "sky_ditch", "sky_road",
-	"seal_open", "meng_needled", "han_praised", "yue_nu_door", "hui_wine", "hui_argue", "hui_drink", "seal_open_roll", "seal_strict_roll", "seal_blank_roll", "covenant_bind_reed", "covenant_dig_cold", "covenant_toll_wolf", "roads_one_court", "roads_two_court", "roads_ask_court"]
+	"seal_open", "meng_needled", "han_praised", "yue_nu_door", "hui_wine", "hui_argue", "hui_drink", "seal_open_roll", "seal_strict_roll", "seal_blank_roll", "covenant_bind_reed", "covenant_dig_cold", "covenant_toll_wolf", "joy_shape_hong", "joy_teach_jiao", "joy_leave_ao", "roads_one_court", "roads_two_court", "roads_ask_court"]
 
 ## The step a letter is written after: its own, or the step of the crossroads it answers.
 static func after_of(id: String) -> String:
@@ -552,9 +559,14 @@ static func read_answer(g, who: String) -> Array:
 ## What a parcel of everything he could leave at home weighs, and costs; and the sending of it.
 static func parcel_jin(g) -> float:
 	var w := 0.0
-	for id in Load.stowable(g):
+	for id in parcel_of(g):
 		w += Load.weight_of(str(id)) * float(Load.carried(g, str(id)))
 	return w
+
+## What goes in a parcel home: the goods of the land on his back (load.gd GOODS).  Not his food, and not what
+## a search of the story is looking for: those used to go with the rest, and he had to walk home for them.
+static func parcel_of(g) -> Array:
+	return Load.stowable(g).filter(func(id): return Load.GOODS.has(str(id)))
 
 static func parcel_cost(g) -> int:
 	return int(ceil(parcel_jin(g) * PARCEL_JIN))
@@ -572,7 +584,7 @@ static func send_home(g) -> float:
 		return 0.0
 	var w := parcel_jin(g)
 	g.stones -= parcel_cost(g)
-	for id in Load.stowable(g):
+	for id in parcel_of(g):
 		Load.stow(g, str(id))
 	g.parcels_sent = int(g.parcels_sent) + 1
 	g.note("Sent %d jin home by the post" % int(round(w)))

@@ -59,8 +59,12 @@ const TOWNS := {
 	"clearbell": {"n": "Clearbell", "area": "hanshan", "areas": ["hanshan"], "office": "hall_cold"},
 	"ashmarket": {"n": "Ashmarket", "area": "heishui", "areas": ["heishui"], "office": "hall_black"},
 	"knifegate": {"n": "Knifegate", "area": "langya", "areas": ["langya"], "office": "hall_wolf"},
+	# (the Sea Floor release: the three towns under the Eastern Sea; the Tail-Gate's news is Lampdeep's)
+	"shuttlereef": {"n": "Shuttlereef", "area": "jiaoshi", "areas": ["jiaoshi"], "office": "reeve_shuttlereef"},
+	"redbranch": {"n": "Redbranch", "area": "shanhu", "areas": ["shanhu"], "office": "reeve_redbranch"},
+	"lampdeep": {"n": "Lampdeep", "area": "beiming", "areas": ["beiming", "weilu"], "office": "reeve_lampdeep"},
 }
-const ORDER := ["sect", "cloudfoot", "qingshi", "yanggu", "shazhou", "longmen", "tushan", "featherfall", "tearwater", "youdu_city", "landfall", "lightfoot", "fourstreams", "reedhaven", "clearbell", "ashmarket", "knifegate"]
+const ORDER := ["sect", "cloudfoot", "qingshi", "yanggu", "shazhou", "longmen", "tushan", "featherfall", "tearwater", "youdu_city", "landfall", "lightfoot", "fourstreams", "reedhaven", "clearbell", "ashmarket", "knifegate", "shuttlereef", "redbranch", "lampdeep"]
 ## the towns the Rice Hearth keeps: where the home fire is
 const HOME_TOWNS := ["qingshi", "sect", "cloudfoot"]
 
@@ -111,6 +115,8 @@ const ACTS := {
 	# and went into his sleeve while somebody looked
 	# the Rivers and Lakes release (raids.gd): a raid on its roads or on the camp of its country, broken by his coming
 	"rescued": {"m": "peace", "per": 2, "max": 3, "why": "raids on its roads broken by his coming", "one": "One raid on its roads broken by his coming."},
+	# the Sea Floor release (mills.gd): a crate carried from one works to another that was waiting on it
+	"supplied": {"m": "plenty", "per": 2, "max": 3, "why": "crates carried between its works", "one": "One crate carried to its works."},
 	"restored": {"m": "regard", "per": 2, "max": 3, "why": "lost things carried to whose they were", "one": "One lost thing carried to whose it was."},
 	# the Higher Sky release (betters.gd): he was beaten by somebody above him, and the country heard
 	"bested": {"m": "peace", "per": -2, "max": 3, "why": "times he was beaten in its country by somebody above him", "one": "Once he was beaten in its country by somebody above him."},
@@ -212,11 +218,11 @@ static func towns(g) -> Array:
 	for tid in ORDER:
 		# (the Rivers and Lakes release: and a town down the river counts for nothing until the river-boat has
 		# set him down in its country)
-		if not (Arks.beyond(str(TOWNS[tid].area)) or Data.layer_of(str(TOWNS[tid].area)) == "lakes") or g.seen.has(str(TOWNS[tid].area)):
+		if not (Arks.beyond(str(TOWNS[tid].area)) or Data.layer_of(str(TOWNS[tid].area)) in ["lakes", "deeps"]) or g.seen.has(str(TOWNS[tid].area)):
 			out.append(tid)
 	return out
 
-const NUMBER_WORDS := ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen"]
+const NUMBER_WORDS := ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty", "twenty-one", "twenty-two"]
 
 ## Told when the story has moved (a crossroads answered, a lord put down): any town that has changed.
 static func poll(g) -> void:
@@ -620,6 +626,10 @@ const FATES := [
 	{"npc": "deserter_qi", "when": ["the_covenant", ["bind"]], "tag": "who rides for the league", "line": "I left the Banner, and now I ride the east road under four colours with a Reed boy and a Gate collector. We do not talk. We have not lost a cart. I think that may be what a league is."},
 	{"npc": "deserter_qi", "when": ["the_covenant", ["dig"]], "tag": "whom nobody has sent for", "line": "The water is back, and nobody needs a rider who left his banner. Nobody is hunting one either. I have a hut above the pass and a goat. I had not known a man could be let alone. It is large."},
 	{"npc": "deserter_qi", "when": ["the_covenant", ["toll"]], "tag": "who holds a rope for the Banner he left", "line": "I left the Banner because it had gone soft. Now it holds every road down here and I hold a rope for it at half pay, as a deserter should. The Banner-Lord nodded to me. Once. I am not over it."},
+	# Part XLII (the Sea Floor release)
+	{"npc": "gauze_girl", "when": ["the_joy_of_fish", ["shape"]], "tag": "who thinks a man made the sea", "line": "I asked who made the terraces and they said you. So I asked who made the rest and nobody would say. I think it was you as well and they are being polite. Was it a great deal of work?"},
+	{"npc": "gauze_girl", "when": ["the_joy_of_fish", ["teach"]], "tag": "who raised the smallest mound", "line": "Mine is the smallest. It is the size of a bun. The Loom-Mother says the small ones are the hardest, because you have to ask so quietly. I asked so quietly that I am not sure it heard, and then it did."},
+	{"npc": "gauze_girl", "when": ["the_joy_of_fish", ["leave"]], "tag": "who has not wept yet, and is in no hurry", "line": "They pegged a thread round a piece of nothing. I go and look at it. It is the same as everywhere else. I think that is the cleverest thing anybody here has ever made, and nobody made it."},
 	# Part XL (the Two Roads release)
 	{"npc": "disciple_han", "when": ["the_two_roads", ["one"]], "tag": "who was refused a second road", "line": "I signed, in the seniority column, and was refused with the rest. I had an answer ready for Mian if he gloated. He did not gloat. He brought me tea. It is very hard to be superior to that boy, and I have tried."},
 	{"npc": "disciple_han", "when": ["the_two_roads", ["two"]], "tag": "who has the Formations beside the Sword", "line": "I have the Formations beside the Sword, since the new moon. I am worse at the Sword than I was. I have told nobody. Everybody knows. Mian says it passes. Mian. Advising me. I listened, which is the worst of it."},

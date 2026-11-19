@@ -1942,6 +1942,12 @@ const CROSSROADS := {
 			"toll": [["Narrator", "Tuoba Lie looks at the scroll, and at Lin Feng, for a long breath. Then he nods, once, to the boy with the slate. By evening there is a rope across the road at Reedhaven, at the height of a man's chest. Lu Ting puts a bowl into the hands of the rider who holds it. He does not know what to do with it."]],
 		},
 		"echo": {
+			# (the Sea Floor release: what four sects did with the water is remembered when the water comes back brown)
+			"s_p42_home": {
+				"bind": [["Elder Qing Xuan", "The league has sent a rider about the silt, child, with a form. Four seals. It asks which gate is answerable for a river. I have written back that the river is. I do not expect that to be the end of it."]],
+				"dig": [["Elder Qing Xuan", "Four sects dug that cleft with you and went home. I thought of writing to them about the silt. Then I thought: they would only say that it is not on their floor. And they would be right, and it is on somebody's."]],
+				"toll": [["Elder Qing Xuan", "The Banner has put a rope across the river at the last gorge, I hear, and is pricing the flood. A boy with a slate. He has priced it at nothing, since nobody would pay. It is the one honest thing anybody has said about it."]],
+			},
 			"s_p41_end": {
 				"bind": [["Elder Qing Xuan", "They have sent me a copy of the Covenant, child, in a clerk's hand, with a request that Azure Cloud consider being the fifth gate. I am considering it. I have been considering it since breakfast. I may consider it for some years."]],
 				"dig": [["Elder Qing Xuan", "Four letters, and I shall tell you what is in them without opening one: nothing. A line each, to say the water is back and they will not be writing again. It is the most courteous thing four sects have ever done for me."]],
@@ -1952,6 +1958,37 @@ const CROSSROADS := {
 			"bind": "The Covenant of the Four Gates has held in the Rivers and Lakes for longer than any of its signers expected. Every road has a guard and every guard a superior. The Reeds count home more than forty now, of four colours. Old pipers say the marsh was quieter when nobody down there had any reason to speak to anybody.",
 			"dig": "In the Rivers and Lakes four sects answer for four towns, and have ignored one another, most peaceably, since the year the water came back. Once a year somebody climbs to the cleft on Cold Mountain with a spade, to see that it is clear. It is never the same sect twice. Nobody arranged that.",
 			"toll": "There is a rope across every road of the Rivers and Lakes, and a child with a slate, and nobody has been robbed between two ropes in living memory. It costs what it costs. The upright towns pay it and call it a tax. The Banner-Lord calls it a toll, and says the difference is that he says thank you with a guard.",
+		}},
+	# ---- Part XLII (the Sea Floor release): three towns under the sea, a Dao that moves the ground, and a clod that grows
+	"the_joy_of_fish": {"step": "s_p42_moot", "part": "XLII", "n": "You Are Not a Fish",
+		"ask": "The silt is going. He has a Dao by which the ground does as it is asked, and one clod of the Swelling Soil left. The Kiln-Master has drawn a better sea floor than the one they have: terraces, a deep bed, warm flats. The Loom-Mother says he is not a fish, and asks him anyway.",
+		"options": [
+			{"id": "shape", "label": "Shape it for them, to the drawing", "tilt": {"craft": 3, "reach": 1}, "creed": {"rule": 6}, "gain": {"renown": 6},
+				"desc": "Do it. He has stood on their floor and seen what the silt cost; the drawing is good, and he has the hands for it. Terraces for the coral out of the current, a deep cold bed for the kelp, warm flats for the pans. They will live better. They will live on a floor somebody else thought best (renown: +6).",
+				"log": "Shaped the floor of the Eastern Sea to the Kiln-Master's drawing: terraces, a deep bed and warm flats, in eleven days."},
+			{"id": "teach", "label": "Give her the clod, and teach her the asking", "tilt": {"heart": 3, "craft": -1}, "creed": {"virtue": 6}, "gain": {"stones": 9900},
+				"desc": "Put the clod in the Loom-Mother's hand and set her palm on the sand, as Old Ao set his. Let the people who live on the floor ask it what they like, badly at first. It will be lopsided for a generation. It will be theirs (spirit stones: +9900).",
+				"log": "Gave the last clod of the Swelling Soil to the Loom-Mother of Shuttlereef, and taught her how the ground is asked."},
+			{"id": "leave", "label": "Give the clod back to the Tail-Gate", "tilt": {"craft": -3, "reach": -2}, "creed": {"rule": -6}, "gain": {"stones": 12000},
+				"desc": "Walk back to the lip and let the last of Gun's earth go where the sea keeps what it is given. Nobody made this floor. The silt is passing; the coral will come back or it will not, in its own nine hundred years. He will not be the second man to improve it (spirit stones: +12000).",
+				"log": "Gave the last clod of the Swelling Soil back to the Tail-Gate, and left the floor of the sea as it lay."},
+		],
+		"after": {
+			"shape": [["Narrator", "It takes eleven days and the whole of the clod. Lin Feng walks the drawing with a plumb-line, as Yu did, and the floor goes up in steps behind him. Hong follows with the first nets. On the twelfth morning the Loom-Mother walks the terraces from end to end, and says they are very good, and does not say anything else."]],
+			"teach": [["Narrator", "The Loom-Mother puts her palm on the sand and nothing happens. She tries again. On the fourth day a mound comes up the size of a loaf, crooked, and every child in Shuttlereef is brought to see it. She is furious with it. She will not let anybody level it. By the end of the month there are forty, and no two are alike."]],
+			"leave": [["Narrator", "He carries it to the lip himself. It is heavier than it was. The frog comes with him, and holds the rope. When he opens his hand the clod does not fall: it goes, the way the silt went, to wherever the sea keeps things. Hong does not speak to him for two days. On the third he sends a float, without a note."]],
+		},
+		"echo": {
+			"s_p42_end": {
+				"shape": [["Elder Qing Xuan", "And under the underlining, child, a smaller hand: the terraces are very fine and the coral is taking, and my granddaughter asked today who made the sea. I did not know what to tell her. I had never needed to know before."]],
+				"teach": [["Elder Qing Xuan", "And under the underlining, a drawing. It is a mound. It is, I am fairly sure, the worst mound ever raised by anybody. She has signed it. I am going to have it framed and hung where the outer court can see what a first attempt looks like."]],
+				"leave": [["Elder Qing Xuan", "And under the underlining: the first red tip came back on the old arch this morning. Nobody did it. I thought you would want to be told that nobody did it. She is quite right. I did."]],
+			},
+		},
+		"end": {
+			"shape": "The floor of the Eastern Sea under Shuttlereef is terraced, bedded and drained, to a drawing, and three towns live better on it than they ever did. The children born since think the sea was made by a man from a mountain. Their grandmothers do not correct them, and do not quite forgive him.",
+			"teach": "On the floor of the Eastern Sea the Jiaoren ask the ground for what they want, with a clod that grows, and get it wrong about one time in three. The floor is the most lopsided in the world. They would not change a mound of it. It is said that Yu would have wept, and then asked to be shown how.",
+			"leave": "The floor of the Eastern Sea lies as it lay. The silt went down the Tail-Gate, and the coral came back red at the tips in its own time, or did not. Nobody there has a Dao for moving ground, and nobody misses one. They remember that a stranger had the sea in his hand once, and opened it.",
 		}},
 }
 const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawings", "nineteen", "ancestor", "widow", "crows", "axe", "cauldron_map", "furnace",
@@ -1965,7 +2002,7 @@ const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawin
 	"the_sack",
 	"the_knot",
 	"the_mat",
-	"the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round", "the_higher_sky", "the_red_seal", "the_two_roads", "the_covenant"]
+	"the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round", "the_higher_sky", "the_red_seal", "the_two_roads", "the_covenant", "the_joy_of_fish"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:
