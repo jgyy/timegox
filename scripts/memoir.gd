@@ -270,7 +270,7 @@ const PAGES := {
 	"p41_last": {"n": "Not Seen Off", "who": "lin", "after": "s_break46", "lines": [
 		"Nobody saw us off. Four sects, a month of my life, and the landing was empty when the boat pulled out. Yue Ling minded for a mile. I minded for about as long as it takes to say so.",
 		"I have wanted to be needed since I was six years old with a broom too tall for me. This month I was needed by everybody at once. It is like being the only dry stone in a ford. Everything stands on you, and nothing stays.",
-		"The water is back. They have forgotten me already; I could see them doing it from the boat. I think that is the best work I have done. I should not like to have to do it often."]},
+		"The water is back. They were forgetting me already, or trying to; I could see it from the boat. I think that is the best work I have done. I should not like to have to do it often."]},
 	"p38_last": {"n": "In My Own Hand", "who": "lin", "after": "s_break43", "lines": [
 		"These pages were her idea. She said a story told only from over somebody's shoulder is a story about a back. So here is the front of it.",
 		"I am Lin Feng. I swept steps. I was handed a root I did not earn and a companion I did not deserve, and I climbed until there was nobody above me, and then three people walked down a mountain and there was.",

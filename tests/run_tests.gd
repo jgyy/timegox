@@ -11432,6 +11432,7 @@ func _rivers_and_lakes() -> void:
 	check(FileAccess.get_file_as_string("res://scripts/menu.gd").contains("func _draw_sects(") and FileAccess.get_file_as_string("res://scripts/menu.gd").contains("\"The Sects\""), "Esc > The Sects is a page")
 
 	print("== raids on the roads and the camps (raids.gd) ==")
+	var wsrc0 := FileAccess.get_file_as_string("res://scripts/world.gd")
 	var RG = new_game.call()
 	RG.level = 135
 	RG.step = Data.step_index("s_p41_home") - 1
@@ -11497,6 +11498,20 @@ func _rivers_and_lakes() -> void:
 	check(RG.step_raids == 2 and RG.cur_step().id == "s_p41_carts", "two since the step began, and it wants three")
 	Raids.broke(RG, Raids.nearest(RG, "lakes", r0.tile))
 	check(RG.raids_broken == 3 and RG.cur_step().id != "s_p41_carts", "three since the step began: a step that asked for three is done")
+	# a step that asks for raids of one realm counts those, and no others
+	var LG41 = new_game.call()
+	LG41.level = 135
+	LG41.step = Data.step_index("s_p41_carts")
+	for a44 in Atlas.all_region_ids():
+		LG41.seen[a44] = true
+	var sr41: Array = Raids.on(LG41, "surface")
+	Raids.broke(LG41, sr41[0])
+	check(LG41.raids_broken == 1 and LG41.step_raids == 0, "a raid broken in the land is a raid broken, and is not one of the three of the Rivers and Lakes")
+	LG41.step = Data.step_index("s_p41_roads")
+	Raids.broke(LG41, sr41[1])
+	check(LG41.step_raids == 1, "a step that names no realm counts any")
+	LG41.free()
+	check(wsrc0.contains("float(Game.day) * Clock.DAY + float(Game.clock)"), "the day-vehicles are asked where they are by all the daylight there has been: the clock of the day wraps at midnight")
 	check(Weal.ACTS.has("rescued") and str(Weal.ACTS.rescued.m) == "peace" and int(Weal.ACTS.rescued.per) > 0, "the peace of a town is the better for it")
 	# the next watch: new raids, and nothing is held against him for the ones he was not at
 	var peace0 := 0

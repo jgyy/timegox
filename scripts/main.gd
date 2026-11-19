@@ -3272,7 +3272,9 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 				world.battle_mark(e2, false)
 				Game.defeated[e2.id] = Game.playtime
 				# (almanac.gd: a pack put down begins again from nothing; what fell is what it had grown to)
-				Almanac.put_down(Game, str(e2.id))
+				# (raiders are no pack of the land: nothing of them is kept to grow again)
+				if not ctx.has("raid"):
+					Almanac.put_down(Game, str(e2.id))
 				# (the Open Net release, wilds.gd: one of the land's own packs put down is felt by the country)
 				if Wilds.native(e2):
 					Wilds.culled(Game, str(e2.get("area", Game.area)))

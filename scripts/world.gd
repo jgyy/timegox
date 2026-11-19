@@ -2220,7 +2220,8 @@ func _traffic_tick(d: float) -> void:
 			_raid_block = Raids.blocked(Game, layer)
 			_raids_draw()
 		var here := Vector2(player.position.x - off.x, player.position.z - off.z) / TS
-		for it in Traffic.near(layer, here, TRAFFIC_SHOW, float(Game.clock), float(Game.playtime), _raid_block):
+		# (the clock of the day wraps at midnight: the day-vehicles go by all the daylight there has been)
+		for it in Traffic.near(layer, here, TRAFFIC_SHOW, float(Game.day) * Clock.DAY + float(Game.clock), float(Game.playtime), _raid_block):
 			var v: Dictionary = it.v
 			var w: Dictionary = it.w
 			var id := str(v.id)

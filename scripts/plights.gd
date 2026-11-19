@@ -163,7 +163,7 @@ static func act(g, p: Dictionary, id: String, what: String) -> Array:
 	if what == "good":
 		g.stones = int(g.stones) - cost(g, id)
 		if int(d.get("hours", 0)) > 0:
-			Clock.set_hour(g, minf(23.5, Clock.hour(g) + float(int(d.hours))))
+			Clock.set_hour(g, maxf(Clock.hour(g), minf(23.5, Clock.hour(g) + float(int(d.hours)))))
 		g.deeds_good = int(g.deeds_good) + 1
 		Weal.act(g, town, "kind")
 		g.note("A kindness: %s (%s)" % [str(pl.n).to_lower(), str(p.n)])

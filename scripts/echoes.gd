@@ -1569,14 +1569,14 @@ const CROSSROADS := {
 		"after": {
 			"open": [["Narrator", "The desk is carried down to the Cloud Gate and left there. The first to sit is Auntie Zhou of the kitchen, for the cleaver. She is asked to show the part that is not the knife, and she shows the registrar the bone she left in. Proven. By autumn there is a queue on the steps on the first of every month, and half of it has never held a sword."]],
 			"strict": [["Narrator", "It takes eleven days. He fails a hundred and sixty of them, each in one sentence, and writes the sentence down and gives it to them folded. The yard is very quiet for a week. Then, one by one, at hours nobody chose, they begin to be found in corners of it practising the single thing the sentence was about."]],
-			"blank": [["Narrator", "The leaves of the Roll are washed in the lotus pond and pegged along the east wall, two hundred and six of them, with the ink running down in grey threads. The registrar watches the whole of it. Then he asks for a leaf, and seals it blank, and puts it in his own sleeve, and goes down the steps without his box."]],
+			"blank": [["Narrator", "The leaves of the Roll are washed in the kitchen, bowl by bowl, and pegged along the east wall, two hundred and six of them, with the ink running down in grey threads. The registrar watches the whole of it. Then he asks for a leaf, and seals it blank, and puts it in his own sleeve, and goes down the steps without his box."]],
 		},
 		"echo": {
 			# (the Two Roads release: and when the outer court sits down on the steps with a pack of leaves)
 			"s_p40_home": {
 				"open": [["Elder Qing Xuan", "The registrar came up on the first of the month and found them at it. He asked whether leaves was a thing a person could do. Du said: come and lose. He sat. He has sealed Du in it. Proven. I am told it is the first paper Du has ever framed."]],
-				"strict": [["Elder Qing Xuan", "The eleven who failed still come to their posts at the hour nobody wants. I looked this morning. They were there. They had a pack. They were playing in complete silence, and one of them was reading his sentence between tricks."]],
-				"blank": [["Elder Qing Xuan", "They have painted a pack on the washed leaves of the Roll, child. Off my east wall. Two hundred and six blank sheets, and forty of them are now fire sevens. I asked who. Nobody has a paper to say who they are, so I could not be told."]],
+				"strict": [["Elder Qing Xuan", "Eleven of those who failed still come to their posts at the hour nobody wants. I looked this morning. They were there. They had a pack. They were playing in complete silence, and one of them was reading his sentence between tricks."]],
+				"blank": [["Elder Qing Xuan", "They have painted a pack on the washed leaves of the Roll, child. Off my east wall. Two hundred and six blank sheets, and forty of them are now a pack, fire seven and all. I asked who. Nobody has a paper to say who they are, so I could not be told."]],
 			},
 			"s_p39_end": {
 				"open": [["Elder Qing Xuan", "And I am to sit next month, child, behind a ferryman. For sweeping. I have asked what grade a man gets who has done the top ten steps badly for a season. The registrar said he would have to watch. I find I am practising."]],
@@ -1930,10 +1930,10 @@ const CROSSROADS := {
 				"desc": "Sign. They needed one another for a month and found that they could bear it; let that be kept, in writing, with every road guarded by all four in turn. The rock can be dug as well. The Rivers and Lakes will have a roll of oaths and somebody to answer for every mile (and nobody there will ever again be let alone).",
 				"log": "Signed the Covenant of the Four Gates at Reedhaven: one league, one roll of oaths, every road kept by all four in turn."},
 			{"id": "dig", "label": "Dig out the cleft, and sign nothing", "tilt": {"craft": -3, "heart": 2}, "creed": {"rule": -6}, "gain": {"stones": 9900},
-				"desc": "Put the scroll away. Take the four of them up the mountain with a spade each and dig out the cleft. When the water is in its beds again they will have no need of one another, and can go back to forgetting, which they were good at (spirit stones: what the four had pooled to pay a league's clerk, and now have no use for).",
+				"desc": "Put the scroll away. Take the four of them up the mountain with a spade each and dig out the cleft. When the water is in its beds again they will have no need of one another, and can go back to forgetting, which they were good at (spirit stones: what three of the four had pooled to pay a league's clerk, and now have no use for).",
 				"log": "Left the Covenant unsigned, and had the four sects dig out the springs of Cold Mountain with their own hands."},
 			{"id": "toll", "label": "One strong hand on every road", "tilt": {"heart": -3, "reach": 1}, "creed": {"virtue": -8}, "gain": {"stones": 14000},
-				"desc": "Give the roads to the Wolf Banner, all of them, for a toll, as it has kept the pass for nine generations. One hand, one price, and nobody robbed between the ropes. It will be safe, and it will be dear, and the upright towns will pay a crooked one for the privilege (spirit stones: the Banner pays at once for what it is given).",
+				"desc": "Give the roads to the Wolf Banner, all of them, for a toll, as it has kept the pass for nine generations. One hand, one price, and nobody robbed between the ropes. The rock can be dug as well. It will be safe, and it will be dear, and the upright towns will pay a crooked one for the privilege (spirit stones: the Banner pays at once for what it is given).",
 				"log": "Gave the roads of the Rivers and Lakes to the Wolf Banner to keep, for a toll at every rope."},
 		],
 		"after": {
@@ -1945,7 +1945,7 @@ const CROSSROADS := {
 			"s_p41_end": {
 				"bind": [["Elder Qing Xuan", "They have sent me a copy of the Covenant, child, in a clerk's hand, with a request that Azure Cloud consider being the fifth gate. I am considering it. I have been considering it since breakfast. I may consider it for some years."]],
 				"dig": [["Elder Qing Xuan", "Four letters, and I shall tell you what is in them without opening one: nothing. A line each, to say the water is back and they will not be writing again. It is the most courteous thing four sects have ever done for me."]],
-				"toll": [["Elder Qing Xuan", "There is a rope across the road at Longmen, I am told, at the height of a man's chest, and a boy with a slate. He priced Bao at four coppers. Bao has not spoken since. I do not say you were wrong, child. I say I shall go round by the fields."]],
+				"toll": [["Elder Qing Xuan", "There is a rope across the landing at Reedhaven, I am told, at the height of a man's chest, and a boy with a slate. He priced Bao's carter at four coppers. The carter has not spoken since. I do not say you were wrong, child. I say I shall go round by the fields."]],
 			},
 		},
 		"end": {

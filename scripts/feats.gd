@@ -153,8 +153,8 @@ const FEATS := {
 	"companion": {"n": "Two on the Road", "kind": "road", "pts": 5, "test": ["step", "s_yue"], "desc": "Wake the girl by the lotus pond."},
 	"sky_held": {"n": "The Sky Is Held", "kind": "road", "pts": 10, "test": ["step", "s_ch_hundun"], "desc": "End the Falling Sky."},
 	"tribulations": {"n": "Struck Twenty Times", "kind": "road", "pts": 10, "test": ["realm", 20], "desc": "Come through twenty Heavenly Tribulations."},
-	"far_traveller": {"n": "Thirty Countries", "kind": "road", "pts": 10, "test": ["seen", 30], "desc": "Set foot in thirty regions of the four realms."},
-	"every_country": {"n": "The Whole Map", "kind": "road", "pts": 20, "test": ["seen", 48], "desc": "Set foot in forty-eight regions of the four realms."},
+	"far_traveller": {"n": "Thirty Countries", "kind": "road", "pts": 10, "test": ["seen", 30], "desc": "Set foot in thirty regions of the realms."},
+	"every_country": {"n": "The Whole Map", "kind": "road", "pts": 20, "test": ["seen", 48], "desc": "Set foot in forty-eight regions of the realms."},
 	"crossroads": {"n": "Asked and Answered", "kind": "road", "pts": 10, "test": ["picks", 10], "desc": "Answer ten crossroads of the road."},
 	"calendar": {"n": "A Season on the Road", "kind": "road", "pts": 5, "test": ["day", 30], "desc": "See the thirtieth day of the journey."},
 	# ---- the sword

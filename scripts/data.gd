@@ -5635,7 +5635,7 @@ const STEPS := [
 	{"id": "s_p40_du", "kind": "cards", "of": "du_outer", "area": "sect", "t": "Hall Master Du confiscated the pack, and has not put it down since. Sit down with him at the table by Treasurer Bao's counter, and win a hand of the Round", "stones": 101200},
 	{"id": "s_p40_monkeys", "kind": "hunt", "area": "silk", "cave": -1, "n": 52, "of": ["furious_monkey", "counted_acorn", "morning_three"], "t": "The game came from a keeper of monkeys under the Mulberry Silk Woods, and his troop is furious about a count. Clear 52 packs of them from the cave", "stones": 101400},
 	{"id": "s_p40_acorns", "kind": "collect", "item": "keeper_acorn", "n": 4, "area": "silk", "cave": -1, "t": "Seven acorns a day, and four of today's have been thrown at the wall. Find the 4 Acorns of the Seven in the cave under the Mulberry Silk Woods", "stones": 101600},
-	{"id": "s_p40_keeper", "kind": "talk", "npc": "ju_gong", "area": "silk", "cave": -1, "t": "An old man is sitting just inside the cave mouth with seven acorns in his lap, waiting to be asked. Speak to Ju Gong, the keeper of monkeys", "stones": 101800},
+	{"id": "s_p40_keeper", "kind": "talk", "npc": "ju_gong", "area": "silk", "cave": -1, "t": "An old man is sitting just inside the cave mouth with three acorns in his lap, waiting to be asked. Speak to Ju Gong, the keeper of monkeys", "stones": 101800},
 	{"id": "s_p40_fury", "kind": "hunt", "area": "silk", "cave": -1, "n": 26, "of": ["counted_acorn", "morning_three"], "t": "\"The monkeys I can talk round. It is the count itself that has got loose.\" Clear 26 acorns counted twice and threes of the morning from the cave", "stones": 101900},
 	{"id": "s_p40_zhen", "kind": "cards", "of": "zhen_lantern", "area": "yanggu", "t": "The Dawn Market has played the Round by lantern since before it had a warden. Sit down with Auntie Zhen at Market-Warden Shu's counter in Yanggu, and win a hand", "stones": 102000},
 	{"id": "s_p40_hawkers", "kind": "folk", "role": "hawker", "town": "yanggu", "n": 2, "area": "yanggu", "t": "\"Somebody is selling packs that know more than their owners. Ask whoever walks every street.\" Ask 2 hawkers of Yanggu Market", "stones": 102200},
@@ -12344,7 +12344,7 @@ const DIALOGUE := {
 		["Yue Ling", "That is not what you did at the stele. You did not put a stone on each and stay where you were. You went. Slowly. But you went."],
 	],
 	"done:s_p40_minds": [
-		["Narrator", "The road not taken follows a little behind, the old hands say, and looks over the shoulder. Sixteen of them looked over Lin Feng's. They found him already walking the one they were, and had nothing to follow."],
+		["Narrator", "The road not taken follows a little behind, the old hands say, and looks over the shoulder. Twenty-six of them looked over Lin Feng's. They found him already walking the one they were, and had nothing to follow."],
 		["Lin Feng", "I had been afraid of that. The other road, behind me, for ever. I turned round and it was under my feet as well."],
 	],
 	"done:s_p40_rong": [

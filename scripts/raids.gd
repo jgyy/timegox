@@ -234,7 +234,10 @@ static func broke(g, raid: Dictionary, fled: bool = false) -> Array:
 			g.raid_done.erase(k)
 	g.raid_done[str(raid.key)] = true
 	g.raids_broken = int(g.raids_broken) + 1
-	g.step_raids = int(g.step_raids) + 1
+	# (a step that asks for raids of one realm counts those)
+	var want := str(g.cur_step().get("layer", ""))
+	if want == "" or Data.layer_of(str(raid.area)) == want:
+		g.step_raids = int(g.step_raids) + 1
 	if fled:
 		g.raids_fled = int(g.raids_fled) + 1
 	var n := gift(g) / (2 if fled else 1)
